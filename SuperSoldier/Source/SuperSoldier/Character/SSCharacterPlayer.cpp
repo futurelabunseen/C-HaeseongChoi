@@ -7,6 +7,7 @@
 #include "InputMappingContext.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 ASSCharacterPlayer::ASSCharacterPlayer()
 {
@@ -20,25 +21,34 @@ ASSCharacterPlayer::ASSCharacterPlayer()
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	FollowCamera->bUsePawnControlRotation = false;
 
+	bSprint = false;
+
 	static ConstructorHelpers::FObjectFinder<UInputMappingContext> InputMappingContextRef(
 		TEXT("/Game/SuperSoldier/Input/IMC_Normal.IMC_Normal"));
 	if (InputMappingContextRef.Object)
 	{
-		DefaultMappingContext = InputMappingContextRef.Object;
+		NormalInputMappingContext = InputMappingContextRef.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionShoulderMoveRef(
+	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionMoveRef(
 		TEXT("/Game/SuperSoldier/Input/Actions/IA_Move.IA_Move"));
-	if (InputActionShoulderMoveRef.Object)
+	if (InputActionMoveRef.Object)
 	{
-		MoveAction = InputActionShoulderMoveRef.Object;
+		MoveAction = InputActionMoveRef.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionShoulderLookRef(
+	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionLookRef(
 		TEXT("/Game/SuperSoldier/Input/Actions/IA_Look.IA_Look"));
-	if (InputActionShoulderLookRef.Object)
+	if (InputActionLookRef.Object)
 	{
-		LookAction = InputActionShoulderLookRef.Object;
+		LookAction = InputActionLookRef.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionSprintRef(
+		TEXT("/Game/SuperSoldier/Input/Actions/IA_Sprint.IA_Sprint"));
+	if (InputActionSprintRef.Object)
+	{
+		SprintAction = InputActionSprintRef.Object;
 	}
 }
 
@@ -49,6 +59,7 @@ void ASSCharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent);
 	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ASSCharacterPlayer::Move);
 	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ASSCharacterPlayer::Look);
+	EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Triggered, this, &ASSCharacterPlayer::Sprint);
 }
 
 void ASSCharacterPlayer::BeginPlay()
@@ -60,7 +71,7 @@ void ASSCharacterPlayer::BeginPlay()
 	if (UEnhancedInputLocalPlayerSubsystem* Subsystem =
 		ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 	{
-		Subsystem->AddMappingContext(DefaultMappingContext, 0);
+		Subsystem->AddMappingContext(NormalInputMappingContext, 0);
 	}
 }
 
@@ -84,4 +95,33 @@ void ASSCharacterPlayer::Look(const FInputActionValue& Value)
 
 	AddControllerYawInput(LookAxisVector.X);
 	AddControllerPitchInput(LookAxisVector.Y);
+}
+
+void ASSCharacterPlayer::Sprint(const FInputActionValue& Value)
+{
+	UE_LOG(LogTemp, Log, TEXT("Sprint"));
+
+	bSprint = Value.Get<bool>();
+
+	float TargetSpeed = bSprint ? 600.0f : 400.0f;
+	float CurrentSpeed = GetCharacterMovement()->MaxWalkSpeed;
+
+	float SpeedDiff = FMath::Abs(TargetSpeed - CurrentSpeed);
+
+	GetWorld()->GetTimerManager().SetTimer(SpeedChangeTimerHandle, this, &ASSCharacterPlayer::UpdateSpeed, 0.02f, true);
+}
+
+void ASSCharacterPlayer::UpdateSpeed()
+{
+	float TargetSpeed = bSprint ? 600.0f : 400.0f;
+	float CurrentSpeed = GetCharacterMovement()->MaxWalkSpeed;
+	const float SpeedChangeTimePerSecond = 20.0f;
+	float NewSpeed = FMath::FInterpTo(CurrentSpeed, TargetSpeed, GetWorld()->GetDeltaSeconds(), SpeedChangeTimePerSecond);
+
+	GetCharacterMovement()->MaxWalkSpeed = NewSpeed;
+
+	if (FMath::IsNearlyEqual(NewSpeed, TargetSpeed, 0.5f))
+	{
+		GetWorld()->GetTimerManager().ClearTimer(SpeedChangeTimerHandle);
+	}
 }

@@ -22,7 +22,7 @@ ASSCharacterBase::ASSCharacterBase()
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 500.0f, 0.0f);
 	GetCharacterMovement()->JumpZVelocity = 0.0f;
 	GetCharacterMovement()->AirControl = 0.0f;
-	GetCharacterMovement()->MaxWalkSpeed = 500.0f;
+	GetCharacterMovement()->MaxWalkSpeed = 400.0f;
 	GetCharacterMovement()->MinAnalogWalkSpeed = 20.0f;
 	GetCharacterMovement()->BrakingDecelerationWalking = 2000.0f;
 
@@ -32,14 +32,14 @@ ASSCharacterBase::ASSCharacterBase()
 	GetMesh()->SetCollisionProfileName(TEXT("NoCollision"));
 
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> CharacterMeshRef(
-		TEXT("/Game/SuperSoldier/Characters/Meshes/Wraith.Wraith"));
+		TEXT("/Game/SuperSoldier/Characters/SpaceSoldier/Mesh/SK_SpaceSoldier.SK_SpaceSoldier"));
 	if (CharacterMeshRef.Object)
 	{
 		GetMesh()->SetSkeletalMesh(CharacterMeshRef.Object);
 	} 
 
 	static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstanceClassRef(
-		TEXT("/Game/ParagonWraith/Characters/Heroes/Wraith/Wraith_AnimBlueprint.Wraith_AnimBlueprint_C"));
+		TEXT("/Game/SuperSoldier/Characters/SpaceSoldier/Animations/ABP_SpaceSoldier.ABP_SpaceSoldier_C"));
 	if (AnimInstanceClassRef.Class)
 	{
 		GetMesh()->SetAnimInstanceClass(AnimInstanceClassRef.Class);

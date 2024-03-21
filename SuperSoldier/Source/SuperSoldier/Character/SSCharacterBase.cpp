@@ -32,7 +32,7 @@ ASSCharacterBase::ASSCharacterBase()
 	GetMesh()->SetCollisionProfileName(TEXT("NoCollision"));
 
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> CharacterMeshRef(
-		TEXT("/Game/ParagonWraith/Characters/Heroes/Wraith/Meshes/Wraith.Wraith"));
+		TEXT("/Game/SuperSoldier/Characters/Meshes/Wraith.Wraith"));
 	if (CharacterMeshRef.Object)
 	{
 		GetMesh()->SetSkeletalMesh(CharacterMeshRef.Object);

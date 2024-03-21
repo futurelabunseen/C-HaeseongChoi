@@ -2,7 +2,7 @@
 
 
 #include "Core/SSGameMode.h"
-#include "Player/SSPlayerController.h"
+#include "Core/SSPlayerController.h"
 
 ASSGameMode::ASSGameMode()
 {

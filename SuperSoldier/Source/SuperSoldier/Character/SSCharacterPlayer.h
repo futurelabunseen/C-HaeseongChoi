@@ -64,4 +64,14 @@ protected:
 	TObjectPtr<class UInputAction> AimAction;
 
 	void Aim(const FInputActionValue& Value);
+
+// Fire Section
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
+	TObjectPtr<class UAnimMontage> FireActionMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction> FireAction;
+
+	void Fire(const FInputActionValue& Value);
 };

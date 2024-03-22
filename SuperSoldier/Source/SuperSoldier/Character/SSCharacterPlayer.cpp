@@ -58,6 +58,20 @@ ASSCharacterPlayer::ASSCharacterPlayer()
 	{
 		AimAction = InputActionAimRef.Object;
 	}
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> FireActionAimRef(
+		TEXT("/Game/SuperSoldier/Input/Actions/IA_Fire.IA_Fire"));
+	if (FireActionAimRef.Object)
+	{
+		FireAction = FireActionAimRef.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> FireActionMontageRef(
+		TEXT("/Game/SuperSoldier/Characters/SpaceSoldier/Animations/AM_SoldierAction.AM_SoldierAction"));
+	if (FireActionMontageRef.Object)
+	{
+		FireActionMontage = FireActionMontageRef.Object;
+	}
 }
 
 void ASSCharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -69,6 +83,7 @@ void ASSCharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ASSCharacterPlayer::Look);
 	EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Triggered, this, &ASSCharacterPlayer::Sprint);
 	EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Triggered, this, &ASSCharacterPlayer::Aim);
+	EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &ASSCharacterPlayer::Fire);
 }
 
 void ASSCharacterPlayer::BeginPlay()
@@ -144,21 +159,19 @@ void ASSCharacterPlayer::Aim(const FInputActionValue& Value)
 
 	if (bAiming)
 	{
-		UE_LOG(LogTemp, Log, TEXT("Aiming"));
 		CameraBoom->TargetArmLength = 120.0f;
 		CameraBoom->SetRelativeLocation(FVector(0.0f, 50.0f, 70.0f));
 
 		GetCharacterMovement()->MaxWalkSpeed = 400.0f;
 
 		// Pawn
-		bUseControllerRotationYaw = false;
+		bUseControllerRotationYaw = true;
 
 		// Movement
 		GetCharacterMovement()->bOrientRotationToMovement = false;
 	}
 	else
 	{
-		UE_LOG(LogTemp, Log, TEXT("Release Aim"));
 		CameraBoom->TargetArmLength = 400.0f;
 		CameraBoom->SetRelativeLocation(FVector(0.0f, 50.0f, 0.0f));
 
@@ -175,4 +188,14 @@ void ASSCharacterPlayer::Aim(const FInputActionValue& Value)
 	}
 
 	// 카메라 위치 변화 필요
+}
+
+void ASSCharacterPlayer::Fire(const FInputActionValue& Value)
+{
+	UE_LOG(LogTemp, Log, TEXT("Fire"));
+
+	// Animation Setting
+	const float AnimationSpeedRate = 1.0f;
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	AnimInstance->Montage_Play(FireActionMontage, AnimationSpeedRate);
 }

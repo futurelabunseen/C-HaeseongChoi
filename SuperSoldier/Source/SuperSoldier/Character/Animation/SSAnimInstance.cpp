@@ -21,6 +21,21 @@ void USSAnimInstance::NativeInitializeAnimation()
 	}
 }
 
+void USSAnimInstance::SetAimRotation(float DeltaSeconds)
+{
+	FRotator ControlRotation = Owner->GetControlRotation();
+	FRotator ActorRotation = Owner->GetActorRotation();
+	FRotator DeltaRotation = ControlRotation - ActorRotation;
+	DeltaRotation.Normalize();
+
+	FRotator CurRotator = FRotator(AimPitch, AimYaw, 0.0f);
+
+	FRotator ResultRotator = FMath::RInterpTo(CurRotator, DeltaRotation, DeltaSeconds, 15.0f);
+
+	AimPitch = FMath::ClampAngle(ResultRotator.Pitch, -90.0f, 90.0f);
+	AimYaw = FMath::ClampAngle(ResultRotator.Yaw, -90.0f, 90.0f);
+}
+
 void USSAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
 	Super::NativeUpdateAnimation(DeltaSeconds);
@@ -30,5 +45,6 @@ void USSAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		Velocity = Movement->Velocity;
 		GroundSpeed = Velocity.Size2D();
 		bIsIdle = GroundSpeed < MovingThreashould;
+		SetAimRotation(DeltaSeconds);
 	}
 }

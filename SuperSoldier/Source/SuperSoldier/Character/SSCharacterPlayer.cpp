@@ -14,7 +14,8 @@ ASSCharacterPlayer::ASSCharacterPlayer()
 	// Camera
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
-	CameraBoom->TargetArmLength = 400.0f;
+	CameraBoom->TargetArmLength = 500.0f;
+	CameraBoom->SetRelativeLocation(FVector(0.0f, 50.0f, 0.0f));
 	CameraBoom->bUsePawnControlRotation = true;
 
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
@@ -50,6 +51,13 @@ ASSCharacterPlayer::ASSCharacterPlayer()
 	{
 		SprintAction = InputActionSprintRef.Object;
 	}
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionAimRef(
+		TEXT("/Game/SuperSoldier/Input/Actions/IA_Aim.IA_Aim"));
+	if (InputActionAimRef.Object)
+	{
+		AimAction = InputActionAimRef.Object;
+	}
 }
 
 void ASSCharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -60,6 +68,7 @@ void ASSCharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ASSCharacterPlayer::Move);
 	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ASSCharacterPlayer::Look);
 	EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Triggered, this, &ASSCharacterPlayer::Sprint);
+	EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Triggered, this, &ASSCharacterPlayer::Aim);
 }
 
 void ASSCharacterPlayer::BeginPlay()
@@ -99,29 +108,71 @@ void ASSCharacterPlayer::Look(const FInputActionValue& Value)
 
 void ASSCharacterPlayer::Sprint(const FInputActionValue& Value)
 {
-	UE_LOG(LogTemp, Log, TEXT("Sprint"));
-
 	bSprint = Value.Get<bool>();
 
-	float TargetSpeed = bSprint ? 600.0f : 400.0f;
-	float CurrentSpeed = GetCharacterMovement()->MaxWalkSpeed;
+	if (bAiming)
+	{
+		return;
+	}
 
-	float SpeedDiff = FMath::Abs(TargetSpeed - CurrentSpeed);
-
-	GetWorld()->GetTimerManager().SetTimer(SpeedChangeTimerHandle, this, &ASSCharacterPlayer::UpdateSpeed, 0.02f, true);
+	GetWorld()->GetTimerManager().SetTimer(SpeedChangeTimerHandle, this,
+		&ASSCharacterPlayer::UpdateMaxWalkSpeed, 0.02f, true);
 }
 
-void ASSCharacterPlayer::UpdateSpeed()
+void ASSCharacterPlayer::UpdateMaxWalkSpeed()
 {
 	float TargetSpeed = bSprint ? 600.0f : 400.0f;
 	float CurrentSpeed = GetCharacterMovement()->MaxWalkSpeed;
-	const float SpeedChangeTimePerSecond = 20.0f;
-	float NewSpeed = FMath::FInterpTo(CurrentSpeed, TargetSpeed, GetWorld()->GetDeltaSeconds(), SpeedChangeTimePerSecond);
+	const float SpeedChangeTimePerSecond = 15.0f;
+
+	// 현재 최대 이동속도와 캐릭터가 가져야할 최대 이동속도를 보간하는 코드
+	float NewSpeed = FMath::FInterpTo(CurrentSpeed, TargetSpeed, 
+		GetWorld()->GetDeltaSeconds(), SpeedChangeTimePerSecond);
 
 	GetCharacterMovement()->MaxWalkSpeed = NewSpeed;
 
+	// 만약 오차범위 0.5f 미만으로 같다면 타이머를 종료
 	if (FMath::IsNearlyEqual(NewSpeed, TargetSpeed, 0.5f))
 	{
 		GetWorld()->GetTimerManager().ClearTimer(SpeedChangeTimerHandle);
 	}
+}
+
+void ASSCharacterPlayer::Aim(const FInputActionValue& Value)
+{
+	bAiming = Value.Get<bool>();
+
+	if (bAiming)
+	{
+		UE_LOG(LogTemp, Log, TEXT("Aiming"));
+		CameraBoom->TargetArmLength = 120.0f;
+		CameraBoom->SetRelativeLocation(FVector(0.0f, 50.0f, 70.0f));
+
+		GetCharacterMovement()->MaxWalkSpeed = 400.0f;
+
+		// Pawn
+		bUseControllerRotationYaw = false;
+
+		// Movement
+		GetCharacterMovement()->bOrientRotationToMovement = false;
+	}
+	else
+	{
+		UE_LOG(LogTemp, Log, TEXT("Release Aim"));
+		CameraBoom->TargetArmLength = 400.0f;
+		CameraBoom->SetRelativeLocation(FVector(0.0f, 50.0f, 0.0f));
+
+		if (bSprint)
+		{
+			GetWorld()->GetTimerManager().SetTimer(SpeedChangeTimerHandle, this,
+				&ASSCharacterPlayer::UpdateMaxWalkSpeed, 0.02f, true);
+		}
+
+		bUseControllerRotationYaw = false;
+
+		// Movement
+		GetCharacterMovement()->bOrientRotationToMovement = true;
+	}
+
+	// 카메라 위치 변화 필요
 }

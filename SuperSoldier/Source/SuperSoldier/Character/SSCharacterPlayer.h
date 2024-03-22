@@ -54,5 +54,14 @@ protected:
 	TObjectPtr<class UInputAction> SprintAction;
 
 	void Sprint(const FInputActionValue& Value);
-	void UpdateSpeed();
+	void UpdateMaxWalkSpeed();
+
+// Aim Section
+protected:
+	bool bAiming;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction> AimAction;
+
+	void Aim(const FInputActionValue& Value);
 };

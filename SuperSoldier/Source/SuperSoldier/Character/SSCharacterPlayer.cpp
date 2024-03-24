@@ -12,6 +12,7 @@
 #include "Blueprint/UserWidget.h"
 #include "Character/SSCharacterControlData.h"
 #include "Physics/SSColision.h"
+#include "Engine/DamageEvents.h"
 
 ASSCharacterPlayer::ASSCharacterPlayer()
 {
@@ -291,6 +292,9 @@ void ASSCharacterPlayer::AttackHitCheck()
 
 	if (HitDetected)
 	{
+		FDamageEvent DamageEvent;
+		const float AttackDamage = 30.0f;
+		HitResult.GetActor()->TakeDamage(AttackDamage, DamageEvent, GetController(), this);
 	}
 
 #if ENABLE_DRAW_DEBUG

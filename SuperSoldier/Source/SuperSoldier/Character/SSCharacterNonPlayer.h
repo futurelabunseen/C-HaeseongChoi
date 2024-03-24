@@ -13,5 +13,9 @@ UCLASS()
 class SUPERSOLDIER_API ASSCharacterNonPlayer : public ASSCharacterBase
 {
 	GENERATED_BODY()
+public:
+	ASSCharacterNonPlayer();
 	
+protected:
+	virtual void SetDead() override;
 };

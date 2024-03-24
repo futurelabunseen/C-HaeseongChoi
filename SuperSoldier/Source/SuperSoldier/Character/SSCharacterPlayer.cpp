@@ -60,11 +60,11 @@ ASSCharacterPlayer::ASSCharacterPlayer()
 		AimAction = InputActionAimRef.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UAnimMontage> UpperBodyMontageRef(
-		TEXT("/Game/SuperSoldier/Characters/SpaceSoldier/Animations/AM_SoldierAction.AM_SoldierAction"));
-	if (UpperBodyMontageRef.Object)
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> FireMontageRef(
+		TEXT("/Game/SuperSoldier/Characters/Murdock/Animations/AM_Fire.AM_Fire"));
+	if (FireMontageRef.Object)
 	{
-		UpperBodyMontage = UpperBodyMontageRef.Object;
+		FireMontage = FireMontageRef.Object;
 	}
 
 	static ConstructorHelpers::FObjectFinder<UInputAction> FireActionRef(
@@ -72,6 +72,13 @@ ASSCharacterPlayer::ASSCharacterPlayer()
 	if (FireActionRef.Object)
 	{
 		FireAction = FireActionRef.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> ThrowMontageRef(
+		TEXT("/Game/SuperSoldier/Characters/Murdock/Animations/AM_Throw.AM_Throw"));
+	if (ThrowMontageRef.Object)
+	{
+		ThrowMontage = ThrowMontageRef.Object;
 	}
 
 	static ConstructorHelpers::FObjectFinder<UInputAction> ThrowActionRef(
@@ -172,7 +179,7 @@ void ASSCharacterPlayer::Aim(const FInputActionValue& Value)
 	{
 		CameraBoom->TargetArmLength = 120.0f;
 		CameraBoom->SetRelativeLocation(FVector(0.0f, 50.0f, 70.0f));
-		
+
 		bUseControllerRotationYaw = true;
 		GetCharacterMovement()->bOrientRotationToMovement = false;
 		GetCharacterMovement()->MaxWalkSpeed = 400.0f;
@@ -204,41 +211,40 @@ void ASSCharacterPlayer::Aim(const FInputActionValue& Value)
 
 void ASSCharacterPlayer::Fire(const FInputActionValue& Value)
 {
-	bFiring = true;
-	GetCharacterMovement()->MaxWalkSpeed = 400.0f;
+	if (bAiming)
+	{
+		bFiring = true;
 
-	const float AnimationSpeedRate = 1.0f;
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	AnimInstance->Montage_Play(UpperBodyMontage, AnimationSpeedRate);
-	
-	// 몽타주가 종료가 될 때 함수가 호출되게 선언
-	FOnMontageEnded EndDelegate;
-	EndDelegate.BindUObject(this, &ASSCharacterPlayer::EndFire);
-	AnimInstance->Montage_SetEndDelegate(EndDelegate, UpperBodyMontage);
+		const float AnimationSpeedRate = 1.0f;
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		AnimInstance->Montage_Play(FireMontage, AnimationSpeedRate);
+
+		// 몽타주가 종료가 될 때 함수가 호출되게 선언
+		FOnMontageEnded EndDelegate;
+		EndDelegate.BindUObject(this, &ASSCharacterPlayer::EndFire);
+		AnimInstance->Montage_SetEndDelegate(EndDelegate, FireMontage);
+	}
 }
 
 void ASSCharacterPlayer::EndFire(UAnimMontage* TargetMontage, bool IsProperlyEnded)
 {
 	bFiring = false;
-	if (!bAiming && bSprint)
-	{
-		GetCharacterMovement()->MaxWalkSpeed = 600.0f;
-	}
 }
 
 void ASSCharacterPlayer::Throw(const FInputActionValue& Value)
 {
 	bThrowing = true;
 
+	GetCharacterMovement()->MaxWalkSpeed = 400.0f;
+
 	const float AnimationSpeedRate = 1.25f;
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	AnimInstance->Montage_Play(UpperBodyMontage, AnimationSpeedRate);
-	AnimInstance->Montage_JumpToSection(TEXT("Throw"), UpperBodyMontage);
+	AnimInstance->Montage_Play(ThrowMontage, AnimationSpeedRate);
 	
 	// 몽타주가 종료가 될 때 함수가 호출되게 선언
 	FOnMontageEnded EndDelegate;
 	EndDelegate.BindUObject(this, &ASSCharacterPlayer::EndThrow);
-	AnimInstance->Montage_SetEndDelegate(EndDelegate, UpperBodyMontage);
+	AnimInstance->Montage_SetEndDelegate(EndDelegate, ThrowMontage);
 }
 
 void ASSCharacterPlayer::EndThrow(UAnimMontage* TargetMontage, bool IsProperlyEnded)

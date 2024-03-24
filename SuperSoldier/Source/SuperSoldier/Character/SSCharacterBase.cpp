@@ -30,14 +30,14 @@ ASSCharacterBase::ASSCharacterBase()
 	GetMesh()->SetCollisionProfileName(TEXT("NoCollision"));
 
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> CharacterMeshRef(
-		TEXT("/Game/SuperSoldier/Characters/SpaceSoldier/Mesh/SK_SpaceSoldier.SK_SpaceSoldier"));
+		TEXT("/Game/ParagonMurdock/Characters/Heroes/Murdock/Skins/A_Executioner/Mesh/Murdock_Executioner.Murdock_Executioner"));
 	if (CharacterMeshRef.Object)
 	{
 		GetMesh()->SetSkeletalMesh(CharacterMeshRef.Object);
 	} 
 
 	static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstanceClassRef(
-		TEXT("/Game/SuperSoldier/Characters/SpaceSoldier/Animations/ABP_SpaceSoldier.ABP_SpaceSoldier_C"));
+		TEXT("/Game/SuperSoldier/Characters/Murdock/Animations/ABP_MurdockPlayer.ABP_MurdockPlayer_C"));
 	if (AnimInstanceClassRef.Class)
 	{
 		GetMesh()->SetAnimInstanceClass(AnimInstanceClassRef.Class);

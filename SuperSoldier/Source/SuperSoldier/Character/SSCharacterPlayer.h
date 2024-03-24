@@ -90,4 +90,8 @@ protected:
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Widget, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UUserWidget> CrosshairWidget;
+
+// Attack Hit Section
+protected:
+	virtual void AttackHitCheck() override;
 };

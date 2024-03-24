@@ -10,6 +10,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "Character/SSCharacterControlData.h"
+#include "Physics/SSColision.h"
 
 ASSCharacterPlayer::ASSCharacterPlayer()
 {
@@ -248,4 +249,28 @@ void ASSCharacterPlayer::EndThrow(UAnimMontage* TargetMontage, bool IsProperlyEn
 	{
 		GetCharacterMovement()->MaxWalkSpeed = 600.0f;
 	}
+}
+
+void ASSCharacterPlayer::AttackHitCheck()
+{
+	FVector CameraLocation;
+	FRotator CameraRotation;
+	GetController()->GetPlayerViewPoint(CameraLocation, CameraRotation);
+
+	FVector TraceStart = CameraLocation;
+	FVector TraceEnd = TraceStart + CameraRotation.Vector() * 5000.0f;
+
+	FHitResult HitResult;
+	FCollisionQueryParams TraceParams(FName(TEXT("Attack")), false, this);
+
+	bool HitDetected = GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, CCHANNEL_SSACTION, TraceParams);
+
+	if (HitDetected)
+	{
+	}
+
+#if ENABLE_DRAW_DEBUG
+	FColor DrawColor = HitDetected ? FColor::Green : FColor::Red;
+	DrawDebugLine(GetWorld(), TraceStart, TraceEnd, DrawColor, false, 5.0f);
+#endif
 }

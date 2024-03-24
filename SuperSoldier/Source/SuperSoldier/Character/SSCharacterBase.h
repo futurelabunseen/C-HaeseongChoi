@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Interface/SSAnimationAttackInterface.h"
 #include "SSCharacterBase.generated.h"
 
 UENUM()
@@ -14,15 +15,20 @@ enum class ECharacterControlType : uint8
 };
 
 UCLASS()
-class SUPERSOLDIER_API ASSCharacterBase : public ACharacter
+class SUPERSOLDIER_API ASSCharacterBase : public ACharacter, public ISSAnimationAttackInterface
 {
 	GENERATED_BODY()
 
 public:
 	ASSCharacterBase();
 
+// CharacterControl Section
 protected:
 	virtual void SetCharacterControlData(const class USSCharacterControlData* CharacterControlData);
-
+	
 	TMap<ECharacterControlType, class USSCharacterControlData*> CharacterControlManager;
+
+// Attack Hit Section
+protected:
+	virtual void AttackHitCheck() override;
 };

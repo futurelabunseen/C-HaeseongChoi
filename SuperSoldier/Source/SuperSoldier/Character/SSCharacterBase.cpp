@@ -5,6 +5,7 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Character/SSCharacterControlData.h"
+#include "Physics/SSColision.h"
 
 // Sets default values
 ASSCharacterBase::ASSCharacterBase()
@@ -16,7 +17,7 @@ ASSCharacterBase::ASSCharacterBase()
 
 	// Capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
-	GetCapsuleComponent()->SetCollisionProfileName(TEXT("Pawn"));
+	GetCapsuleComponent()->SetCollisionProfileName(CPROFILE_SSCAPSULE);
 
 	// Movement
 	GetCharacterMovement()->bOrientRotationToMovement = true;
@@ -65,6 +66,11 @@ void ASSCharacterBase::SetCharacterControlData(const USSCharacterControlData* Ch
 	
 	GetCharacterMovement()->bOrientRotationToMovement = CharacterControlData->bOrientRotationToMovement;
 	GetCharacterMovement()->MaxWalkSpeed = CharacterControlData->MaxWalkSpeed;
+}
+
+void ASSCharacterBase::AttackHitCheck()
+{
+	UE_LOG(LogTemp, Log, TEXT("ASSCharacterBase::AttackHitCheck"));
 }
 
 

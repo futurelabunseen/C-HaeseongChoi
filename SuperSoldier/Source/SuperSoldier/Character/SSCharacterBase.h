@@ -22,12 +22,6 @@ class SUPERSOLDIER_API ASSCharacterBase : public ACharacter, public ISSAnimation
 public:
 	ASSCharacterBase();
 
-// CharacterControl Section
-protected:
-	virtual void SetCharacterControlData(const class USSCharacterControlData* CharacterControlData);
-	
-	TMap<ECharacterControlType, class USSCharacterControlData*> CharacterControlManager;
-
 // Attack Hit Section
 protected:
 	virtual void AttackHitCheck() override;

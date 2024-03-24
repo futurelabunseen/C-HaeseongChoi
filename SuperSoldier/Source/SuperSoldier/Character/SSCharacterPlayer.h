@@ -20,8 +20,12 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
 protected:
+	// CharacterControl Section
+	virtual void SetCharacterControlData(const class USSCharacterControlData* CharacterControlData);
+
+	TMap<ECharacterControlType, class USSCharacterControlData*> CharacterControlManager;
+protected:
 	virtual void BeginPlay() override;
-	virtual void SetCharacterControlData(const class USSCharacterControlData* CharacterControlData) override;
 
 // Camera Section
 protected:

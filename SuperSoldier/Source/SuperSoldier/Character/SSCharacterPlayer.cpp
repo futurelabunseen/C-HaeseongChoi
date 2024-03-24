@@ -2,6 +2,7 @@
 
 
 #include "Character/SSCharacterPlayer.h"
+#include "Components/CapsuleComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "InputMappingContext.h"
@@ -14,6 +15,21 @@
 
 ASSCharacterPlayer::ASSCharacterPlayer()
 {
+	// Pawn
+	bUseControllerRotationPitch = false;
+	bUseControllerRotationYaw = false;
+	bUseControllerRotationRoll = false;
+
+	// Capsule
+	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
+
+	// Movement
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+	GetCharacterMovement()->RotationRate = FRotator(0.0f, 350.0f, 0.0f);
+	GetCharacterMovement()->MaxWalkSpeed = 400.0f;
+	GetCharacterMovement()->MinAnalogWalkSpeed = 20.0f;
+	GetCharacterMovement()->BrakingDecelerationWalking = 2000.0f;
+
 	// Camera
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
@@ -26,7 +42,10 @@ ASSCharacterPlayer::ASSCharacterPlayer()
 	FollowCamera->bUsePawnControlRotation = false;
 
 	bSprint = false;
+	bAiming = false;
+	bThrowing = false;
 
+	// Input Action & Input Mapping Context
 	static ConstructorHelpers::FObjectFinder<UInputMappingContext> InputMappingContextRef(
 		TEXT("/Game/SuperSoldier/Input/IMC_Normal.IMC_Normal"));
 	if (InputMappingContextRef.Object)
@@ -62,13 +81,7 @@ ASSCharacterPlayer::ASSCharacterPlayer()
 		AimAction = InputActionAimRef.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UAnimMontage> FireMontageRef(
-		TEXT("/Game/SuperSoldier/Characters/Murdock/Animations/AM_Fire.AM_Fire"));
-	if (FireMontageRef.Object)
-	{
-		FireMontage = FireMontageRef.Object;
-	}
-
+	// Fire Input Action
 	static ConstructorHelpers::FObjectFinder<UInputAction> FireActionRef(
 		TEXT("/Game/SuperSoldier/Input/Actions/IA_Fire.IA_Fire"));
 	if (FireActionRef.Object)
@@ -76,13 +89,7 @@ ASSCharacterPlayer::ASSCharacterPlayer()
 		FireAction = FireActionRef.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UAnimMontage> ThrowMontageRef(
-		TEXT("/Game/SuperSoldier/Characters/Murdock/Animations/AM_Throw.AM_Throw"));
-	if (ThrowMontageRef.Object)
-	{
-		ThrowMontage = ThrowMontageRef.Object;
-	}
-
+	// Throw Throw Action
 	static ConstructorHelpers::FObjectFinder<UInputAction> ThrowActionRef(
 		TEXT("/Game/SuperSoldier/Input/Actions/IA_Grenade.IA_Grenade"));
 	if (ThrowActionRef.Object)
@@ -90,12 +97,28 @@ ASSCharacterPlayer::ASSCharacterPlayer()
 		ThrowAction = ThrowActionRef.Object;
 	}
 
+	// Widget (maybe Transfer to somewhere)
 	static ConstructorHelpers::FClassFinder<UUserWidget> CrosshairWidgetRef(
 		TEXT("/Game/SuperSoldier/UI/HUD.HUD_C"));
 
 	if (CrosshairWidgetRef.Class)
 	{
 		CrosshairWidget = CreateWidget<UUserWidget>(GetWorld(), CrosshairWidgetRef.Class);
+	}
+
+	// Character Control Data
+	static ConstructorHelpers::FObjectFinder<USSCharacterControlData> NormalModeRef(
+		TEXT("/Game/SuperSoldier/Characters/CharacterControl/DA_NormalMode.DA_NormalMode"));
+	if (NormalModeRef.Object)
+	{
+		CharacterControlManager.Add(ECharacterControlType::Normal, NormalModeRef.Object);
+	}
+
+	static ConstructorHelpers::FObjectFinder<USSCharacterControlData> AimModeRef(
+		TEXT("/Game/SuperSoldier/Characters/CharacterControl/DA_AimMode.DA_AimMode"));
+	if (AimModeRef.Object)
+	{
+		CharacterControlManager.Add(ECharacterControlType::Aiming, AimModeRef.Object);
 	}
 }
 
@@ -133,7 +156,10 @@ void ASSCharacterPlayer::BeginPlay()
 
 void ASSCharacterPlayer::SetCharacterControlData(const USSCharacterControlData* CharacterControlData)
 {
-	Super::SetCharacterControlData(CharacterControlData);
+	bUseControllerRotationYaw = CharacterControlData->bUseControllerRotationYaw;
+
+	GetCharacterMovement()->bOrientRotationToMovement = CharacterControlData->bOrientRotationToMovement;
+	GetCharacterMovement()->MaxWalkSpeed = CharacterControlData->MaxWalkSpeed;
 
 	CharacterControlData->bCrosshairVisibility ? 
 		CrosshairWidget->SetVisibility(ESlateVisibility::Visible) : 
@@ -214,7 +240,6 @@ void ASSCharacterPlayer::Fire(const FInputActionValue& Value)
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 		AnimInstance->Montage_Play(FireMontage, AnimationSpeedRate);
 
-		// 몽타주가 종료가 될 때 함수가 호출되게 선언
 		FOnMontageEnded EndDelegate;
 		EndDelegate.BindUObject(this, &ASSCharacterPlayer::EndFire);
 		AnimInstance->Montage_SetEndDelegate(EndDelegate, FireMontage);
@@ -236,7 +261,6 @@ void ASSCharacterPlayer::Throw(const FInputActionValue& Value)
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	AnimInstance->Montage_Play(ThrowMontage, AnimationSpeedRate);
 	
-	// 몽타주가 종료가 될 때 함수가 호출되게 선언
 	FOnMontageEnded EndDelegate;
 	EndDelegate.BindUObject(this, &ASSCharacterPlayer::EndThrow);
 	AnimInstance->Montage_SetEndDelegate(EndDelegate, ThrowMontage);

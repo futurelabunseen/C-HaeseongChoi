@@ -8,6 +8,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Blueprint/UserWidget.h"
 
 ASSCharacterPlayer::ASSCharacterPlayer()
 {
@@ -59,18 +60,33 @@ ASSCharacterPlayer::ASSCharacterPlayer()
 		AimAction = InputActionAimRef.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UInputAction> FireActionAimRef(
-		TEXT("/Game/SuperSoldier/Input/Actions/IA_Fire.IA_Fire"));
-	if (FireActionAimRef.Object)
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> UpperBodyMontageRef(
+		TEXT("/Game/SuperSoldier/Characters/SpaceSoldier/Animations/AM_SoldierAction.AM_SoldierAction"));
+	if (UpperBodyMontageRef.Object)
 	{
-		FireAction = FireActionAimRef.Object;
+		UpperBodyMontage = UpperBodyMontageRef.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UAnimMontage> FireActionMontageRef(
-		TEXT("/Game/SuperSoldier/Characters/SpaceSoldier/Animations/AM_SoldierAction.AM_SoldierAction"));
-	if (FireActionMontageRef.Object)
+	static ConstructorHelpers::FObjectFinder<UInputAction> FireActionRef(
+		TEXT("/Game/SuperSoldier/Input/Actions/IA_Fire.IA_Fire"));
+	if (FireActionRef.Object)
 	{
-		FireActionMontage = FireActionMontageRef.Object;
+		FireAction = FireActionRef.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> ThrowActionRef(
+		TEXT("/Game/SuperSoldier/Input/Actions/IA_Grenade.IA_Grenade"));
+	if (ThrowActionRef.Object)
+	{
+		ThrowAction = ThrowActionRef.Object;
+	}
+
+	static ConstructorHelpers::FClassFinder<UUserWidget> CrosshairWidgetRef(
+		TEXT("/Game/SuperSoldier/UI/HUD.HUD_C"));
+
+	if (CrosshairWidgetRef.Class)
+	{
+		CrosshairWidget = CreateWidget<UUserWidget>(GetWorld(), CrosshairWidgetRef.Class);
 	}
 }
 
@@ -84,6 +100,7 @@ void ASSCharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Triggered, this, &ASSCharacterPlayer::Sprint);
 	EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Triggered, this, &ASSCharacterPlayer::Aim);
 	EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &ASSCharacterPlayer::Fire);
+	EnhancedInputComponent->BindAction(ThrowAction, ETriggerEvent::Triggered, this, &ASSCharacterPlayer::Throw);
 }
 
 void ASSCharacterPlayer::BeginPlay()
@@ -96,6 +113,12 @@ void ASSCharacterPlayer::BeginPlay()
 		ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 	{
 		Subsystem->AddMappingContext(NormalInputMappingContext, 0);
+	}
+
+	if (CrosshairWidget)
+	{
+		CrosshairWidget->AddToViewport();
+		CrosshairWidget->SetVisibility(ESlateVisibility::Hidden);
 	}
 }
 
@@ -125,31 +148,19 @@ void ASSCharacterPlayer::Sprint(const FInputActionValue& Value)
 {
 	bSprint = Value.Get<bool>();
 
-	if (bAiming)
+	// 총을 쏘거나 움직이고 있으면 달리기 불가능
+	if (bFiring || bAiming)
 	{
 		return;
 	}
 
-	GetWorld()->GetTimerManager().SetTimer(SpeedChangeTimerHandle, this,
-		&ASSCharacterPlayer::UpdateMaxWalkSpeed, 0.02f, true);
-}
-
-void ASSCharacterPlayer::UpdateMaxWalkSpeed()
-{
-	float TargetSpeed = bSprint ? 600.0f : 400.0f;
-	float CurrentSpeed = GetCharacterMovement()->MaxWalkSpeed;
-	const float SpeedChangeTimePerSecond = 15.0f;
-
-	// 현재 최대 이동속도와 캐릭터가 가져야할 최대 이동속도를 보간하는 코드
-	float NewSpeed = FMath::FInterpTo(CurrentSpeed, TargetSpeed, 
-		GetWorld()->GetDeltaSeconds(), SpeedChangeTimePerSecond);
-
-	GetCharacterMovement()->MaxWalkSpeed = NewSpeed;
-
-	// 만약 오차범위 0.5f 미만으로 같다면 타이머를 종료
-	if (FMath::IsNearlyEqual(NewSpeed, TargetSpeed, 0.5f))
+	if (bSprint)
 	{
-		GetWorld()->GetTimerManager().ClearTimer(SpeedChangeTimerHandle);
+		GetCharacterMovement()->MaxWalkSpeed = 600.0f;
+	}
+	else
+	{
+		GetCharacterMovement()->MaxWalkSpeed = 400.0f;
 	}
 }
 
@@ -161,41 +172,80 @@ void ASSCharacterPlayer::Aim(const FInputActionValue& Value)
 	{
 		CameraBoom->TargetArmLength = 120.0f;
 		CameraBoom->SetRelativeLocation(FVector(0.0f, 50.0f, 70.0f));
-
+		
+		bUseControllerRotationYaw = true;
+		GetCharacterMovement()->bOrientRotationToMovement = false;
 		GetCharacterMovement()->MaxWalkSpeed = 400.0f;
 
-		// Pawn
-		bUseControllerRotationYaw = true;
-
-		// Movement
-		GetCharacterMovement()->bOrientRotationToMovement = false;
+		if (CrosshairWidget)
+		{
+			CrosshairWidget->SetVisibility(ESlateVisibility::Visible);
+		}
 	}
 	else
 	{
 		CameraBoom->TargetArmLength = 400.0f;
-		CameraBoom->SetRelativeLocation(FVector(0.0f, 50.0f, 0.0f));
+		CameraBoom->SetRelativeLocation(FVector(0.0f, 60.0f, 0.0f));
 
 		if (bSprint)
 		{
-			GetWorld()->GetTimerManager().SetTimer(SpeedChangeTimerHandle, this,
-				&ASSCharacterPlayer::UpdateMaxWalkSpeed, 0.02f, true);
+			GetCharacterMovement()->MaxWalkSpeed = 600.0f;
 		}
 
 		bUseControllerRotationYaw = false;
-
-		// Movement
 		GetCharacterMovement()->bOrientRotationToMovement = true;
-	}
 
-	// 카메라 위치 변화 필요
+		if (CrosshairWidget)
+		{
+			CrosshairWidget->SetVisibility(ESlateVisibility::Hidden);
+		}
+	}
 }
 
 void ASSCharacterPlayer::Fire(const FInputActionValue& Value)
 {
-	UE_LOG(LogTemp, Log, TEXT("Fire"));
+	bFiring = true;
+	GetCharacterMovement()->MaxWalkSpeed = 400.0f;
 
-	// Animation Setting
 	const float AnimationSpeedRate = 1.0f;
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	AnimInstance->Montage_Play(FireActionMontage, AnimationSpeedRate);
+	AnimInstance->Montage_Play(UpperBodyMontage, AnimationSpeedRate);
+	
+	// 몽타주가 종료가 될 때 함수가 호출되게 선언
+	FOnMontageEnded EndDelegate;
+	EndDelegate.BindUObject(this, &ASSCharacterPlayer::EndFire);
+	AnimInstance->Montage_SetEndDelegate(EndDelegate, UpperBodyMontage);
+}
+
+void ASSCharacterPlayer::EndFire(UAnimMontage* TargetMontage, bool IsProperlyEnded)
+{
+	bFiring = false;
+	if (!bAiming && bSprint)
+	{
+		GetCharacterMovement()->MaxWalkSpeed = 600.0f;
+	}
+}
+
+void ASSCharacterPlayer::Throw(const FInputActionValue& Value)
+{
+	bThrowing = true;
+
+	const float AnimationSpeedRate = 1.25f;
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	AnimInstance->Montage_Play(UpperBodyMontage, AnimationSpeedRate);
+	AnimInstance->Montage_JumpToSection(TEXT("Throw"), UpperBodyMontage);
+	
+	// 몽타주가 종료가 될 때 함수가 호출되게 선언
+	FOnMontageEnded EndDelegate;
+	EndDelegate.BindUObject(this, &ASSCharacterPlayer::EndThrow);
+	AnimInstance->Montage_SetEndDelegate(EndDelegate, UpperBodyMontage);
+}
+
+void ASSCharacterPlayer::EndThrow(UAnimMontage* TargetMontage, bool IsProperlyEnded)
+{
+	bThrowing = false;
+	if (!bAiming && bSprint)
+	{
+		GetCharacterMovement()->MaxWalkSpeed = 600.0f;
+	}
 }

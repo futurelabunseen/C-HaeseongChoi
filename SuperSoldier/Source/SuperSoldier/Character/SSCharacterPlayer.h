@@ -18,7 +18,7 @@ public:
 	ASSCharacterPlayer();
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
+	
 protected:
 	virtual void BeginPlay() override;
 
@@ -48,14 +48,11 @@ protected:
 // Sprint Section
 protected:
 	bool bSprint;
-	FTimerHandle SpeedChangeTimerHandle;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> SprintAction;
 
 	void Sprint(const FInputActionValue& Value);
-	void UpdateMaxWalkSpeed();
-
 // Aim Section
 protected:
 	bool bAiming;
@@ -65,13 +62,28 @@ protected:
 
 	void Aim(const FInputActionValue& Value);
 
-// Fire Section
+// Fire & Throw Section
 protected:
+	bool bFiring;
+	bool bThrowing;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
-	TObjectPtr<class UAnimMontage> FireActionMontage;
+	TObjectPtr<class UAnimMontage> UpperBodyMontage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> FireAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction> ThrowAction;
+
 	void Fire(const FInputActionValue& Value);
+	void EndFire(UAnimMontage* TargetMontage, bool IsProperlyEnded);
+
+	void Throw(const FInputActionValue& Value);
+	void EndThrow(UAnimMontage* TargetMontage, bool IsProperlyEnded);
+
+// Crosshair Section
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Widget, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UUserWidget> CrosshairWidget;
 };

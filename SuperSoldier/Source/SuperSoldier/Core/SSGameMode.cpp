@@ -3,6 +3,7 @@
 
 #include "Core/SSGameMode.h"
 #include "Core/SSPlayerController.h"
+#include "GameFramework/HUD.h"
 
 ASSGameMode::ASSGameMode()
 {

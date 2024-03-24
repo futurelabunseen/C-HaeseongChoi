@@ -21,6 +21,7 @@ public:
 	
 protected:
 	virtual void BeginPlay() override;
+	virtual void SetCharacterControlData(const class USSCharacterControlData* CharacterControlData) override;
 
 // Camera Section
 protected:

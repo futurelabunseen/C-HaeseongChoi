@@ -4,6 +4,7 @@
 #include "Character/SSCharacterBase.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Character/SSCharacterControlData.h"
 
 // Sets default values
 ASSCharacterBase::ASSCharacterBase()
@@ -42,6 +43,28 @@ ASSCharacterBase::ASSCharacterBase()
 	{
 		GetMesh()->SetAnimInstanceClass(AnimInstanceClassRef.Class);
 	}
+
+	static ConstructorHelpers::FObjectFinder<USSCharacterControlData> NormalModeRef(
+		TEXT("/Game/SuperSoldier/Characters/CharacterControl/DA_NormalMode.DA_NormalMode"));
+	if (NormalModeRef.Object)
+	{
+		CharacterControlManager.Add(ECharacterControlType::Normal, NormalModeRef.Object);
+	}
+
+	static ConstructorHelpers::FObjectFinder<USSCharacterControlData> AimModeRef(
+		TEXT("/Game/SuperSoldier/Characters/CharacterControl/DA_AimMode.DA_AimMode"));
+	if (AimModeRef.Object)
+	{
+		CharacterControlManager.Add(ECharacterControlType::Aiming, AimModeRef.Object);
+	}
+}
+
+void ASSCharacterBase::SetCharacterControlData(const USSCharacterControlData* CharacterControlData)
+{
+	bUseControllerRotationYaw = CharacterControlData->bUseControllerRotationYaw;
+	
+	GetCharacterMovement()->bOrientRotationToMovement = CharacterControlData->bOrientRotationToMovement;
+	GetCharacterMovement()->MaxWalkSpeed = CharacterControlData->MaxWalkSpeed;
 }
 
 

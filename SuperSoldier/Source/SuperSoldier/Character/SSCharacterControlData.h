@@ -4,17 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
-#include "ABCharacterControlData.generated.h"
+#include "SSCharacterControlData.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class SUPERSOLDIER_API UABCharacterControlData : public UPrimaryDataAsset
+class SUPERSOLDIER_API USSCharacterControlData : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
 public:
-	UABCharacterControlData();
+	USSCharacterControlData();
 
 	UPROPERTY(EditAnywhere, Category = Pawn)
 	uint32 bUseControllerRotationYaw : 1;
@@ -22,9 +22,15 @@ public:
 	UPROPERTY(EditAnywhere, Category = CharacterMovement)
 	uint32 bOrientRotationToMovement : 1;
 
+	UPROPERTY(EditAnywhere, Category = CharacterMovement)
+	float MaxWalkSpeed;
+
 	UPROPERTY(EditAnywhere, Category = SpringArm)
 	float TargetArmLength;
 
 	UPROPERTY(EditAnywhere, Category = SpringArm)
 	FVector RelativeLocation;
+
+	UPROPERTY(EditAnywhere, Category = Widget)
+	uint32 bCrosshairVisibility : 1;
 };

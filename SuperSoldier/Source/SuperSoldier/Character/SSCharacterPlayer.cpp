@@ -9,6 +9,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Blueprint/UserWidget.h"
+#include "Character/SSCharacterControlData.h"
 
 ASSCharacterPlayer::ASSCharacterPlayer()
 {
@@ -129,6 +130,18 @@ void ASSCharacterPlayer::BeginPlay()
 	}
 }
 
+void ASSCharacterPlayer::SetCharacterControlData(const USSCharacterControlData* CharacterControlData)
+{
+	Super::SetCharacterControlData(CharacterControlData);
+
+	CharacterControlData->bCrosshairVisibility ? 
+		CrosshairWidget->SetVisibility(ESlateVisibility::Visible) : 
+		CrosshairWidget->SetVisibility(ESlateVisibility::Hidden);
+	
+	CameraBoom->TargetArmLength = CharacterControlData->TargetArmLength;
+	CameraBoom->SetRelativeLocation(CharacterControlData->RelativeLocation);
+}
+
 void ASSCharacterPlayer::Move(const FInputActionValue& Value)
 {
 	FVector2D MovementVector = Value.Get<FVector2D>();
@@ -177,34 +190,15 @@ void ASSCharacterPlayer::Aim(const FInputActionValue& Value)
 
 	if (bAiming)
 	{
-		CameraBoom->TargetArmLength = 120.0f;
-		CameraBoom->SetRelativeLocation(FVector(0.0f, 50.0f, 70.0f));
-
-		bUseControllerRotationYaw = true;
-		GetCharacterMovement()->bOrientRotationToMovement = false;
-		GetCharacterMovement()->MaxWalkSpeed = 400.0f;
-
-		if (CrosshairWidget)
-		{
-			CrosshairWidget->SetVisibility(ESlateVisibility::Visible);
-		}
+		SetCharacterControlData(*CharacterControlManager.Find(ECharacterControlType::Aiming));
 	}
 	else
 	{
-		CameraBoom->TargetArmLength = 400.0f;
-		CameraBoom->SetRelativeLocation(FVector(0.0f, 60.0f, 0.0f));
+		SetCharacterControlData(*CharacterControlManager.Find(ECharacterControlType::Normal));
 
-		if (bSprint)
+		if (!bSprint)
 		{
-			GetCharacterMovement()->MaxWalkSpeed = 600.0f;
-		}
-
-		bUseControllerRotationYaw = false;
-		GetCharacterMovement()->bOrientRotationToMovement = true;
-
-		if (CrosshairWidget)
-		{
-			CrosshairWidget->SetVisibility(ESlateVisibility::Hidden);
+			GetCharacterMovement()->MaxWalkSpeed = 400.0f;
 		}
 	}
 }

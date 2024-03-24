@@ -6,6 +6,13 @@
 #include "GameFramework/Character.h"
 #include "SSCharacterBase.generated.h"
 
+UENUM()
+enum class ECharacterControlType : uint8
+{
+	Normal,
+	Aiming
+};
+
 UCLASS()
 class SUPERSOLDIER_API ASSCharacterBase : public ACharacter
 {
@@ -13,4 +20,9 @@ class SUPERSOLDIER_API ASSCharacterBase : public ACharacter
 
 public:
 	ASSCharacterBase();
+
+protected:
+	virtual void SetCharacterControlData(const class USSCharacterControlData* CharacterControlData);
+
+	TMap<ECharacterControlType, class USSCharacterControlData*> CharacterControlManager;
 };

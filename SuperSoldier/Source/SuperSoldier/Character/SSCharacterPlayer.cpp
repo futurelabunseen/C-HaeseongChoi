@@ -201,19 +201,24 @@ void ASSCharacterPlayer::Look(const FInputActionValue& Value)
 	AddControllerPitchInput(LookAxisVector.Y);
 }
 
+bool ASSCharacterPlayer::AttemptSprint()
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (!AnimInstance->IsAnyMontagePlaying())
+	{
+		GetCharacterMovement()->MaxWalkSpeed = 600.0f;
+		return true;
+	}
+	return false;
+}
+
 void ASSCharacterPlayer::Sprint(const FInputActionValue& Value)
 {
 	bSprint = Value.Get<bool>();
 
-	// 총을 쏘거나 움직이고 있으면 달리기 불가능
-	if (bFiring || bAiming)
-	{
-		return;
-	}
-
 	if (bSprint)
 	{
-		GetCharacterMovement()->MaxWalkSpeed = 600.0f;
+		AttemptSprint();
 	}
 	else
 	{
@@ -233,21 +238,26 @@ void ASSCharacterPlayer::Aim(const FInputActionValue& Value)
 	{
 		SetCharacterControlData(*CharacterControlManager.Find(ECharacterControlType::Normal));
 
-		if (!bSprint)
+		if (bSprint)
 		{
-			GetCharacterMovement()->MaxWalkSpeed = 400.0f;
+			AttemptSprint();
 		}
 	}
 }
 
 void ASSCharacterPlayer::Fire(const FInputActionValue& Value)
 {
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance->IsAnyMontagePlaying())
+	{
+		return;
+	}
+
 	if (bAiming)
 	{
 		bFiring = true;
 
 		const float AnimationSpeedRate = 1.0f;
-		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 		AnimInstance->Montage_Play(FireMontage, AnimationSpeedRate);
 
 		FOnMontageEnded EndDelegate;
@@ -263,12 +273,17 @@ void ASSCharacterPlayer::EndFire(UAnimMontage* TargetMontage, bool IsProperlyEnd
 
 void ASSCharacterPlayer::Throw(const FInputActionValue& Value)
 {
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance->IsAnyMontagePlaying())
+	{
+		return;
+	}
+
 	bThrowing = true;
 
 	GetCharacterMovement()->MaxWalkSpeed = 400.0f;
 
 	const float AnimationSpeedRate = 1.25f;
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	AnimInstance->Montage_Play(ThrowMontage, AnimationSpeedRate);
 	
 	FOnMontageEnded EndDelegate;
@@ -279,9 +294,9 @@ void ASSCharacterPlayer::Throw(const FInputActionValue& Value)
 void ASSCharacterPlayer::EndThrow(UAnimMontage* TargetMontage, bool IsProperlyEnded)
 {
 	bThrowing = false;
-	if (!bAiming && bSprint)
+	if (bSprint)
 	{
-		GetCharacterMovement()->MaxWalkSpeed = 600.0f;
+		AttemptSprint();
 	}
 }
 
@@ -303,9 +318,9 @@ void ASSCharacterPlayer::Call(const FInputActionValue& Value)
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 		AnimInstance->Montage_JumpToSection(TEXT("End"), CallMontage);
 
-		if (!bAiming && bSprint)
+		if (bSprint)
 		{
-			GetCharacterMovement()->MaxWalkSpeed = 600.0f;
+			AttemptSprint();
 		}
 	}
 }

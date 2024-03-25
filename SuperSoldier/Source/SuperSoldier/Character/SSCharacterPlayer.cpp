@@ -334,19 +334,19 @@ void ASSCharacterPlayer::Call(const FInputActionValue& Value)
 	}
 }
 
-void ASSCharacterPlayer::ProcessCommandInput(const FInputActionValue& Value)
+const EStrataCommand ASSCharacterPlayer::TranslateCommand(const FVector2D& InputValue)
 {
-	FVector2D InputValue = Value.Get<FVector2D>();
+	EStrataCommand InputCommand = EStrataCommand::NONE;
 
 	if (InputValue.X)
 	{
 		if (InputValue.X > 0)
 		{
-			UE_LOG(LogTemp, Log, TEXT("Command: Right"));
+			InputCommand = EStrataCommand::RIGHT;
 		}
 		else
 		{
-			UE_LOG(LogTemp, Log, TEXT("Command: Left"));
+			InputCommand = EStrataCommand::LEFT;
 		}
 	}
 
@@ -354,13 +354,27 @@ void ASSCharacterPlayer::ProcessCommandInput(const FInputActionValue& Value)
 	{
 		if (InputValue.Y > 0)
 		{
-			UE_LOG(LogTemp, Log, TEXT("Command: Up"));
+			InputCommand = EStrataCommand::UP;
 		}
 		else
 		{
-			UE_LOG(LogTemp, Log, TEXT("Command: Down"));
+			InputCommand = EStrataCommand::DOWN;
 		}
 	}
+
+	return InputCommand;
+}
+
+void ASSCharacterPlayer::ProcessCommandInput(const FInputActionValue& Value)
+{
+	FVector2D InputValue = Value.Get<FVector2D>();
+	const EStrataCommand StrataCommand = TranslateCommand(InputValue);
+	
+	UEnum* EnumPtr = FindObject<UEnum>(ANY_PACKAGE, TEXT("EStrataCommand"), true);
+	check(EnumPtr);
+
+	FString CommandString = EnumPtr->GetDisplayNameTextByValue(static_cast<uint32>(StrataCommand)).ToString();
+	UE_LOG(LogTemp, Log, TEXT("%s"), *CommandString)
 }
 
 void ASSCharacterPlayer::AttackHitCheck()

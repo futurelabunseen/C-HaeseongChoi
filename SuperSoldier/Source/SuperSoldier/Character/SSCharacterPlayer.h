@@ -7,6 +7,15 @@
 #include "InputActionValue.h"
 #include "SSCharacterPlayer.generated.h"
 
+UENUM()
+enum class EStrataCommand : uint32
+{
+	NONE = 0 UMETA(DisplayName = "Command None"),
+	UP UMETA(DisplayName = "Command Up"),
+	DOWN UMETA(DisplayName = "Command Down"),
+	LEFT UMETA(DisplayName = "Command Left"),
+	RIGHT UMETA(DisplayName = "Command Right"),
+};
 /**
  * 
  */
@@ -104,6 +113,8 @@ protected:
 	TObjectPtr<class UInputAction> CommandAction;
 
 	void Call(const FInputActionValue& Value);
+
+	const EStrataCommand TranslateCommand(const FVector2D& InputValue);
 	void ProcessCommandInput(const FInputActionValue& Value);
 // Crosshair Section
 protected:

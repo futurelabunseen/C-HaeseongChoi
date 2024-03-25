@@ -106,6 +106,14 @@ ASSCharacterPlayer::ASSCharacterPlayer()
 		CallAction = CallActionRef.Object;
 	}
 
+	// Strata Command Action
+	static ConstructorHelpers::FObjectFinder<UInputAction> CommandActionRef(
+		TEXT("/Game/SuperSoldier/Input/Actions/IA_Command.IA_Command"));
+	if (CommandActionRef.Object)
+	{
+		CommandAction = CommandActionRef.Object;
+	}
+
 	// Widget (maybe Transfer to somewhere)
 	static ConstructorHelpers::FClassFinder<UUserWidget> CrosshairWidgetRef(
 		TEXT("/Game/SuperSoldier/UI/HUD.HUD_C"));
@@ -143,6 +151,7 @@ void ASSCharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &ASSCharacterPlayer::Fire);
 	EnhancedInputComponent->BindAction(ThrowAction, ETriggerEvent::Triggered, this, &ASSCharacterPlayer::Throw);
 	EnhancedInputComponent->BindAction(CallAction, ETriggerEvent::Triggered, this, &ASSCharacterPlayer::Call);
+	EnhancedInputComponent->BindAction(CommandAction, ETriggerEvent::Triggered, this, &ASSCharacterPlayer::ProcessCommandInput);
 }
 
 void ASSCharacterPlayer::BeginPlay()
@@ -321,6 +330,35 @@ void ASSCharacterPlayer::Call(const FInputActionValue& Value)
 		if (bSprint)
 		{
 			AttemptSprint();
+		}
+	}
+}
+
+void ASSCharacterPlayer::ProcessCommandInput(const FInputActionValue& Value)
+{
+	FVector2D InputValue = Value.Get<FVector2D>();
+
+	if (InputValue.X)
+	{
+		if (InputValue.X > 0)
+		{
+			UE_LOG(LogTemp, Log, TEXT("Command: Right"));
+		}
+		else
+		{
+			UE_LOG(LogTemp, Log, TEXT("Command: Left"));
+		}
+	}
+
+	else
+	{
+		if (InputValue.Y > 0)
+		{
+			UE_LOG(LogTemp, Log, TEXT("Command: Up"));
+		}
+		else
+		{
+			UE_LOG(LogTemp, Log, TEXT("Command: Down"));
 		}
 	}
 }

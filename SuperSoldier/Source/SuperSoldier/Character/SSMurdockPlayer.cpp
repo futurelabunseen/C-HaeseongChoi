@@ -37,4 +37,12 @@ ASSMurdockPlayer::ASSMurdockPlayer()
 	{
 		ThrowMontage = ThrowMontageRef.Object;
 	}
+
+	// Call Montage
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> CallMontageRef(
+		TEXT("/Game/SuperSoldier/Characters/Murdock/Animations/AM_Call.AM_Call"));
+	if (CallMontageRef.Object)
+	{
+		CallMontage = CallMontageRef.Object;
+	}
 }

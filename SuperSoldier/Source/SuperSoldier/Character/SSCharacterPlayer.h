@@ -89,7 +89,17 @@ protected:
 
 	void Throw(const FInputActionValue& Value);
 	void EndThrow(UAnimMontage* TargetMontage, bool IsProperlyEnded);
+// Strata Section
+protected:
+	bool bCalling;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
+	TObjectPtr<class UAnimMontage> CallMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction> CallAction;
+
+	void Call(const FInputActionValue& Value);
 // Crosshair Section
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Widget, Meta = (AllowPrivateAccess = "true"))
@@ -98,4 +108,5 @@ protected:
 // Attack Hit Section
 protected:
 	virtual void AttackHitCheck() override;
+
 };

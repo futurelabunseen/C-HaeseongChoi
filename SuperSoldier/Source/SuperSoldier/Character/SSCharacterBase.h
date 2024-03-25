@@ -41,5 +41,5 @@ protected:
 	FTimerHandle DissolveTimerHandle;
 	float DissolveDelayTime = 5.0f;
 	float DissolveStartTime;
-	float DissolveDuration = 10.0f;
+	float DissolveDuration = 6.0f;
 };

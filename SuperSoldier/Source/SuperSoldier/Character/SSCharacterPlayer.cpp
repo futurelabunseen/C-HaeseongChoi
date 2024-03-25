@@ -98,6 +98,14 @@ ASSCharacterPlayer::ASSCharacterPlayer()
 		ThrowAction = ThrowActionRef.Object;
 	}
 
+	// Call Throw Action
+	static ConstructorHelpers::FObjectFinder<UInputAction> CallActionRef(
+		TEXT("/Game/SuperSoldier/Input/Actions/IA_Call.IA_Call"));
+	if (CallActionRef.Object)
+	{
+		CallAction = CallActionRef.Object;
+	}
+
 	// Widget (maybe Transfer to somewhere)
 	static ConstructorHelpers::FClassFinder<UUserWidget> CrosshairWidgetRef(
 		TEXT("/Game/SuperSoldier/UI/HUD.HUD_C"));
@@ -134,6 +142,7 @@ void ASSCharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Triggered, this, &ASSCharacterPlayer::Aim);
 	EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &ASSCharacterPlayer::Fire);
 	EnhancedInputComponent->BindAction(ThrowAction, ETriggerEvent::Triggered, this, &ASSCharacterPlayer::Throw);
+	EnhancedInputComponent->BindAction(CallAction, ETriggerEvent::Triggered, this, &ASSCharacterPlayer::Call);
 }
 
 void ASSCharacterPlayer::BeginPlay()
@@ -273,6 +282,31 @@ void ASSCharacterPlayer::EndThrow(UAnimMontage* TargetMontage, bool IsProperlyEn
 	if (!bAiming && bSprint)
 	{
 		GetCharacterMovement()->MaxWalkSpeed = 600.0f;
+	}
+}
+
+void ASSCharacterPlayer::Call(const FInputActionValue& Value)
+{
+	bCalling = Value.Get<bool>();
+
+	if (bCalling)
+	{
+		GetCharacterMovement()->MaxWalkSpeed = 400.0f;
+
+		const float AnimationSpeedRate = 1.0f;
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		AnimInstance->Montage_Play(CallMontage, AnimationSpeedRate);
+	}
+
+	else
+	{
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		AnimInstance->Montage_JumpToSection(TEXT("End"), CallMontage);
+
+		if (!bAiming && bSprint)
+		{
+			GetCharacterMovement()->MaxWalkSpeed = 600.0f;
+		}
 	}
 }
 

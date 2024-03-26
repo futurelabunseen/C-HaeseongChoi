@@ -21,6 +21,9 @@ class SUPERSOLDIER_API ASSCharacterBase : public ACharacter, public ISSAnimation
 
 public:
 	ASSCharacterBase();
+protected:
+	virtual void BeginPlay() override;
+
 
 // Attack Hit Section
 protected:

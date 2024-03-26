@@ -13,6 +13,16 @@ class UStratagemInterface : public UInterface
 	GENERATED_BODY()
 };
 
+UENUM()
+enum class EStrataCommand : uint32
+{
+	NONE = 0 UMETA(DisplayName = "Command None"),
+	UP UMETA(DisplayName = "Command Up"),
+	DOWN UMETA(DisplayName = "Command Down"),
+	LEFT UMETA(DisplayName = "Command Left"),
+	RIGHT UMETA(DisplayName = "Command Right"),
+};
+
 /**
  * 
  */
@@ -22,4 +32,5 @@ class SUPERSOLDIER_API IStratagemInterface
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
+	virtual void ActivateStratagem() = 0;
 };

@@ -5,21 +5,20 @@
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
 #include "Interface/StratagemInterface.h"
-#include "StratagemManager.generated.h"
+#include "SSStratagem.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class SUPERSOLDIER_API UStratagemManager : public UObject
+class SUPERSOLDIER_API USSStratagem : public UObject, public IStratagemInterface
 {
 	GENERATED_BODY()
 public:
-	UStratagemManager();
+	USSStratagem();
 
-	void InitializeStratagem();
-	IStratagemInterface* GetStratagem(const FName& StratagemName);
-private:
+	virtual void ActivateStratagem() override;
+protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Strata, Meta = (AllowPrivateAccess = "true"))
-	TMap<FName, IStratagemInterface*> StratagemMap;
+	TArray<EStrataCommand> ArrCommand;
 };

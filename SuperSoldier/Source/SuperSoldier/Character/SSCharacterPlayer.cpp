@@ -14,6 +14,9 @@
 #include "Physics/SSColision.h"
 #include "Engine/DamageEvents.h"
 
+#include "Interface/StratagemInterface.h"
+#include "Strata/StratagemManager.h"
+
 ASSCharacterPlayer::ASSCharacterPlayer()
 {
 	// Pawn
@@ -171,6 +174,8 @@ void ASSCharacterPlayer::BeginPlay()
 		CrosshairWidget->AddToViewport();
 		CrosshairWidget->SetVisibility(ESlateVisibility::Hidden);
 	}
+
+	StratagemManager = NewObject<UStratagemManager>();
 }
 
 void ASSCharacterPlayer::SetCharacterControlData(const USSCharacterControlData* CharacterControlData)
@@ -334,19 +339,21 @@ void ASSCharacterPlayer::Call(const FInputActionValue& Value)
 	}
 }
 
-const EStrataCommand ASSCharacterPlayer::TranslateCommand(const FVector2D& InputValue)
+void ASSCharacterPlayer::ProcessCommandInput(const FInputActionValue& Value)
 {
-	EStrataCommand InputCommand = EStrataCommand::NONE;
+	FVector2D InputValue = Value.Get<FVector2D>();
+
+	EStrataCommand StrataCommand = EStrataCommand::NONE;
 
 	if (InputValue.X)
 	{
 		if (InputValue.X > 0)
 		{
-			InputCommand = EStrataCommand::RIGHT;
+			StrataCommand = EStrataCommand::RIGHT;
 		}
 		else
 		{
-			InputCommand = EStrataCommand::LEFT;
+			StrataCommand = EStrataCommand::LEFT;
 		}
 	}
 
@@ -354,27 +361,23 @@ const EStrataCommand ASSCharacterPlayer::TranslateCommand(const FVector2D& Input
 	{
 		if (InputValue.Y > 0)
 		{
-			InputCommand = EStrataCommand::UP;
+			StrataCommand = EStrataCommand::UP;
 		}
 		else
 		{
-			InputCommand = EStrataCommand::DOWN;
+			StrataCommand = EStrataCommand::DOWN;
 		}
 	}
-
-	return InputCommand;
-}
-
-void ASSCharacterPlayer::ProcessCommandInput(const FInputActionValue& Value)
-{
-	FVector2D InputValue = Value.Get<FVector2D>();
-	const EStrataCommand StrataCommand = TranslateCommand(InputValue);
 	
 	UEnum* EnumPtr = FindObject<UEnum>(ANY_PACKAGE, TEXT("EStrataCommand"), true);
 	check(EnumPtr);
 
 	FString CommandString = EnumPtr->GetDisplayNameTextByValue(static_cast<uint32>(StrataCommand)).ToString();
-	UE_LOG(LogTemp, Log, TEXT("%s"), *CommandString)
+	UE_LOG(LogTemp, Log, TEXT("%s"), *CommandString);
+
+	// Check
+	IStratagemInterface* CurStratagem = StratagemManager->GetStratagem(FName(TEXT("Stratagem")));
+	CurStratagem->ActivateStratagem();
 }
 
 void ASSCharacterPlayer::AttackHitCheck()

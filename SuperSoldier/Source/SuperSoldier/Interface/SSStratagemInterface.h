@@ -4,11 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
-#include "StratagemInterface.generated.h"
+#include "SSStratagemInterface.generated.h"
 
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
-class UStratagemInterface : public UInterface
+class USSStratagemInterface : public UInterface
 {
 	GENERATED_BODY()
 };
@@ -26,7 +26,7 @@ enum class EStrataCommand : uint32
 /**
  * 
  */
-class SUPERSOLDIER_API IStratagemInterface
+class SUPERSOLDIER_API ISSStratagemInterface
 {
 	GENERATED_BODY()
 

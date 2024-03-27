@@ -1,16 +1,16 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "StratagemManager.h"
-#include "Interface/StratagemInterface.h"
+#include "SSStratagemManager.h"
+#include "Interface/SSStratagemInterface.h"
 #include "SSStratagem.h"
 
-UStratagemManager::UStratagemManager()
+USSStratagemManager::USSStratagemManager()
 {
 	InitializeStratagem();
 }
 
-void UStratagemManager::InitializeStratagem()
+void USSStratagemManager::InitializeStratagem()
 {
 	// 스트라타젬 전체 목록 초기화
 	USSStratagem* Stratagem = NewObject<USSStratagem>();
@@ -20,10 +20,10 @@ void UStratagemManager::InitializeStratagem()
 	}
 }
 
-IStratagemInterface* UStratagemManager::GetStratagem(const FName& StratagemName)
+ISSStratagemInterface* USSStratagemManager::GetStratagem(const FName& StratagemName)
 {
 	// 목록에 있는 특정 스트라타젬을 가져와 리턴
-	IStratagemInterface* RetVal = *StratagemMap.Find(StratagemName);
+	ISSStratagemInterface* RetVal = *StratagemMap.Find(StratagemName);
 
 	return RetVal;
 }

@@ -14,8 +14,8 @@
 #include "Physics/SSColision.h"
 #include "Engine/DamageEvents.h"
 
-#include "Interface/StratagemInterface.h"
-#include "Strata/StratagemManager.h"
+#include "Interface/SSStratagemInterface.h"
+#include "Strata/SSStratagemManager.h"
 
 ASSCharacterPlayer::ASSCharacterPlayer()
 {
@@ -175,7 +175,7 @@ void ASSCharacterPlayer::BeginPlay()
 		CrosshairWidget->SetVisibility(ESlateVisibility::Hidden);
 	}
 
-	StratagemManager = NewObject<UStratagemManager>();
+	StratagemManager = NewObject<USSStratagemManager>();
 }
 
 void ASSCharacterPlayer::SetCharacterControlData(const USSCharacterControlData* CharacterControlData)
@@ -376,7 +376,7 @@ void ASSCharacterPlayer::ProcessCommandInput(const FInputActionValue& Value)
 	UE_LOG(LogTemp, Log, TEXT("%s"), *CommandString);
 
 	// Check
-	IStratagemInterface* CurStratagem = StratagemManager->GetStratagem(FName(TEXT("Stratagem")));
+	ISSStratagemInterface* CurStratagem = StratagemManager->GetStratagem(FName(TEXT("Stratagem")));
 	CurStratagem->ActivateStratagem();
 }
 

@@ -93,7 +93,7 @@ protected:
 // Strata Section
 protected:
 	bool bCalling;
-	TObjectPtr<class UStratagemManager> StratagemManager;
+	TObjectPtr<class USSStratagemManager> StratagemManager;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
 	TObjectPtr<class UAnimMontage> CallMontage;

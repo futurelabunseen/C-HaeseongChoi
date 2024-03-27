@@ -4,14 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
-#include "Interface/StratagemInterface.h"
+#include "Interface/SSStratagemInterface.h"
 #include "SSStratagem.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class SUPERSOLDIER_API USSStratagem : public UObject, public IStratagemInterface
+class SUPERSOLDIER_API USSStratagem : public UObject, public ISSStratagemInterface
 {
 	GENERATED_BODY()
 public:

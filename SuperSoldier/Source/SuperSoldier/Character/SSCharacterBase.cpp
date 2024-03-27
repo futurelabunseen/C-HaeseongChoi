@@ -90,7 +90,7 @@ void ASSCharacterBase::UpdateDissolveProgress()
 	for (const int32& DynamicMaterialIndex : DynamicMaterialIndices)
 	{
 		UMaterialInstanceDynamic* DynamicMaterial = Cast<UMaterialInstanceDynamic>(GetMesh()->GetMaterial(DynamicMaterialIndex));
-		DynamicMaterial->SetScalarParameterValue("Progress", Alpha);
+		DynamicMaterial->SetScalarParameterValue("DissolveParams", Alpha);
 	}
 
 	if (Alpha >= 1.0f)

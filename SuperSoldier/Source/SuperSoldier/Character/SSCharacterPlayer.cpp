@@ -14,7 +14,8 @@
 #include "Physics/SSColision.h"
 #include "Engine/DamageEvents.h"
 
-#include "Interface/SSStratagemInterface.h"
+#include "Core/SSGameInstance.h"
+//#include "Interface/SSStratagemInterface.h"
 #include "Strata/SSStratagemManager.h"
 
 ASSCharacterPlayer::ASSCharacterPlayer()
@@ -175,7 +176,11 @@ void ASSCharacterPlayer::BeginPlay()
 		CrosshairWidget->SetVisibility(ESlateVisibility::Hidden);
 	}
 
-	StratagemManager = NewObject<USSStratagemManager>();
+	// Register Stratagem
+	USSGameInstance* SSGameInstance = Cast<USSGameInstance>(GetGameInstance());
+	USSStratagemManager* StratagemManager = SSGameInstance->GetStratagemManager();
+	ISSStratagemInterface* DefaultStratagem = StratagemManager->GetStratagem(FName(TEXT("Stratagem")));
+	AvailableStratagems.Add(DefaultStratagem);
 }
 
 void ASSCharacterPlayer::SetCharacterControlData(const USSCharacterControlData* CharacterControlData)
@@ -330,19 +335,25 @@ void ASSCharacterPlayer::Call(const FInputActionValue& Value)
 	else
 	{
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-		AnimInstance->Montage_JumpToSection(TEXT("End"), CallMontage);
 
-		if (bSprint)
+		FName CurSection = AnimInstance->Montage_GetCurrentSection(CallMontage);
+		bool bNotAlreadyPlaying = CurSection.Compare(FName(TEXT("End"))) != 0;
+
+		if (bNotAlreadyPlaying)
 		{
-			AttemptSprint();
+			AnimInstance->Montage_JumpToSection(TEXT("End"), CallMontage);
+
+			if (bSprint)
+			{
+				AttemptSprint();
+			}
 		}
 	}
 }
 
-void ASSCharacterPlayer::ProcessCommandInput(const FInputActionValue& Value)
+void ASSCharacterPlayer::TranslateInput(const FInputActionValue& Value)
 {
 	FVector2D InputValue = Value.Get<FVector2D>();
-
 	EStrataCommand StrataCommand = EStrataCommand::NONE;
 
 	if (InputValue.X)
@@ -368,16 +379,80 @@ void ASSCharacterPlayer::ProcessCommandInput(const FInputActionValue& Value)
 			StrataCommand = EStrataCommand::DOWN;
 		}
 	}
-	
+
+	InputSequence.Add(StrataCommand);
+
+	UEnum* EnumPtr = FindObject<UEnum>(ANY_PACKAGE, TEXT("EStrataCommand"), true);
+	check(EnumPtr);
+
+	UE_LOG(LogTemp, Log, TEXT("============CurrentInputSequence============="))
+	for (const EStrataCommand& Cmd : InputSequence)
+	{
+		FString CommandString = EnumPtr->GetDisplayNameTextByValue(static_cast<uint32>(Cmd)).ToString();
+
+		UE_LOG(LogTemp, Log, TEXT("%s"), *CommandString);
+	}
+	UE_LOG(LogTemp, Log, TEXT("============================================="))
+
+#ifdef DEBUG_STRATAINPUT
 	UEnum* EnumPtr = FindObject<UEnum>(ANY_PACKAGE, TEXT("EStrataCommand"), true);
 	check(EnumPtr);
 
 	FString CommandString = EnumPtr->GetDisplayNameTextByValue(static_cast<uint32>(StrataCommand)).ToString();
 	UE_LOG(LogTemp, Log, TEXT("%s"), *CommandString);
+#endif // DEBUG_STRATAINPUT
+}
 
-	// Check
-	ISSStratagemInterface* CurStratagem = StratagemManager->GetStratagem(FName(TEXT("Stratagem")));
-	CurStratagem->ActivateStratagem();
+void ASSCharacterPlayer::ProcessCommandInput(const FInputActionValue& Value)
+{
+	TranslateInput(Value);
+	
+	bool bMatching = false;
+	for (ISSStratagemInterface* Stratagem : AvailableStratagems)
+	{
+		const TArray<EStrataCommand> StrataCommandArr = Stratagem->GetCommandSequence();
+
+		if (InputSequence.Num() > StrataCommandArr.Num()) continue;
+
+		bool bChk = true;
+		for (int i = 0; i < InputSequence.Num(); ++i)
+		{
+			if (InputSequence[i] != StrataCommandArr[i])
+			{
+				bChk = false;
+				break;
+			}
+		}
+
+		if (bChk)
+		{
+			bMatching = true;
+
+			if (InputSequence.Num() == StrataCommandArr.Num())
+			{
+				UE_LOG(LogTemp, Log, TEXT("Matching Success!!!!"))
+				UE_LOG(LogTemp, Log, TEXT("Reset InputSequence"))
+
+				Stratagem->ActivateStratagem();
+				InputSequence.Reset();
+
+				UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+				AnimInstance->Montage_JumpToSection(TEXT("End"), CallMontage);
+
+				if (bSprint)
+				{
+					AttemptSprint();
+				}
+			}
+		}
+	}
+
+	if (!bMatching)
+	{
+		UE_LOG(LogTemp, Log, TEXT("Matching Fail Reset InputSequence"))
+
+		InputSequence.Reset();
+	}
 }
 
 void ASSCharacterPlayer::AttackHitCheck()

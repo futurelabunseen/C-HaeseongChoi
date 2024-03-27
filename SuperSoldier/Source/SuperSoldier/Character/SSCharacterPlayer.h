@@ -5,11 +5,13 @@
 #include "CoreMinimal.h"
 #include "Character/SSCharacterBase.h"
 #include "InputActionValue.h"
+#include "Interface/SSStratagemInterface.h"
 #include "SSCharacterPlayer.generated.h"
 
 /**
  * 
  */
+
 UCLASS()
 class SUPERSOLDIER_API ASSCharacterPlayer : public ASSCharacterBase
 {
@@ -93,7 +95,8 @@ protected:
 // Strata Section
 protected:
 	bool bCalling;
-	TObjectPtr<class USSStratagemManager> StratagemManager;
+	TArray<EStrataCommand> InputSequence;
+	TArray<ISSStratagemInterface*> AvailableStratagems;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
 	TObjectPtr<class UAnimMontage> CallMontage;
@@ -105,6 +108,7 @@ protected:
 	TObjectPtr<class UInputAction> CommandAction;
 
 	void Call(const FInputActionValue& Value);
+	void TranslateInput(const FInputActionValue& Value);
 	void ProcessCommandInput(const FInputActionValue& Value);
 // Crosshair Section
 protected:

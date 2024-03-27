@@ -13,4 +13,12 @@ UCLASS()
 class SUPERSOLDIER_API USSGameInstance : public UGameInstance
 {
 	GENERATED_BODY()
+public:
+	USSGameInstance();
+	virtual void Init() override;
+
+	class USSStratagemManager* const GetStratagemManager() { return StratagemManager.Get(); }
+private:
+	UPROPERTY()
+	TObjectPtr<class USSStratagemManager> StratagemManager;
 };

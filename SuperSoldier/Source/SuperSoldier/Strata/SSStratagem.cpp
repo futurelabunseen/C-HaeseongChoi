@@ -5,6 +5,15 @@
 
 USSStratagem::USSStratagem()
 {
+	ArrCommand.Add(EStrataCommand::UP);
+	ArrCommand.Add(EStrataCommand::RIGHT);
+	ArrCommand.Add(EStrataCommand::DOWN);
+	ArrCommand.Add(EStrataCommand::LEFT);
+}
+
+const TArray<EStrataCommand>& USSStratagem::GetCommandSequence() const
+{
+	return ArrCommand;
 }
 
 void USSStratagem::ActivateStratagem()

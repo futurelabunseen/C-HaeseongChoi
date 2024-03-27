@@ -17,6 +17,7 @@ class SUPERSOLDIER_API USSStratagem : public UObject, public ISSStratagemInterfa
 public:
 	USSStratagem();
 
+	virtual const TArray<EStrataCommand>& GetCommandSequence() const;
 	virtual void ActivateStratagem() override;
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Strata, Meta = (AllowPrivateAccess = "true"))

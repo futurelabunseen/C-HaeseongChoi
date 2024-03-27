@@ -325,8 +325,6 @@ void ASSCharacterPlayer::Call(const FInputActionValue& Value)
 
 	if (bCalling)
 	{
-		GetCharacterMovement()->MaxWalkSpeed = 400.0f;
-
 		const float AnimationSpeedRate = 1.0f;
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 		AnimInstance->Montage_Play(CallMontage, AnimationSpeedRate);
@@ -342,11 +340,6 @@ void ASSCharacterPlayer::Call(const FInputActionValue& Value)
 		if (bNotAlreadyPlaying)
 		{
 			AnimInstance->Montage_JumpToSection(TEXT("End"), CallMontage);
-
-			if (bSprint)
-			{
-				AttemptSprint();
-			}
 		}
 	}
 }

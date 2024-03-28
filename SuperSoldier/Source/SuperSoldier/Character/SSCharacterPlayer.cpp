@@ -49,6 +49,7 @@ ASSCharacterPlayer::ASSCharacterPlayer()
 	bSprint = false;
 	bAiming = false;
 	bThrowing = false;
+	bThrowingStrata = false;
 
 	// Input Action & Input Mapping Context
 	static ConstructorHelpers::FObjectFinder<UInputMappingContext> InputMappingContextRef(
@@ -252,6 +253,11 @@ void ASSCharacterPlayer::Aim(const FInputActionValue& Value)
 {
 	bAiming = Value.Get<bool>();
 
+	if (bCalling)
+	{
+		return;
+	}
+
 	if (bAiming)
 	{
 		SetCharacterControlData(*CharacterControlManager.Find(ECharacterControlType::Aiming));
@@ -260,6 +266,7 @@ void ASSCharacterPlayer::Aim(const FInputActionValue& Value)
 	{
 		SetCharacterControlData(*CharacterControlManager.Find(ECharacterControlType::Normal));
 
+		GetCharacterMovement()->MaxWalkSpeed = 400.0f;
 		if (bSprint)
 		{
 			AttemptSprint();
@@ -269,6 +276,14 @@ void ASSCharacterPlayer::Aim(const FInputActionValue& Value)
 
 void ASSCharacterPlayer::Fire(const FInputActionValue& Value)
 {
+	if (bThrowingStrata)
+	{
+		const float AnimationSpeedRate = 1.0f;
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		AnimInstance->Montage_Play(StrataThrowMontage, AnimationSpeedRate);
+		return;
+	}
+
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	if (AnimInstance->IsAnyMontagePlaying())
 	{
@@ -345,6 +360,24 @@ void ASSCharacterPlayer::Call(const FInputActionValue& Value)
 			AnimInstance->Montage_JumpToSection(TEXT("End"), CallMontage);
 		}
 	}
+}
+
+void ASSCharacterPlayer::EndCall(UAnimMontage* TargetMontage, bool IsProperlyEnded)
+{
+	bThrowingStrata = true;
+
+	const float AnimationSpeedRate = 1.0f;
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	AnimInstance->Montage_Play(StrataReadyMontage, AnimationSpeedRate);
+
+	FOnMontageEnded EndDelegate;
+	EndDelegate.BindUObject(this, &ASSCharacterPlayer::EndStrata);
+	AnimInstance->Montage_SetEndDelegate(EndDelegate, StrataReadyMontage);
+}
+
+void ASSCharacterPlayer::EndStrata(UAnimMontage* TargetMontage, bool IsProperlyEnded)
+{
+	bThrowingStrata = false;
 }
 
 void ASSCharacterPlayer::TranslateInput(const FInputActionValue& Value)
@@ -434,6 +467,10 @@ void ASSCharacterPlayer::ProcessCommandInput(const FInputActionValue& Value)
 
 				UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 				AnimInstance->Montage_JumpToSection(TEXT("End"), CallMontage);
+
+				FOnMontageEnded EndDelegate;
+				EndDelegate.BindUObject(this, &ASSCharacterPlayer::EndCall);
+				AnimInstance->Montage_SetEndDelegate(EndDelegate, CallMontage);
 
 				if (bSprint)
 				{

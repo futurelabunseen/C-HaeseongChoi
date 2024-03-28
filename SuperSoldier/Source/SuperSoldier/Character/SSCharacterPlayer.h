@@ -95,11 +95,19 @@ protected:
 // Strata Section
 protected:
 	bool bCalling;
+	bool bThrowingStrata;
+
 	TArray<EStrataCommand> InputSequence;
 	TArray<ISSStratagemInterface*> AvailableStratagems;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
 	TObjectPtr<class UAnimMontage> CallMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
+	TObjectPtr<class UAnimMontage> StrataReadyMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
+	TObjectPtr<class UAnimMontage> StrataThrowMontage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> CallAction;
@@ -108,6 +116,8 @@ protected:
 	TObjectPtr<class UInputAction> CommandAction;
 
 	void Call(const FInputActionValue& Value);
+	void EndCall(UAnimMontage* TargetMontage, bool IsProperlyEnded);
+	void EndStrata(UAnimMontage* TargetMontage, bool IsProperlyEnded);
 	void TranslateInput(const FInputActionValue& Value);
 	void ProcessCommandInput(const FInputActionValue& Value);
 // Crosshair Section

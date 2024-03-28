@@ -45,4 +45,19 @@ ASSMurdockPlayer::ASSMurdockPlayer()
 	{
 		CallMontage = CallMontageRef.Object;
 	}
+
+	// Strata Montage
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> StrataReadyMontageRef(
+		TEXT("/Game/SuperSoldier/Characters/Murdock/Animations/AM_StrataReady.AM_StrataReady"));
+	if (StrataReadyMontageRef.Object)
+	{
+		StrataReadyMontage = StrataReadyMontageRef.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> StrataThrowMontageRef(
+		TEXT("/Game/SuperSoldier/Characters/Murdock/Animations/AM_StrataThrow.AM_StrataThrow"));
+	if (StrataThrowMontageRef.Object)
+	{
+		StrataThrowMontage = StrataThrowMontageRef.Object;
+	}
 }

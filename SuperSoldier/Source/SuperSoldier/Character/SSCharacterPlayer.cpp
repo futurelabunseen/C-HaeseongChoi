@@ -180,7 +180,10 @@ void ASSCharacterPlayer::BeginPlay()
 	USSGameInstance* SSGameInstance = Cast<USSGameInstance>(GetGameInstance());
 	USSStratagemManager* StratagemManager = SSGameInstance->GetStratagemManager();
 	ISSStratagemInterface* DefaultStratagem = StratagemManager->GetStratagem(FName(TEXT("Stratagem")));
-	AvailableStratagems.Add(DefaultStratagem);
+	if (DefaultStratagem)
+	{
+		AvailableStratagems.Add(DefaultStratagem);
+	}
 }
 
 void ASSCharacterPlayer::SetCharacterControlData(const USSCharacterControlData* CharacterControlData)

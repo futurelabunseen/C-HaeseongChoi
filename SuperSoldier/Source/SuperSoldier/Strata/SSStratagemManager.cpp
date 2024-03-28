@@ -7,7 +7,6 @@
 
 USSStratagemManager::USSStratagemManager()
 {
-	InitializeStratagem();
 }
 
 void USSStratagemManager::InitializeStratagem()

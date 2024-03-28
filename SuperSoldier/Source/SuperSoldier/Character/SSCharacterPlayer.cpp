@@ -355,18 +355,17 @@ void ASSCharacterPlayer::Call(const FInputActionValue& Value)
 
 		else
 		{
+			// 현재 재생중인 섹션이 End가 아니면 End 섹션을 재생
 			UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-			AnimInstance->Montage_JumpToSection(TEXT("End"), CallMontage);
-
-			InputSequence.Reset();
-
-			/*FName CurSection = AnimInstance->Montage_GetCurrentSection(CallMontage);
+			FName CurSection = AnimInstance->Montage_GetCurrentSection(CallMontage);
 			bool bNotAlreadyPlaying = CurSection.Compare(FName(TEXT("End"))) != 0;
 
 			if (bNotAlreadyPlaying)
 			{
 				AnimInstance->Montage_JumpToSection(TEXT("End"), CallMontage);
-			}*/
+			}
+
+			InputSequence.Reset();
 		}
 	}
 }
@@ -376,6 +375,9 @@ void ASSCharacterPlayer::EndCalling(UAnimMontage* TargetMontage, bool IsProperly
 	if (bChangeMontageForThrowingStrata)
 	{
 		bReadyForThrowingStrata = true;
+		
+		// 다른 방법 필요
+		GetMesh()->HideBoneByName(TEXT("bot_hand"), EPhysBodyOp::PBO_None);
 
 		const float AnimationSpeedRate = 1.0f;
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
@@ -397,6 +399,9 @@ void ASSCharacterPlayer::EndCalling(UAnimMontage* TargetMontage, bool IsProperly
 void ASSCharacterPlayer::EndStrata(UAnimMontage* TargetMontage, bool IsProperlyEnded)
 {
 	bReadyForThrowingStrata = false;
+
+	// 다른 방법 필요
+	GetMesh()->UnHideBoneByName(TEXT("bot_hand"));
 }
 
 void ASSCharacterPlayer::TranslateInput(const FInputActionValue& Value)

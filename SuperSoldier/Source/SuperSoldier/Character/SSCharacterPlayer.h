@@ -28,6 +28,8 @@ protected:
 	TMap<ECharacterControlType, class USSCharacterControlData*> CharacterControlManager;
 protected:
 	virtual void BeginPlay() override;
+	bool GetAnyMontagePlaying(UAnimMontage* FilterMontage = NULL);
+	void AttemptSprintEndDelegate(UAnimMontage* TargetMontage, bool IsProperlyEnded);
 
 // Camera Section
 protected:
@@ -72,9 +74,6 @@ protected:
 
 // Fire & Throw Section
 protected:
-	bool bFiring;
-	bool bThrowing;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
 	TObjectPtr<class UAnimMontage> FireMontage;
 
@@ -88,14 +87,13 @@ protected:
 	TObjectPtr<class UInputAction> ThrowAction;
 
 	void Fire(const FInputActionValue& Value);
-	void EndFire(UAnimMontage* TargetMontage, bool IsProperlyEnded);
-
 	void Throw(const FInputActionValue& Value);
-	void EndThrow(UAnimMontage* TargetMontage, bool IsProperlyEnded);
+
 // Strata Section
 protected:
 	bool bCalling;
-	bool bThrowingStrata;
+	bool bReadyForThrowingStrata;
+	bool bChangeMontageForThrowingStrata;
 
 	TArray<EStrataCommand> InputSequence;
 	TArray<ISSStratagemInterface*> AvailableStratagems;
@@ -116,9 +114,10 @@ protected:
 	TObjectPtr<class UInputAction> CommandAction;
 
 	void Call(const FInputActionValue& Value);
-	void EndCall(UAnimMontage* TargetMontage, bool IsProperlyEnded);
+	void EndCalling(UAnimMontage* TargetMontage, bool IsProperlyEnded);
 	void EndStrata(UAnimMontage* TargetMontage, bool IsProperlyEnded);
 	void TranslateInput(const FInputActionValue& Value);
+	bool MatchingInput();
 	void ProcessCommandInput(const FInputActionValue& Value);
 // Crosshair Section
 protected:

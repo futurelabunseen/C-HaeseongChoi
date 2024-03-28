@@ -48,8 +48,8 @@ ASSCharacterPlayer::ASSCharacterPlayer()
 
 	bSprint = false;
 	bAiming = false;
-	bThrowing = false;
-	bThrowingStrata = false;
+	bReadyForThrowingStrata = false;
+	bChangeMontageForThrowingStrata = false;
 
 	// Input Action & Input Mapping Context
 	static ConstructorHelpers::FObjectFinder<UInputMappingContext> InputMappingContextRef(
@@ -187,6 +187,35 @@ void ASSCharacterPlayer::BeginPlay()
 	}
 }
 
+bool ASSCharacterPlayer::GetAnyMontagePlaying(UAnimMontage* FilterMontage)
+{
+	bool bRet = false;
+
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (FilterMontage == NULL)
+	{
+		bRet = AnimInstance->IsAnyMontagePlaying();
+	}
+	else
+	{
+		UAnimMontage* CurrentActivateMontage = AnimInstance->GetCurrentActiveMontage();
+		UClass* CurMontageClass = CurrentActivateMontage->StaticClass();
+		UClass* FilterMontageClass = FilterMontage->StaticClass();
+
+		bRet = AnimInstance->IsAnyMontagePlaying() &&
+			CurMontageClass != FilterMontageClass;
+	}
+	return bRet;
+}
+
+void ASSCharacterPlayer::AttemptSprintEndDelegate(UAnimMontage* TargetMontage, bool IsProperlyEnded)
+{
+	if (bSprint && GetAnyMontagePlaying(TargetMontage) == false)
+	{
+		GetCharacterMovement()->MaxWalkSpeed = 600.0f;
+	}
+}
+
 void ASSCharacterPlayer::SetCharacterControlData(const USSCharacterControlData* CharacterControlData)
 {
 	bUseControllerRotationYaw = CharacterControlData->bUseControllerRotationYaw;
@@ -226,8 +255,7 @@ void ASSCharacterPlayer::Look(const FInputActionValue& Value)
 
 bool ASSCharacterPlayer::AttemptSprint()
 {
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	if (!AnimInstance->IsAnyMontagePlaying())
+	if(!bAiming && bSprint && !GetAnyMontagePlaying())
 	{
 		GetCharacterMovement()->MaxWalkSpeed = 600.0f;
 		return true;
@@ -239,11 +267,7 @@ void ASSCharacterPlayer::Sprint(const FInputActionValue& Value)
 {
 	bSprint = Value.Get<bool>();
 
-	if (bSprint)
-	{
-		AttemptSprint();
-	}
-	else
+	if (AttemptSprint() == false)
 	{
 		GetCharacterMovement()->MaxWalkSpeed = 400.0f;
 	}
@@ -267,117 +291,112 @@ void ASSCharacterPlayer::Aim(const FInputActionValue& Value)
 		SetCharacterControlData(*CharacterControlManager.Find(ECharacterControlType::Normal));
 
 		GetCharacterMovement()->MaxWalkSpeed = 400.0f;
-		if (bSprint)
-		{
-			AttemptSprint();
-		}
+		AttemptSprint();
 	}
 }
 
 void ASSCharacterPlayer::Fire(const FInputActionValue& Value)
 {
-	if (bThrowingStrata)
+	if (bReadyForThrowingStrata)
 	{
 		const float AnimationSpeedRate = 1.0f;
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 		AnimInstance->Montage_Play(StrataThrowMontage, AnimationSpeedRate);
-		return;
-	}
-
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	if (AnimInstance->IsAnyMontagePlaying())
-	{
-		return;
-	}
-
-	if (bAiming)
-	{
-		bFiring = true;
-
-		const float AnimationSpeedRate = 1.0f;
-		AnimInstance->Montage_Play(FireMontage, AnimationSpeedRate);
 
 		FOnMontageEnded EndDelegate;
-		EndDelegate.BindUObject(this, &ASSCharacterPlayer::EndFire);
-		AnimInstance->Montage_SetEndDelegate(EndDelegate, FireMontage);
+		EndDelegate.BindUObject(this, &ASSCharacterPlayer::AttemptSprintEndDelegate);
+		AnimInstance->Montage_SetEndDelegate(EndDelegate, StrataThrowMontage);
+		return;
 	}
-}
 
-void ASSCharacterPlayer::EndFire(UAnimMontage* TargetMontage, bool IsProperlyEnded)
-{
-	bFiring = false;
+	// 애니메이션 몽타주가 재생 중이 아니고, 조준 중이라면 격발
+	if (!GetAnyMontagePlaying() && bAiming)
+	{
+		const float AnimationSpeedRate = 1.0f;
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		AnimInstance->Montage_Play(FireMontage, AnimationSpeedRate);
+	}
 }
 
 void ASSCharacterPlayer::Throw(const FInputActionValue& Value)
 {
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	if (AnimInstance->IsAnyMontagePlaying())
+	if (!GetAnyMontagePlaying())
 	{
-		return;
-	}
+		GetCharacterMovement()->MaxWalkSpeed = 400.0f;
 
-	bThrowing = true;
+		const float AnimationSpeedRate = 1.0f;
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		AnimInstance->Montage_Play(ThrowMontage, AnimationSpeedRate);
 
-	GetCharacterMovement()->MaxWalkSpeed = 400.0f;
-
-	const float AnimationSpeedRate = 1.25f;
-	AnimInstance->Montage_Play(ThrowMontage, AnimationSpeedRate);
-	
-	FOnMontageEnded EndDelegate;
-	EndDelegate.BindUObject(this, &ASSCharacterPlayer::EndThrow);
-	AnimInstance->Montage_SetEndDelegate(EndDelegate, ThrowMontage);
-}
-
-void ASSCharacterPlayer::EndThrow(UAnimMontage* TargetMontage, bool IsProperlyEnded)
-{
-	bThrowing = false;
-	if (bSprint)
-	{
-		AttemptSprint();
+		FOnMontageEnded EndDelegate;
+		EndDelegate.BindUObject(this, &ASSCharacterPlayer::AttemptSprintEndDelegate);
+		AnimInstance->Montage_SetEndDelegate(EndDelegate, ThrowMontage);
 	}
 }
 
 void ASSCharacterPlayer::Call(const FInputActionValue& Value)
 {
-	bCalling = Value.Get<bool>();
-
-	if (bCalling)
+	if (!GetAnyMontagePlaying(CallMontage))
 	{
-		const float AnimationSpeedRate = 1.0f;
-		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-		AnimInstance->Montage_Play(CallMontage, AnimationSpeedRate);
-	}
+		bCalling = Value.Get<bool>();
 
-	else
-	{
-		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-
-		FName CurSection = AnimInstance->Montage_GetCurrentSection(CallMontage);
-		bool bNotAlreadyPlaying = CurSection.Compare(FName(TEXT("End"))) != 0;
-
-		if (bNotAlreadyPlaying)
+		if (bCalling)
 		{
+			GetCharacterMovement()->MaxWalkSpeed = 400.0f;
+
+			const float AnimationSpeedRate = 1.0f;
+			UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+			AnimInstance->Montage_Play(CallMontage, AnimationSpeedRate);
+
+			FOnMontageEnded EndDelegate;
+			EndDelegate.BindUObject(this, &ASSCharacterPlayer::EndCalling);
+			AnimInstance->Montage_SetEndDelegate(EndDelegate, CallMontage);
+		}
+
+		else
+		{
+			UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 			AnimInstance->Montage_JumpToSection(TEXT("End"), CallMontage);
+
+			InputSequence.Reset();
+
+			/*FName CurSection = AnimInstance->Montage_GetCurrentSection(CallMontage);
+			bool bNotAlreadyPlaying = CurSection.Compare(FName(TEXT("End"))) != 0;
+
+			if (bNotAlreadyPlaying)
+			{
+				AnimInstance->Montage_JumpToSection(TEXT("End"), CallMontage);
+			}*/
 		}
 	}
 }
 
-void ASSCharacterPlayer::EndCall(UAnimMontage* TargetMontage, bool IsProperlyEnded)
+void ASSCharacterPlayer::EndCalling(UAnimMontage* TargetMontage, bool IsProperlyEnded)
 {
-	bThrowingStrata = true;
+	if (bChangeMontageForThrowingStrata)
+	{
+		bReadyForThrowingStrata = true;
 
-	const float AnimationSpeedRate = 1.0f;
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	AnimInstance->Montage_Play(StrataReadyMontage, AnimationSpeedRate);
+		const float AnimationSpeedRate = 1.0f;
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		AnimInstance->Montage_Play(StrataReadyMontage, AnimationSpeedRate);
 
-	FOnMontageEnded EndDelegate;
-	EndDelegate.BindUObject(this, &ASSCharacterPlayer::EndStrata);
-	AnimInstance->Montage_SetEndDelegate(EndDelegate, StrataReadyMontage);
+		FOnMontageEnded EndDelegate;
+		EndDelegate.BindUObject(this, &ASSCharacterPlayer::EndStrata);
+		AnimInstance->Montage_SetEndDelegate(EndDelegate, StrataReadyMontage);
+	}
+	else
+	{
+		if (bSprint && GetAnyMontagePlaying(TargetMontage) == false)
+		{
+			GetCharacterMovement()->MaxWalkSpeed = 600.0f;
+		}
+	}
 }
 
 void ASSCharacterPlayer::EndStrata(UAnimMontage* TargetMontage, bool IsProperlyEnded)
 {
-	bThrowingStrata = false;
+	bReadyForThrowingStrata = false;
 }
 
 void ASSCharacterPlayer::TranslateInput(const FInputActionValue& Value)
@@ -432,55 +451,79 @@ void ASSCharacterPlayer::TranslateInput(const FInputActionValue& Value)
 #endif // DEBUG_STRATAINPUT
 }
 
-void ASSCharacterPlayer::ProcessCommandInput(const FInputActionValue& Value)
+bool ASSCharacterPlayer::MatchingInput()
 {
-	TranslateInput(Value);
-	
-	bool bMatching = false;
-	for (ISSStratagemInterface* Stratagem : AvailableStratagems)
+	bool bSuccessMatching = false;
+	if (!AvailableStratagems.IsEmpty())
 	{
-		const TArray<EStrataCommand> StrataCommandArr = Stratagem->GetCommandSequence();
-
-		if (InputSequence.Num() > StrataCommandArr.Num()) continue;
-
-		bool bChk = true;
-		for (int i = 0; i < InputSequence.Num(); ++i)
+		// 사용 가능한 스트라타젬을 순회, 매칭
+		for (int i = 0; i < AvailableStratagems.Num(); ++i)
 		{
-			if (InputSequence[i] != StrataCommandArr[i])
+			if (AvailableStratagems.IsValidIndex(i))
 			{
-				bChk = false;
-				break;
-			}
-		}
+				ISSStratagemInterface* Stratagem = AvailableStratagems[i];
 
-		if (bChk)
-		{
-			bMatching = true;
+				const TArray<EStrataCommand> StrataCommandArr = Stratagem->GetCommandSequence();
 
-			if (InputSequence.Num() == StrataCommandArr.Num())
-			{
-				UE_LOG(LogTemp, Log, TEXT("Matching Success!!!!"))
-				UE_LOG(LogTemp, Log, TEXT("Reset InputSequence"))
-
-				Stratagem->ActivateStratagem();
-				InputSequence.Reset();
-
-				UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-				AnimInstance->Montage_JumpToSection(TEXT("End"), CallMontage);
-
-				FOnMontageEnded EndDelegate;
-				EndDelegate.BindUObject(this, &ASSCharacterPlayer::EndCall);
-				AnimInstance->Montage_SetEndDelegate(EndDelegate, CallMontage);
-
-				if (bSprint)
+				// 스트라타젬 커맨드 수보다, 현재 입력 커맨드 수가 많으면 검사할 필요가 없음
+				if (InputSequence.Num() > StrataCommandArr.Num())
 				{
-					AttemptSprint();
+					continue;
+				}
+
+				// 입력 커맨드 수만큼 순회 하면서, 스트라타젬 커맨드와 비교
+				bool bAllInputCommandMatching = true;
+				for (int j = 0; j < InputSequence.Num(); ++j)
+				{
+					if (InputSequence[j] != StrataCommandArr[j])
+					{
+						bAllInputCommandMatching = false;
+						break;
+					}
+				}
+
+				// 모든 커맨드가 매칭이 성공했을 경우
+				if (bAllInputCommandMatching)
+				{
+					bSuccessMatching = true;
+
+					// 모든 커맨드가 매칭 성공 했으며, 입력 수와 스트라타젬 커맨드 수가 같으면
+					// 스트라타젬을 발동, 입력 커맨드 배열을 비운다.
+					int32 InputSequenceNum = InputSequence.Num();
+					int32 StrataCommandArrNum = StrataCommandArr.Num();
+
+					if (InputSequenceNum == StrataCommandArrNum)
+					{
+						UE_LOG(LogTemp, Log, TEXT("Matching Success!!!!"))
+							Stratagem->ActivateStratagem();
+
+						UE_LOG(LogTemp, Log, TEXT("Reset InputSequence"))
+							InputSequence.Reset();
+
+						UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+						if (AnimInstance)
+						{
+							AnimInstance->Montage_JumpToSection(TEXT("End"), CallMontage);
+						}
+
+						bChangeMontageForThrowingStrata = true;
+					}
 				}
 			}
 		}
 	}
+	
+	return bSuccessMatching;
+}
 
-	if (!bMatching)
+void ASSCharacterPlayer::ProcessCommandInput(const FInputActionValue& Value)
+{
+	if (bCalling)
+	{
+		TranslateInput(Value);
+	}
+
+	if (!MatchingInput())
 	{
 		UE_LOG(LogTemp, Log, TEXT("Matching Fail Reset InputSequence"))
 

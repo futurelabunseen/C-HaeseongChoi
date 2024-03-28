@@ -21,9 +21,6 @@ ASSCharacterBase::ASSCharacterBase()
 void ASSCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	// Remove Gun
-	// GetMesh()->HideBoneByName(TEXT("gun"), EPhysBodyOp::PBO_None);
 }
 
 void ASSCharacterBase::AttackHitCheck()

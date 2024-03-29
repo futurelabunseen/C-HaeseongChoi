@@ -16,6 +16,7 @@ class SUPERSOLDIER_API USSStratagem : public UObject, public ISSStratagemInterfa
 	GENERATED_BODY()
 public:
 	USSStratagem();
+	~USSStratagem();
 
 	virtual const TArray<EStrataCommand>& GetCommandSequence() const;
 	virtual void ActivateStratagem() override;

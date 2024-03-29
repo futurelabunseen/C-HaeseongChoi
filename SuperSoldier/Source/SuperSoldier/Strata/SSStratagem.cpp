@@ -11,6 +11,10 @@ USSStratagem::USSStratagem()
 	ArrCommand.Add(EStrataCommand::LEFT);
 }
 
+USSStratagem::~USSStratagem()
+{
+}
+
 const TArray<EStrataCommand>& USSStratagem::GetCommandSequence() const
 {
 	return ArrCommand;

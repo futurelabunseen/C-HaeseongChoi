@@ -32,6 +32,6 @@ class SUPERSOLDIER_API ISSStratagemInterface
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-	virtual const TArray<EStrataCommand>& GetCommandSequence() const = 0;
 	virtual void ActivateStratagem() = 0;
+	virtual const TArray<EStrataCommand>& GetCommandSequence() const = 0;
 };

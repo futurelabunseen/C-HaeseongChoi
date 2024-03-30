@@ -210,7 +210,7 @@ bool ASSCharacterPlayer::GetAnyMontagePlaying(UAnimMontage* FilterMontage)
 
 void ASSCharacterPlayer::AttemptSprintEndDelegate(UAnimMontage* TargetMontage, bool IsProperlyEnded)
 {
-	if (bSprint && GetAnyMontagePlaying(TargetMontage) == false)
+	if (!bAiming && bSprint && GetAnyMontagePlaying(TargetMontage) == false)
 	{
 		GetCharacterMovement()->MaxWalkSpeed = 600.0f;
 	}
@@ -276,11 +276,6 @@ void ASSCharacterPlayer::Sprint(const FInputActionValue& Value)
 void ASSCharacterPlayer::Aim(const FInputActionValue& Value)
 {
 	bAiming = Value.Get<bool>();
-
-	if (bCalling)
-	{
-		return;
-	}
 
 	if (bAiming)
 	{
@@ -389,7 +384,7 @@ void ASSCharacterPlayer::EndCalling(UAnimMontage* TargetMontage, bool IsProperly
 	}
 	else
 	{
-		if (bSprint && GetAnyMontagePlaying(TargetMontage) == false)
+		if (!bAiming && bSprint && GetAnyMontagePlaying(TargetMontage) == false)
 		{
 			GetCharacterMovement()->MaxWalkSpeed = 600.0f;
 		}

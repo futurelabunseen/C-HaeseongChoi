@@ -32,8 +32,11 @@ void USSAnimInstance::SetAimRotation(float DeltaSeconds)
 
 	FRotator ResultRotator = FMath::RInterpTo(CurRotator, DeltaRotation, DeltaSeconds, 15.0f);
 
-	AimPitch = FMath::ClampAngle(ResultRotator.Pitch, -90.0f, 90.0f);
-	AimYaw = FMath::ClampAngle(ResultRotator.Yaw, -90.0f, 90.0f);
+	AimPitch = ResultRotator.Pitch;
+	AimYaw = ResultRotator.Yaw;
+
+	// AimPitch = FMath::ClampAngle(ResultRotator.Pitch, -90.0f, 90.0f);
+	// AimYaw = FMath::ClampAngle(ResultRotator.Yaw, -90.0f, 90.0f);
 }
 
 void USSAnimInstance::NativeUpdateAnimation(float DeltaSeconds)

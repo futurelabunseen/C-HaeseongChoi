@@ -551,3 +551,10 @@ void ASSCharacterPlayer::AttackHitCheck()
 	DrawDebugLine(GetWorld(), TraceStart, TraceEnd, DrawColor, false, 5.0f);
 #endif
 }
+
+void ASSCharacterPlayer::ReleaseThrowable()
+{
+	UE_LOG(LogTemp, Log, TEXT("Player::ReleaseThrowable"))
+
+	// Throw Actor
+}

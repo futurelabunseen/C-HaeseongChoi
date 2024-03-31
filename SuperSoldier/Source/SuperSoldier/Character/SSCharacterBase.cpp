@@ -36,6 +36,10 @@ float ASSCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 	return DamageAmount;
 }
 
+void ASSCharacterBase::ReleaseThrowable()
+{
+}
+
 void ASSCharacterBase::SetDead()
 {
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);

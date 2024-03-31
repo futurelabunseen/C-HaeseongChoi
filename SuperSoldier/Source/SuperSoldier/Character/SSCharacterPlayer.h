@@ -131,4 +131,7 @@ protected:
 protected:
 	virtual void AttackHitCheck() override;
 
+// Throw Section
+public:
+	virtual void ReleaseThrowable() override;
 };

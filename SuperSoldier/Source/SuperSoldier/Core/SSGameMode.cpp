@@ -3,7 +3,10 @@
 
 #include "Core/SSGameMode.h"
 #include "Core/SSPlayerController.h"
+#include "Core/SSGameState.h"
 #include "GameFramework/HUD.h"
+#include "SuperSoldier.h"
+
 
 ASSGameMode::ASSGameMode()
 {
@@ -22,4 +25,42 @@ ASSGameMode::ASSGameMode()
 	{
 		PlayerControllerClass = PlayerControllerClassRef.Class;
 	}
+
+	// Set GameState
+	GameStateClass = ASSGameState::StaticClass();
+}
+
+void ASSGameMode::StartPlay()
+{
+	// 게임의 시작을 지시한다.
+	SS_LOG(LogSSNetwork, Log, TEXT("%s"), TEXT("Begin"));
+	Super::StartPlay();
+	SS_LOG(LogSSNetwork, Log, TEXT("%s"), TEXT("End"));
+}
+
+void ASSGameMode::PreLogin(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage)
+{
+	// 클라이언트의 접속 요청을 처리한다.
+	SS_LOG(LogSSNetwork, Log, TEXT("%s"), TEXT("====================================================================="));
+	SS_LOG(LogSSNetwork, Log, TEXT("%s"), TEXT("Begin"));
+	Super::PreLogin(Options, Address, UniqueId, ErrorMessage);
+	SS_LOG(LogSSNetwork, Log, TEXT("%s"), TEXT("End"));
+}
+
+APlayerController* ASSGameMode::Login(UPlayer* NewPlayer, ENetRole InRemoteRole, const FString& Portal, const FString& Options, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage)
+{
+	// 접속을 허용한 클라이언트에 대응하는 플레이어 컨트롤러를 만든다.
+	SS_LOG(LogSSNetwork, Log, TEXT("%s"), TEXT("Begin"));
+	APlayerController* NewPlayerController = Super::Login(NewPlayer, InRemoteRole, Portal, Options, UniqueId, ErrorMessage);
+	SS_LOG(LogSSNetwork, Log, TEXT("%s"), TEXT("End"));
+
+	return NewPlayerController;
+}
+
+void ASSGameMode::PostLogin(APlayerController* NewPlayer)
+{
+	// 플레이어 입장을 위해 플레이어에 필요한 기본 설정을 모두 마무리 한다.
+	SS_LOG(LogSSNetwork, Log, TEXT("%s"), TEXT("Begin"));
+	Super::PostLogin(NewPlayer);
+	SS_LOG(LogSSNetwork, Log, TEXT("%s"), TEXT("End"));
 }

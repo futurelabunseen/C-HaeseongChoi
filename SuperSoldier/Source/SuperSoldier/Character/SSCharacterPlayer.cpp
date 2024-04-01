@@ -163,12 +163,10 @@ void ASSCharacterPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 
-	APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
-
-	if (UEnhancedInputLocalPlayerSubsystem* Subsystem =
-		ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+	APlayerController* PlayerController = Cast<APlayerController>(GetController());
+	if (PlayerController)
 	{
-		Subsystem->AddMappingContext(NormalInputMappingContext, 0);
+		EnableInput(PlayerController);
 	}
 
 	if (CrosshairWidget)
@@ -184,6 +182,17 @@ void ASSCharacterPlayer::BeginPlay()
 	if (DefaultStratagem)
 	{
 		AvailableStratagems.Add(DefaultStratagem);
+	}
+
+	if (!IsLocallyControlled())
+	{
+		return;
+	}
+
+	if (UEnhancedInputLocalPlayerSubsystem* Subsystem =
+		ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+	{
+		Subsystem->AddMappingContext(NormalInputMappingContext, 0);
 	}
 }
 

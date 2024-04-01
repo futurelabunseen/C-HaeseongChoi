@@ -134,7 +134,5 @@ protected:
 // Throw Section
 public:
 	virtual void ReleaseThrowable() override;
-
-	UPROPERTY()
-	TSubclassOf<AActor> StrataIndicatorClass;
+	TObjectPtr<class AActor> CurStrataIndicator;
 };

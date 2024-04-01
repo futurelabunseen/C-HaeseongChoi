@@ -142,14 +142,6 @@ ASSCharacterPlayer::ASSCharacterPlayer()
 	{
 		CharacterControlManager.Add(ECharacterControlType::Aiming, AimModeRef.Object);
 	}
-
-	static ConstructorHelpers::FClassFinder<AActor> StrataIndicatorFinder(
-		TEXT("/Game/SuperSoldier/Props/BP_StrataIndicator.BP_StrataIndicator_C"));
-
-	if (StrataIndicatorFinder.Succeeded())
-	{
-		StrataIndicatorClass = StrataIndicatorFinder.Class;
-	}
 }
 
 void ASSCharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -382,9 +374,20 @@ void ASSCharacterPlayer::EndCalling(UAnimMontage* TargetMontage, bool IsProperly
 		// 다른 방법 필요
 		GetMesh()->HideBoneByName(TEXT("bot_hand"), EPhysBodyOp::PBO_None);
 
+		FString StrataIndicatorPath = TEXT("/Game/SuperSoldier/Props/BP_StrataIndicator.BP_StrataIndicator_C");
+		UClass* StrataIndicatorClass = StaticLoadClass(UObject::StaticClass(), nullptr, *StrataIndicatorPath);
+
 		if (StrataIndicatorClass)
 		{
-			GetWorld()->SpawnActor<AActor>(StrataIndicatorClass);
+			CurStrataIndicator = GetWorld()->SpawnActor<AActor>(StrataIndicatorClass);
+
+			USkeletalMeshComponent* PlayerSkeletalMesh = GetMesh();
+			if (PlayerSkeletalMesh)
+			{
+				FName SocketName = TEXT("Socket_StrataIndicator");
+				FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepRelative, true);
+				CurStrataIndicator->AttachToComponent(PlayerSkeletalMesh, AttachmentRules, SocketName);
+			}
 		}
 
 		const float AnimationSpeedRate = 1.0f;
@@ -567,7 +570,21 @@ void ASSCharacterPlayer::AttackHitCheck()
 
 void ASSCharacterPlayer::ReleaseThrowable()
 {
-	UE_LOG(LogTemp, Log, TEXT("Player::ReleaseThrowable"))
+	// UE_LOG(LogTemp, Log, TEXT("Player::ReleaseThrowable"))
 
 	// Throw Actor
+	if (CurStrataIndicator)
+	{
+		CurStrataIndicator->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+		CurStrataIndicator->SetActorRotation(FRotator(0.0f, 0.0f, 0.0f).Quaternion());
+
+		UClass* StrataIndicatorClass = CurStrataIndicator.GetClass();
+		UFunction* ThrowFunction = CurStrataIndicator->FindFunction(FName(TEXT("Throw")));
+
+		if (ThrowFunction)
+		{
+			FVector ThrowDirection = FVector(1.0f, 0.0f, 0.0f);
+			CurStrataIndicator->ProcessEvent(ThrowFunction, &ThrowDirection);
+		}
+	}
 }

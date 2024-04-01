@@ -142,6 +142,14 @@ ASSCharacterPlayer::ASSCharacterPlayer()
 	{
 		CharacterControlManager.Add(ECharacterControlType::Aiming, AimModeRef.Object);
 	}
+
+	static ConstructorHelpers::FClassFinder<AActor> StrataIndicatorFinder(
+		TEXT("/Game/SuperSoldier/Props/BP_StrataIndicator.BP_StrataIndicator_C"));
+
+	if (StrataIndicatorFinder.Succeeded())
+	{
+		StrataIndicatorClass = StrataIndicatorFinder.Class;
+	}
 }
 
 void ASSCharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -373,6 +381,11 @@ void ASSCharacterPlayer::EndCalling(UAnimMontage* TargetMontage, bool IsProperly
 		
 		// 다른 방법 필요
 		GetMesh()->HideBoneByName(TEXT("bot_hand"), EPhysBodyOp::PBO_None);
+
+		if (StrataIndicatorClass)
+		{
+			GetWorld()->SpawnActor<AActor>(StrataIndicatorClass);
+		}
 
 		const float AnimationSpeedRate = 1.0f;
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();

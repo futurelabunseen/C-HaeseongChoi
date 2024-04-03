@@ -17,7 +17,6 @@ public:
 	USSGameInstance();
 	virtual void Init() override;
 
-	UFUNCTION()
 	class USSStratagemManager* const GetStratagemManager() { return StratagemManager.Get(); }
 private:
 	UPROPERTY()

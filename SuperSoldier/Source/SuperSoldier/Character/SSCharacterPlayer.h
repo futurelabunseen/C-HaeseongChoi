@@ -95,11 +95,8 @@ protected:
 	bool bReadyForThrowingStrata;
 	bool bChangeMontageForThrowingStrata;
 
-	UPROPERTY()
 	TArray<EStrataCommand> InputSequence;
-
-	UPROPERTY()
-	TArray<class USSStratagem*> AvailableStratagems;
+	TArray<ISSStratagemInterface*> AvailableStratagems;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
 	TObjectPtr<class UAnimMontage> CallMontage;

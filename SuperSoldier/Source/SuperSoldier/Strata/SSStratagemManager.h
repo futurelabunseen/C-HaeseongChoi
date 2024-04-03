@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
+#include "Interface/SSStratagemInterface.h"
 #include "SSStratagemManager.generated.h"
 
 /**
@@ -15,10 +16,10 @@ class SUPERSOLDIER_API USSStratagemManager : public UObject
 	GENERATED_BODY()
 public:
 	USSStratagemManager();
-	
+
 	void InitializeStratagem();
-	class USSStratagem* GetStratagem(const FName& StratagemName);
+	ISSStratagemInterface* GetStratagem(const FName& StratagemName);
 private:
-	UPROPERTY()
-	TMap<FName, TObjectPtr<class USSStratagem>> StratagemMap;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Strata, Meta = (AllowPrivateAccess = "true"))
+	TMap<FName, ISSStratagemInterface*> StratagemMap;
 };

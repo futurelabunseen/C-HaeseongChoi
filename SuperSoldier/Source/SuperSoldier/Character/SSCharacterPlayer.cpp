@@ -15,7 +15,7 @@
 #include "Engine/DamageEvents.h"
 
 #include "Core/SSGameInstance.h"
-#include "Strata/SSStratagem.h"
+//#include "Interface/SSStratagemInterface.h"
 #include "Strata/SSStratagemManager.h"
 
 ASSCharacterPlayer::ASSCharacterPlayer()
@@ -178,7 +178,7 @@ void ASSCharacterPlayer::BeginPlay()
 	// Register Stratagem
 	USSGameInstance* SSGameInstance = Cast<USSGameInstance>(GetGameInstance());
 	USSStratagemManager* StratagemManager = SSGameInstance->GetStratagemManager();
-	USSStratagem* DefaultStratagem = StratagemManager->GetStratagem(FName(TEXT("Stratagem")));
+	ISSStratagemInterface* DefaultStratagem = StratagemManager->GetStratagem(FName(TEXT("Stratagem")));
 	if (DefaultStratagem)
 	{
 		AvailableStratagems.Add(DefaultStratagem);
@@ -479,52 +479,60 @@ void ASSCharacterPlayer::TranslateInput(const FInputActionValue& Value)
 bool ASSCharacterPlayer::MatchingInput()
 {
 	bool bSuccessMatching = false;
-	if (AvailableStratagems.IsEmpty() == false)
+	if (!AvailableStratagems.IsEmpty())
 	{
 		// 사용 가능한 스트라타젬을 순회, 매칭
-		for (USSStratagem* Stratagem : AvailableStratagems)
+		for (int i = 0; i < AvailableStratagems.Num(); ++i)
 		{
-			const TArray<EStrataCommand> StrataCommandArr = Stratagem->GetCommandSequence();
-
-			// 스트라타젬 커맨드 수보다, 현재 입력 커맨드 수가 많으면 검사할 필요가 없음
-			if (InputSequence.Num() > StrataCommandArr.Num()) continue;
-
-			// 입력 커맨드 수만큼 순회 하면서, 스트라타젬 커맨드와 비교
-			bool bAllInputCommandMatching = true;
-			for (int j = 0; j < InputSequence.Num(); ++j)
+			if (AvailableStratagems.IsValidIndex(i))
 			{
-				if (InputSequence[j] != StrataCommandArr[j])
+				ISSStratagemInterface* Stratagem = AvailableStratagems[i];
+
+				const TArray<EStrataCommand> StrataCommandArr = Stratagem->GetCommandSequence();
+
+				// 스트라타젬 커맨드 수보다, 현재 입력 커맨드 수가 많으면 검사할 필요가 없음
+				if (InputSequence.Num() > StrataCommandArr.Num())
 				{
-					bAllInputCommandMatching = false;
-					break;
+					continue;
 				}
-			}
 
-			// 모든 커맨드가 매칭이 성공했을 경우
-			if (bAllInputCommandMatching)
-			{
-				bSuccessMatching = true;
-
-				// 모든 커맨드가 매칭 성공 했으며, 입력 수와 스트라타젬 커맨드 수가 같으면
-				// 스트라타젬을 발동, 입력 커맨드 배열을 비운다.
-				int32 InputSequenceNum = InputSequence.Num();
-				int32 StrataCommandArrNum = StrataCommandArr.Num();
-
-				if (InputSequenceNum == StrataCommandArrNum)
+				// 입력 커맨드 수만큼 순회 하면서, 스트라타젬 커맨드와 비교
+				bool bAllInputCommandMatching = true;
+				for (int j = 0; j < InputSequence.Num(); ++j)
 				{
-					UE_LOG(LogTemp, Log, TEXT("Matching Success!!!!"))
-						Stratagem->ActivateStratagem();
-
-					UE_LOG(LogTemp, Log, TEXT("Reset InputSequence"))
-						InputSequence.Reset();
-
-					UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-					if (AnimInstance)
+					if (InputSequence[j] != StrataCommandArr[j])
 					{
-						AnimInstance->Montage_JumpToSection(TEXT("End"), CallMontage);
+						bAllInputCommandMatching = false;
+						break;
 					}
+				}
 
-					bChangeMontageForThrowingStrata = true;
+				// 모든 커맨드가 매칭이 성공했을 경우
+				if (bAllInputCommandMatching)
+				{
+					bSuccessMatching = true;
+
+					// 모든 커맨드가 매칭 성공 했으며, 입력 수와 스트라타젬 커맨드 수가 같으면
+					// 스트라타젬을 발동, 입력 커맨드 배열을 비운다.
+					int32 InputSequenceNum = InputSequence.Num();
+					int32 StrataCommandArrNum = StrataCommandArr.Num();
+
+					if (InputSequenceNum == StrataCommandArrNum)
+					{
+						UE_LOG(LogTemp, Log, TEXT("Matching Success!!!!"))
+							Stratagem->ActivateStratagem();
+
+						UE_LOG(LogTemp, Log, TEXT("Reset InputSequence"))
+							InputSequence.Reset();
+
+						UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+						if (AnimInstance)
+						{
+							AnimInstance->Montage_JumpToSection(TEXT("End"), CallMontage);
+						}
+
+						bChangeMontageForThrowingStrata = true;
+					}
 				}
 			}
 		}
@@ -535,7 +543,6 @@ bool ASSCharacterPlayer::MatchingInput()
 
 void ASSCharacterPlayer::ProcessCommandInput(const FInputActionValue& Value)
 {
-	UE_LOG(LogTemp, Log, TEXT("Start ProcessCommandInput"))
 	if (bCalling)
 	{
 		TranslateInput(Value);
@@ -544,10 +551,9 @@ void ASSCharacterPlayer::ProcessCommandInput(const FInputActionValue& Value)
 	if (!MatchingInput())
 	{
 		UE_LOG(LogTemp, Log, TEXT("Matching Fail Reset InputSequence"))
+
 		InputSequence.Reset();
-		UE_LOG(LogTemp, Log, TEXT("Reset Complete"))
 	}
-	UE_LOG(LogTemp, Log, TEXT("End ProcessCommandInput"))
 }
 
 void ASSCharacterPlayer::AttackHitCheck()

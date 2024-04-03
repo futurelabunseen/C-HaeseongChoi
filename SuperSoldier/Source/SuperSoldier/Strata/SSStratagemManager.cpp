@@ -2,7 +2,7 @@
 
 
 #include "SSStratagemManager.h"
-#include "Strata/SSStratagem.h"
+#include "Interface/SSStratagemInterface.h"
 #include "SSStratagem.h"
 
 USSStratagemManager::USSStratagemManager()
@@ -19,10 +19,11 @@ void USSStratagemManager::InitializeStratagem()
 	}
 }
 
-USSStratagem* USSStratagemManager::GetStratagem(const FName& StratagemName)
+ISSStratagemInterface* USSStratagemManager::GetStratagem(const FName& StratagemName)
 {
 	// 목록에 있는 특정 스트라타젬을 가져와 리턴
-	USSStratagem* RetVal = StratagemMap.Find(StratagemName)->Get();
-	check(RetVal)
+	const TScriptInterface<ISSStratagemInterface>& RetStratagem = *StratagemMap.Find(StratagemName);
+	ISSStratagemInterface* RetVal = RetStratagem.GetInterface();
+
 	return RetVal;
 }

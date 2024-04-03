@@ -21,5 +21,5 @@ public:
 	ISSStratagemInterface* GetStratagem(const FName& StratagemName);
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Strata, Meta = (AllowPrivateAccess = "true"))
-	TMap<FName, ISSStratagemInterface*> StratagemMap;
+	TMap<FName, TScriptInterface<ISSStratagemInterface>> StratagemMap;
 };

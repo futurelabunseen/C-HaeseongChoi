@@ -22,7 +22,8 @@ void USSStratagemManager::InitializeStratagem()
 ISSStratagemInterface* USSStratagemManager::GetStratagem(const FName& StratagemName)
 {
 	// 목록에 있는 특정 스트라타젬을 가져와 리턴
-	ISSStratagemInterface* RetVal = *StratagemMap.Find(StratagemName);
+	const TScriptInterface<ISSStratagemInterface>& RetStratagem = *StratagemMap.Find(StratagemName);
+	ISSStratagemInterface* RetVal = RetStratagem.GetInterface();
 
 	return RetVal;
 }

@@ -14,7 +14,7 @@ class SUPERSOLDIER_API ASSCharacterNonPlayer : public ASSCharacterBase
 {
 	GENERATED_BODY()
 public:
-	ASSCharacterNonPlayer();
+	ASSCharacterNonPlayer(const FObjectInitializer& ObjectInitializer);
 	
 protected:
 	virtual void SetDead() override;

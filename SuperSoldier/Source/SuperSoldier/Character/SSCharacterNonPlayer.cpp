@@ -5,7 +5,8 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
-ASSCharacterNonPlayer::ASSCharacterNonPlayer()
+ASSCharacterNonPlayer::ASSCharacterNonPlayer(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer)
 {
 	// Capsule
 	GetCapsuleComponent()->InitCapsuleSize(200.f, 200.0f);

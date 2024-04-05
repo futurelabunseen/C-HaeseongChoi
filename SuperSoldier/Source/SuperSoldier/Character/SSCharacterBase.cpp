@@ -8,7 +8,8 @@
 #include "Physics/SSColision.h"
 
 // Sets default values
-ASSCharacterBase::ASSCharacterBase()
+ASSCharacterBase::ASSCharacterBase(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer)
 {
 	// Capsule
 	GetCapsuleComponent()->SetCollisionProfileName(CPROFILE_SSCAPSULE);

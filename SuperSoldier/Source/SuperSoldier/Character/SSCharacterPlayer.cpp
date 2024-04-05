@@ -15,13 +15,13 @@
 #include "Engine/DamageEvents.h"
 
 #include "Core/SSGameInstance.h"
-//#include "Interface/SSStratagemInterface.h"
 #include "Strata/SSStratagemManager.h"
 
 #include "SuperSoldier.h"
 #include "EngineUtils.h"
 
-ASSCharacterPlayer::ASSCharacterPlayer()
+ASSCharacterPlayer::ASSCharacterPlayer(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer)
 {
 	// Pawn
 	bUseControllerRotationPitch = false;

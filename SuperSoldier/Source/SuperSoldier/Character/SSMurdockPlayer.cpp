@@ -2,8 +2,10 @@
 
 
 #include "Character/SSMurdockPlayer.h"
+#include "SSCharacterMovementComponent.h"
 
-ASSMurdockPlayer::ASSMurdockPlayer()
+ASSMurdockPlayer::ASSMurdockPlayer(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer.SetDefaultSubobjectClass<USSCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
 {
 	// Mesh & AnimInstance
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -100.0f), FRotator(0.0f, -90.0f, 0.0f));

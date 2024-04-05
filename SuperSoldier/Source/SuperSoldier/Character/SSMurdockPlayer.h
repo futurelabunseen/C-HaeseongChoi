@@ -14,7 +14,7 @@ class SUPERSOLDIER_API ASSMurdockPlayer : public ASSCharacterPlayer
 {
 	GENERATED_BODY()
 public:
-	ASSMurdockPlayer();
+	ASSMurdockPlayer(const FObjectInitializer& ObjectInitializer);
 protected:
 	virtual void BeginPlay() override;
 };

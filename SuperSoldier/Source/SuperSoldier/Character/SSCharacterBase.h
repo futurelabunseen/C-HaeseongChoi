@@ -20,7 +20,7 @@ class SUPERSOLDIER_API ASSCharacterBase : public ACharacter, public ISSAnimation
 	GENERATED_BODY()
 
 public:
-	ASSCharacterBase();
+	ASSCharacterBase(const FObjectInitializer& ObjectInitializer);
 protected:
 	virtual void BeginPlay() override;
 

@@ -17,7 +17,7 @@ class SUPERSOLDIER_API ASSCharacterPlayer : public ASSCharacterBase
 {
 	GENERATED_BODY()
 public:
-	ASSCharacterPlayer();
+	ASSCharacterPlayer(const FObjectInitializer& ObjectInitializer);
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 protected:

@@ -19,9 +19,10 @@
 
 #include "SuperSoldier.h"
 #include "EngineUtils.h"
+#include "SSCharacterMovementComponent.h"
 
 ASSCharacterPlayer::ASSCharacterPlayer(const FObjectInitializer& ObjectInitializer)
-	: Super(ObjectInitializer)
+	: Super(ObjectInitializer.SetDefaultSubobjectClass<USSCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
 {
 	// Pawn
 	bUseControllerRotationPitch = false;
@@ -49,8 +50,8 @@ ASSCharacterPlayer::ASSCharacterPlayer(const FObjectInitializer& ObjectInitializ
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	FollowCamera->bUsePawnControlRotation = false;
 
-	bSprint = false;
 	bAiming = false;
+	bSprintKeyPressing = false;
 	bReadyForThrowingStrata = false;
 	bChangeMontageForThrowingStrata = false;
 
@@ -221,9 +222,9 @@ bool ASSCharacterPlayer::GetAnyMontagePlaying(UAnimMontage* FilterMontage)
 
 void ASSCharacterPlayer::AttemptSprintEndDelegate(UAnimMontage* TargetMontage, bool IsProperlyEnded)
 {
-	if (!bAiming && bSprint && GetAnyMontagePlaying(TargetMontage) == false)
+	if (!bAiming && bSprintKeyPressing && GetAnyMontagePlaying(TargetMontage) == false)
 	{
-		GetCharacterMovement()->MaxWalkSpeed = 600.0f;
+		SetSprintToMovementComponent(true);
 	}
 }
 
@@ -232,7 +233,6 @@ void ASSCharacterPlayer::SetCharacterControlData(const USSCharacterControlData* 
 	bUseControllerRotationYaw = CharacterControlData->bUseControllerRotationYaw;
 
 	GetCharacterMovement()->bOrientRotationToMovement = CharacterControlData->bOrientRotationToMovement;
-	GetCharacterMovement()->MaxWalkSpeed = CharacterControlData->MaxWalkSpeed;
 
 	CharacterControlData->bCrosshairVisibility ? 
 		CrosshairWidget->SetVisibility(ESlateVisibility::Visible) : 
@@ -264,23 +264,30 @@ void ASSCharacterPlayer::Look(const FInputActionValue& Value)
 	AddControllerPitchInput(LookAxisVector.Y);
 }
 
-bool ASSCharacterPlayer::AttemptSprint()
+void ASSCharacterPlayer::SetSprintToMovementComponent(bool bNewSprint)
 {
-	if(!bAiming && bSprint && !GetAnyMontagePlaying())
+	USSCharacterMovementComponent* SSCharacterMovement = Cast<USSCharacterMovementComponent>(GetCharacterMovement());
+	SSCharacterMovement->SetSprint(bNewSprint);
+}
+
+void ASSCharacterPlayer::AttemptSprint()
+{
+	if(!bAiming && bSprintKeyPressing && !GetAnyMontagePlaying())
 	{
-		GetCharacterMovement()->MaxWalkSpeed = 600.0f;
-		return true;
+		SetSprintToMovementComponent(true);
 	}
-	return false;
 }
 
 void ASSCharacterPlayer::Sprint(const FInputActionValue& Value)
 {
-	bSprint = Value.Get<bool>();
-
-	if (AttemptSprint() == false)
+	bSprintKeyPressing = Value.Get<bool>();
+	if (bSprintKeyPressing)
 	{
-		GetCharacterMovement()->MaxWalkSpeed = 400.0f;
+		AttemptSprint();
+	}
+	else
+	{
+		SetSprintToMovementComponent(false);
 	}
 }
 
@@ -291,12 +298,11 @@ void ASSCharacterPlayer::Aim(const FInputActionValue& Value)
 	if (bAiming)
 	{
 		SetCharacterControlData(*CharacterControlManager.Find(ECharacterControlType::Aiming));
+		SetSprintToMovementComponent(false);
 	}
 	else
 	{
 		SetCharacterControlData(*CharacterControlManager.Find(ECharacterControlType::Normal));
-
-		GetCharacterMovement()->MaxWalkSpeed = 400.0f;
 		AttemptSprint();
 	}
 }
@@ -330,7 +336,7 @@ void ASSCharacterPlayer::Throw(const FInputActionValue& Value)
 {
 	if (!GetAnyMontagePlaying())
 	{
-		GetCharacterMovement()->MaxWalkSpeed = 400.0f;
+		SetSprintToMovementComponent(false);
 
 		const float AnimationSpeedRate = 1.0f;
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
@@ -350,7 +356,7 @@ void ASSCharacterPlayer::Call(const FInputActionValue& Value)
 
 		if (bCalling)
 		{
-			GetCharacterMovement()->MaxWalkSpeed = 400.0f;
+			SetSprintToMovementComponent(false);
 
 			const float AnimationSpeedRate = 1.0f;
 			UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
@@ -383,7 +389,8 @@ void ASSCharacterPlayer::EndCalling(UAnimMontage* TargetMontage, bool IsProperly
 	if (bChangeMontageForThrowingStrata)
 	{
 		bReadyForThrowingStrata = true;
-		
+		bChangeMontageForThrowingStrata = false;
+
 		// 다른 방법 필요
 		GetMesh()->HideBoneByName(TEXT("bot_hand"), EPhysBodyOp::PBO_None);
 
@@ -413,9 +420,9 @@ void ASSCharacterPlayer::EndCalling(UAnimMontage* TargetMontage, bool IsProperly
 	}
 	else
 	{
-		if (!bAiming && bSprint && GetAnyMontagePlaying(TargetMontage) == false)
+		if (!bAiming && bSprintKeyPressing && GetAnyMontagePlaying(TargetMontage) == false)
 		{
-			GetCharacterMovement()->MaxWalkSpeed = 600.0f;
+			SetSprintToMovementComponent(true);
 		}
 	}
 }
@@ -606,8 +613,6 @@ void ASSCharacterPlayer::AttackHitCheck()
 
 void ASSCharacterPlayer::ReleaseThrowable()
 {
-	// UE_LOG(LogTemp, Log, TEXT("Player::ReleaseThrowable"))
-
 	// Throw Actor
 	if (CurStrataIndicator)
 	{

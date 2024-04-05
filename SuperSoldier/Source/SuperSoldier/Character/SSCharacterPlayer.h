@@ -55,13 +55,15 @@ protected:
 
 // Sprint Section
 protected:
-	bool bSprint;
+	bool bSprintKeyPressing;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> SprintAction;
 
-	bool AttemptSprint();
+	void AttemptSprint();
 	void Sprint(const FInputActionValue& Value);
+	void SetSprintToMovementComponent(bool bNewSprint);
+
 // Aim Section
 protected:
 	bool bAiming;

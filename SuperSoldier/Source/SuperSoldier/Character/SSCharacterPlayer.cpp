@@ -18,6 +18,9 @@
 //#include "Interface/SSStratagemInterface.h"
 #include "Strata/SSStratagemManager.h"
 
+#include "SuperSoldier.h"
+#include "EngineUtils.h"
+
 ASSCharacterPlayer::ASSCharacterPlayer()
 {
 	// Pawn
@@ -163,18 +166,6 @@ void ASSCharacterPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 
-	APlayerController* PlayerController = Cast<APlayerController>(GetController());
-	if (PlayerController)
-	{
-		EnableInput(PlayerController);
-	}
-
-	if (CrosshairWidget)
-	{
-		CrosshairWidget->AddToViewport();
-		CrosshairWidget->SetVisibility(ESlateVisibility::Hidden);
-	}
-
 	// Register Stratagem
 	USSGameInstance* SSGameInstance = Cast<USSGameInstance>(GetGameInstance());
 	USSStratagemManager* StratagemManager = SSGameInstance->GetStratagemManager();
@@ -184,15 +175,26 @@ void ASSCharacterPlayer::BeginPlay()
 		AvailableStratagems.Add(DefaultStratagem);
 	}
 
-	if (!IsLocallyControlled())
+	// If Locally Controlled
+	if (IsLocallyControlled())
 	{
-		return;
-	}
+		APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
+		if (PlayerController)
+		{
+			EnableInput(PlayerController);
 
-	if (UEnhancedInputLocalPlayerSubsystem* Subsystem =
-		ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
-	{
-		Subsystem->AddMappingContext(NormalInputMappingContext, 0);
+			if (CrosshairWidget)
+			{
+				CrosshairWidget->AddToViewport();
+				CrosshairWidget->SetVisibility(ESlateVisibility::Hidden);
+			}
+		}
+
+		if (UEnhancedInputLocalPlayerSubsystem* Subsystem =
+			ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+		{
+			Subsystem->AddMappingContext(NormalInputMappingContext, 0);
+		}
 	}
 }
 
@@ -319,6 +321,8 @@ void ASSCharacterPlayer::Fire(const FInputActionValue& Value)
 		const float AnimationSpeedRate = 1.0f;
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 		AnimInstance->Montage_Play(FireMontage, AnimationSpeedRate);
+
+		ServerRpcFire();
 	}
 }
 
@@ -558,29 +562,46 @@ void ASSCharacterPlayer::ProcessCommandInput(const FInputActionValue& Value)
 
 void ASSCharacterPlayer::AttackHitCheck()
 {
-	FVector CameraLocation;
-	FRotator CameraRotation;
-	GetController()->GetPlayerViewPoint(CameraLocation, CameraRotation);
-
-	FVector TraceStart = CameraLocation;
-	FVector TraceEnd = TraceStart + CameraRotation.Vector() * 5000.0f;
-
-	FHitResult HitResult;
-	FCollisionQueryParams TraceParams(FName(TEXT("Attack")), false, this);
-
-	bool HitDetected = GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, CCHANNEL_SSACTION, TraceParams);
-
-	if (HitDetected)
+	if (IsLocallyControlled())
 	{
-		FDamageEvent DamageEvent;
-		const float AttackDamage = 30.0f;
-		HitResult.GetActor()->TakeDamage(AttackDamage, DamageEvent, GetController(), this);
-	}
+		FVector CameraLocation;
+		FRotator CameraRotation;
+		GetController()->GetPlayerViewPoint(CameraLocation, CameraRotation);
 
+		FVector TraceStart = CameraLocation;
+		FVector TraceEnd = TraceStart + CameraRotation.Vector() * 5000.0f;
+
+		FHitResult HitResult;
+		FCollisionQueryParams TraceParams(FName(TEXT("Attack")), false, this);
+
+		bool HitDetected = GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, CCHANNEL_SSACTION, TraceParams);
+
+		if (HasAuthority())
+		{
+			if (HitDetected)
+			{
+				FDamageEvent DamageEvent;
+				const float AttackDamage = 30.0f;
+				HitResult.GetActor()->TakeDamage(AttackDamage, DamageEvent, GetController(), this);
+			}
+		}
+		else
+		{
+			if (HitDetected)
+			{
+				ServerRpcNotifyHit(HitResult);
+			}
+			else
+			{
+				ServerRpcNotifyMiss(TraceStart, TraceEnd);
+			}
+		}
+	
 #if ENABLE_DRAW_DEBUG
-	FColor DrawColor = HitDetected ? FColor::Green : FColor::Red;
-	DrawDebugLine(GetWorld(), TraceStart, TraceEnd, DrawColor, false, 5.0f);
+		FColor DrawColor = HitDetected ? FColor::Green : FColor::Red;
+		DrawDebugLine(GetWorld(), TraceStart, TraceEnd, DrawColor, false, 5.0f);
 #endif
+	}
 }
 
 void ASSCharacterPlayer::ReleaseThrowable()
@@ -601,5 +622,91 @@ void ASSCharacterPlayer::ReleaseThrowable()
 			FVector ThrowDirection = FVector(1.0f, 0.0f, 0.0f);
 			CurStrataIndicator->ProcessEvent(ThrowFunction, &ThrowDirection);
 		}
+	}
+}
+
+void ASSCharacterPlayer::ClientRpcPlayAnimation_Implementation(ASSCharacterPlayer* CharacterToPlay)
+{
+	if (CharacterToPlay)
+	{
+		const float AnimationSpeedRate = 1.0f;
+		UAnimInstance* AnimInstance = CharacterToPlay->GetMesh()->GetAnimInstance();
+		AnimInstance->Montage_Play(FireMontage, AnimationSpeedRate);
+	}
+}
+
+bool ASSCharacterPlayer::ServerRpcNotifyHit_Validate(const FHitResult& HitResult)
+{
+	return true;
+}
+
+void ASSCharacterPlayer::ServerRpcNotifyHit_Implementation(const FHitResult& HitResult)
+{
+	AActor* HitActor = HitResult.GetActor();
+	if (IsValid(HitActor))
+	{
+		const float AcceptCheckDistance = 300.0f;
+
+		const FVector HitLocation = HitResult.Location;
+		const FBox HitBox = HitActor->GetComponentsBoundingBox();
+		const FVector ActorBoxCenter = (HitBox.Min + HitBox.Max) * 0.5f;
+
+		if (FVector::DistSquared(HitLocation, ActorBoxCenter) <= AcceptCheckDistance * AcceptCheckDistance)
+		{
+			FDamageEvent DamageEvent;
+			const float AttackDamage = 30.0f;
+			HitResult.GetActor()->TakeDamage(AttackDamage, DamageEvent, GetController(), this);
+		}
+	}
+}
+
+bool ASSCharacterPlayer::ServerRpcNotifyMiss_Validate(FVector_NetQuantize TraceStart, FVector_NetQuantize TraceEnd)
+{
+#if ENABLE_DRAW_DEBUG
+	DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Cyan, false, 5.0f);
+#endif
+	return true;
+}
+
+void ASSCharacterPlayer::ServerRpcNotifyMiss_Implementation(FVector_NetQuantize TraceStart, FVector_NetQuantize TraceEnd)
+{
+
+}
+
+bool ASSCharacterPlayer::ServerRpcFire_Validate()
+{
+	return true;
+}
+
+void ASSCharacterPlayer::ServerRpcFire_Implementation()
+{
+	const float AnimationSpeedRate = 1.0f;
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	AnimInstance->Montage_Play(FireMontage, AnimationSpeedRate);
+
+	for (APlayerController* PlayerController : TActorRange<APlayerController>(GetWorld()))
+	{
+		if (PlayerController && GetController() != PlayerController)
+		{
+			if (!PlayerController->IsLocalController())
+			{
+				ASSCharacterPlayer* OtherPlayer = Cast<ASSCharacterPlayer>(PlayerController->GetPawn());
+
+				if(OtherPlayer)
+				{
+					OtherPlayer->ClientRpcPlayAnimation(this);
+				}
+			}
+		}
+	}
+}
+
+void ASSCharacterPlayer::MulticastRpcFire_Implementation()
+{
+	if (!IsLocallyControlled())
+	{
+		const float AnimationSpeedRate = 1.0f;
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		AnimInstance->Montage_Play(FireMontage, AnimationSpeedRate);
 	}
 }

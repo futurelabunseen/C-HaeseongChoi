@@ -14,5 +14,7 @@ class SUPERSOLDIER_API ASSPlayerController : public APlayerController
 {
 	GENERATED_BODY()
 protected:
+	virtual void PostInitializeComponents() override;
+	virtual void PostNetInit() override;
 	virtual void BeginPlay() override;
 };

@@ -20,7 +20,6 @@ public:
 	ASSCharacterPlayer();
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-	
 protected:
 	// CharacterControl Section
 	virtual void SetCharacterControlData(const class USSCharacterControlData* CharacterControlData);
@@ -132,4 +131,21 @@ protected:
 public:
 	virtual void ReleaseThrowable() override;
 	TObjectPtr<class AActor> CurStrataIndicator;
+
+// RPC Section
+protected:
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerRpcFire();
+
+	UFUNCTION(NetMulticast, Unreliable)
+	void MulticastRpcFire();
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerRpcNotifyHit(const FHitResult& HitResult);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerRpcNotifyMiss(FVector_NetQuantize TraceStart, FVector_NetQuantize TraceEnd);
+
+	UFUNCTION(Client, Unreliable)
+	void ClientRpcPlayAnimation(ASSCharacterPlayer* CharacterToPlay);
 };

@@ -230,10 +230,6 @@ void ASSCharacterPlayer::AttemptSprintEndDelegate(UAnimMontage* TargetMontage, b
 
 void ASSCharacterPlayer::SetCharacterControlData(const USSCharacterControlData* CharacterControlData)
 {
-	bUseControllerRotationYaw = CharacterControlData->bUseControllerRotationYaw;
-
-	GetCharacterMovement()->bOrientRotationToMovement = CharacterControlData->bOrientRotationToMovement;
-
 	CharacterControlData->bCrosshairVisibility ? 
 		CrosshairWidget->SetVisibility(ESlateVisibility::Visible) : 
 		CrosshairWidget->SetVisibility(ESlateVisibility::Hidden);
@@ -294,17 +290,25 @@ void ASSCharacterPlayer::Sprint(const FInputActionValue& Value)
 void ASSCharacterPlayer::Aim(const FInputActionValue& Value)
 {
 	bAiming = Value.Get<bool>();
+	SetAimingToMovementComponent(bAiming);
 
 	if (bAiming)
 	{
 		SetCharacterControlData(*CharacterControlManager.Find(ECharacterControlType::Aiming));
 		SetSprintToMovementComponent(false);
+
 	}
 	else
 	{
 		SetCharacterControlData(*CharacterControlManager.Find(ECharacterControlType::Normal));
 		AttemptSprint();
 	}
+}
+
+void ASSCharacterPlayer::SetAimingToMovementComponent(bool bNewAiming)
+{
+	USSCharacterMovementComponent* SSCharacterMovement = Cast<USSCharacterMovementComponent>(GetCharacterMovement());
+	SSCharacterMovement->SetAiming(bNewAiming);
 }
 
 void ASSCharacterPlayer::Fire(const FInputActionValue& Value)

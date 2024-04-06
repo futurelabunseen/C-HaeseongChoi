@@ -16,15 +16,6 @@ class SUPERSOLDIER_API USSCharacterControlData : public UPrimaryDataAsset
 public:
 	USSCharacterControlData();
 
-	UPROPERTY(EditAnywhere, Category = Pawn)
-	uint32 bUseControllerRotationYaw : 1;
-
-	UPROPERTY(EditAnywhere, Category = CharacterMovement)
-	uint32 bOrientRotationToMovement : 1;
-
-	UPROPERTY(EditAnywhere, Category = CharacterMovement)
-	float MaxWalkSpeed;
-
 	UPROPERTY(EditAnywhere, Category = SpringArm)
 	float TargetArmLength;
 

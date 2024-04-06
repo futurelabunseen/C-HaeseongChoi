@@ -7,6 +7,7 @@
 USSCharacterMovementComponent::USSCharacterMovementComponent()
 {
 	bSprint = false;
+	bAiming = false;
 	WalkSpeed = 400.0f;
 	SprintSpeed = 600.0f;
 }
@@ -14,6 +15,11 @@ USSCharacterMovementComponent::USSCharacterMovementComponent()
 void USSCharacterMovementComponent::SetSprint(bool NewSprint)
 {
 	bSprint = NewSprint;
+}
+
+void USSCharacterMovementComponent::SetAiming(bool NewAiming)
+{
+	bAiming = NewAiming;
 }
 
 void USSCharacterMovementComponent::Sprint()
@@ -31,10 +37,28 @@ void USSCharacterMovementComponent::Sprint()
 	}
 }
 
+void USSCharacterMovementComponent::Aiming()
+{
+	if (CharacterOwner)
+	{
+		if (bAiming)
+		{
+			CharacterOwner->bUseControllerRotationYaw = true;
+			bOrientRotationToMovement = false;
+		}
+		else
+		{
+			CharacterOwner->bUseControllerRotationYaw = false;
+			bOrientRotationToMovement = true;
+		}
+	}
+}
+
 void USSCharacterMovementComponent::OnMovementUpdated(float DeltaSeconds, const FVector& OldLocation, const FVector& OldVelocity)
 {
 	Super::OnMovementUpdated(DeltaSeconds, OldLocation, OldVelocity);
 	Sprint();
+	Aiming();
 }
 
 FNetworkPredictionData_Client* USSCharacterMovementComponent::GetPredictionData_Client() const
@@ -57,7 +81,10 @@ void USSCharacterMovementComponent::UpdateFromCompressedFlags(uint8 Flags)
 	Super::UpdateFromCompressedFlags(Flags);
 
 	bSprint = (Flags & FSavedMove_Character::FLAG_Custom_0) != 0;
+	bAiming = (Flags & FSavedMove_Character::FLAG_Custom_1) != 0;
+
 	Sprint();
+	Aiming();
 }
 
 FSSNetworkPredictionData_Client_Character::FSSNetworkPredictionData_Client_Character(const UCharacterMovementComponent& ClientMovement)
@@ -74,6 +101,7 @@ void FSSSavedMove_Character::Clear()
 {
 	Super::Clear();
 	bSprint = false;
+	bAiming = false;
 }
 
 uint8 FSSSavedMove_Character::GetCompressedFlags() const
@@ -83,6 +111,11 @@ uint8 FSSSavedMove_Character::GetCompressedFlags() const
 	if (bSprint)
 	{
 		Result |= FLAG_Custom_0;
+	}
+
+	if (bAiming)
+	{
+		Result |= FLAG_Custom_1;
 	}
 
 	return Result;
@@ -100,6 +133,11 @@ bool FSSSavedMove_Character::CanCombineWith(const FSavedMovePtr& NewMove, AChara
 		return false;
 	}
 
+	if (bAiming != NewCharacterMove->bAiming)
+	{
+		return false;
+	}
+
 	return Super::CanCombineWith(NewMove, InCharacter, MaxDelta);
 }
 
@@ -111,6 +149,7 @@ void FSSSavedMove_Character::SetMoveFor(ACharacter* C, float InDeltaTime, FVecto
 
 	USSCharacterMovementComponent* CharacterMovement = Cast<USSCharacterMovementComponent>(C->GetCharacterMovement());
 	bSprint = CharacterMovement->bSprint;
+	bAiming = CharacterMovement->bAiming;
 }
 
 // Take the data in the saved move
@@ -121,4 +160,5 @@ void FSSSavedMove_Character::PrepMoveFor(ACharacter* C)
 
 	USSCharacterMovementComponent* CharacterMovement = Cast<USSCharacterMovementComponent>(C->GetCharacterMovement());
 	CharacterMovement->bSprint = bSprint;
+	CharacterMovement->bAiming = bAiming;
 }

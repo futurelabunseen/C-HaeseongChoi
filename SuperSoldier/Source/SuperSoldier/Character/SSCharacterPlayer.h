@@ -121,6 +121,7 @@ protected:
 	void TranslateInput(const FInputActionValue& Value);
 	bool MatchingInput();
 	void ProcessCommandInput(const FInputActionValue& Value);
+
 // Crosshair Section
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Widget, Meta = (AllowPrivateAccess = "true"))
@@ -137,18 +138,22 @@ public:
 
 // RPC Section
 protected:
+	void RpcPlayAnimation(UAnimMontage* MontageToPlay);
+
+	UFUNCTION(Client, Unreliable)
+	void ClientRpcPlayAnimation(ASSCharacterPlayer* CharacterToPlay, UAnimMontage* MontageToPlay);
+
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerRpcFire();
 
-	UFUNCTION(NetMulticast, Unreliable)
-	void MulticastRpcFire();
-
 	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerRpcNotifyHit(const FHitResult& HitResult);
+	void ServerRpcNotifyFireHit(const FHitResult& HitResult);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerRpcNotifyMiss(FVector_NetQuantize TraceStart, FVector_NetQuantize TraceEnd);
 
-	UFUNCTION(Client, Unreliable)
-	void ClientRpcPlayAnimation(ASSCharacterPlayer* CharacterToPlay);
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerRpcThrow();
+
+	
 };

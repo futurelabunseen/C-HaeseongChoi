@@ -346,6 +346,8 @@ void ASSCharacterPlayer::Throw(const FInputActionValue& Value)
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 		AnimInstance->Montage_Play(ThrowMontage, AnimationSpeedRate);
 
+		ServerRpcThrow();
+
 		FOnMontageEnded EndDelegate;
 		EndDelegate.BindUObject(this, &ASSCharacterPlayer::AttemptSprintEndDelegate);
 		AnimInstance->Montage_SetEndDelegate(EndDelegate, ThrowMontage);
@@ -600,7 +602,7 @@ void ASSCharacterPlayer::AttackHitCheck()
 		{
 			if (HitDetected)
 			{
-				ServerRpcNotifyHit(HitResult);
+				ServerRpcNotifyFireHit(HitResult);
 			}
 			else
 			{
@@ -634,22 +636,55 @@ void ASSCharacterPlayer::ReleaseThrowable()
 	}
 }
 
-void ASSCharacterPlayer::ClientRpcPlayAnimation_Implementation(ASSCharacterPlayer* CharacterToPlay)
+void ASSCharacterPlayer::RpcPlayAnimation(UAnimMontage* MontageToPlay)
+{
+	for (APlayerController* PlayerController : TActorRange<APlayerController>(GetWorld()))
+	{
+		if (PlayerController && GetController() != PlayerController)
+		{
+			if (!PlayerController->IsLocalController())
+			{
+				ASSCharacterPlayer* OtherPlayer = Cast<ASSCharacterPlayer>(PlayerController->GetPawn());
+
+				if (OtherPlayer)
+				{
+					OtherPlayer->ClientRpcPlayAnimation(this, FireMontage);
+				}
+			}
+		}
+	}
+}
+
+void ASSCharacterPlayer::ClientRpcPlayAnimation_Implementation(ASSCharacterPlayer* CharacterToPlay, UAnimMontage* MontageToPlay)
 {
 	if (CharacterToPlay)
 	{
 		const float AnimationSpeedRate = 1.0f;
 		UAnimInstance* AnimInstance = CharacterToPlay->GetMesh()->GetAnimInstance();
-		AnimInstance->Montage_Play(FireMontage, AnimationSpeedRate);
+		AnimInstance->Montage_Play(MontageToPlay, AnimationSpeedRate);
 	}
 }
 
-bool ASSCharacterPlayer::ServerRpcNotifyHit_Validate(const FHitResult& HitResult)
+bool ASSCharacterPlayer::ServerRpcFire_Validate()
 {
 	return true;
 }
 
-void ASSCharacterPlayer::ServerRpcNotifyHit_Implementation(const FHitResult& HitResult)
+void ASSCharacterPlayer::ServerRpcFire_Implementation()
+{
+	const float AnimationSpeedRate = 1.0f;
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	AnimInstance->Montage_Play(FireMontage, AnimationSpeedRate);
+
+	RpcPlayAnimation(FireMontage);
+}
+
+bool ASSCharacterPlayer::ServerRpcNotifyFireHit_Validate(const FHitResult& HitResult)
+{
+	return true;
+}
+
+void ASSCharacterPlayer::ServerRpcNotifyFireHit_Implementation(const FHitResult& HitResult)
 {
 	AActor* HitActor = HitResult.GetActor();
 	if (IsValid(HitActor))
@@ -672,7 +707,7 @@ void ASSCharacterPlayer::ServerRpcNotifyHit_Implementation(const FHitResult& Hit
 bool ASSCharacterPlayer::ServerRpcNotifyMiss_Validate(FVector_NetQuantize TraceStart, FVector_NetQuantize TraceEnd)
 {
 #if ENABLE_DRAW_DEBUG
-	DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Cyan, false, 5.0f);
+	// DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Cyan, false, 5.0f);
 #endif
 	return true;
 }
@@ -682,40 +717,16 @@ void ASSCharacterPlayer::ServerRpcNotifyMiss_Implementation(FVector_NetQuantize 
 
 }
 
-bool ASSCharacterPlayer::ServerRpcFire_Validate()
+bool ASSCharacterPlayer::ServerRpcThrow_Validate()
 {
 	return true;
 }
 
-void ASSCharacterPlayer::ServerRpcFire_Implementation()
+void ASSCharacterPlayer::ServerRpcThrow_Implementation()
 {
 	const float AnimationSpeedRate = 1.0f;
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	AnimInstance->Montage_Play(FireMontage, AnimationSpeedRate);
+	AnimInstance->Montage_Play(ThrowMontage, AnimationSpeedRate);
 
-	for (APlayerController* PlayerController : TActorRange<APlayerController>(GetWorld()))
-	{
-		if (PlayerController && GetController() != PlayerController)
-		{
-			if (!PlayerController->IsLocalController())
-			{
-				ASSCharacterPlayer* OtherPlayer = Cast<ASSCharacterPlayer>(PlayerController->GetPawn());
-
-				if(OtherPlayer)
-				{
-					OtherPlayer->ClientRpcPlayAnimation(this);
-				}
-			}
-		}
-	}
-}
-
-void ASSCharacterPlayer::MulticastRpcFire_Implementation()
-{
-	if (!IsLocallyControlled())
-	{
-		const float AnimationSpeedRate = 1.0f;
-		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-		AnimInstance->Montage_Play(FireMontage, AnimationSpeedRate);
-	}
+	RpcPlayAnimation(ThrowMontage);
 }

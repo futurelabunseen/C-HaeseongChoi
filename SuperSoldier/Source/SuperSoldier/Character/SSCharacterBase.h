@@ -23,7 +23,8 @@ public:
 	ASSCharacterBase(const FObjectInitializer& ObjectInitializer);
 protected:
 	virtual void BeginPlay() override;
-
+protected:
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 // Attack Hit Section
 protected:
@@ -36,11 +37,8 @@ public:
 
 // Dead Section
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stat, Meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UAnimMontage> DeadMontage;
-
 	virtual void SetDead();
-	void PlayDeadAnimation();
+
 	void Dissolve();
 	void UpdateDissolveProgress();
 
@@ -49,4 +47,11 @@ protected:
 	float DissolveDelayTime = 5.0f;
 	float DissolveStartTime;
 	float DissolveDuration = 6.0f;
+public:
+	UPROPERTY(ReplicatedUsing = OnRep_ServerCharacterbDead)
+	uint8 bDead : 1;
+
+protected:
+	UFUNCTION()
+	void OnRep_ServerCharacterbDead();
 };

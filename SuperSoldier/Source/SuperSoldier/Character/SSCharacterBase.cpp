@@ -6,6 +6,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Character/SSCharacterControlData.h"
 #include "Physics/SSColision.h"
+#include "Net/UnrealNetwork.h"
 
 // Sets default values
 ASSCharacterBase::ASSCharacterBase(const FObjectInitializer& ObjectInitializer)
@@ -17,11 +18,19 @@ ASSCharacterBase::ASSCharacterBase(const FObjectInitializer& ObjectInitializer)
 	// Mesh
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 	GetMesh()->SetCollisionProfileName(TEXT("NoCollision"));
+
+	bDead = false;
 }
 
 void ASSCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
+}
+
+void ASSCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ASSCharacterBase, bDead);
 }
 
 void ASSCharacterBase::AttackHitCheck()
@@ -43,16 +52,9 @@ void ASSCharacterBase::ReleaseThrowable()
 
 void ASSCharacterBase::SetDead()
 {
+	bDead = true;
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
-	PlayDeadAnimation();
 	SetActorEnableCollision(false);
-}
-
-void ASSCharacterBase::PlayDeadAnimation()
-{
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	AnimInstance->StopAllMontages(0.0f);
-	AnimInstance->Montage_Play(DeadMontage, 1.5f);
 }
 
 void ASSCharacterBase::Dissolve()
@@ -99,6 +101,14 @@ void ASSCharacterBase::UpdateDissolveProgress()
 	{
 		GetWorldTimerManager().ClearTimer(DissolveTimerHandle);
 		Destroy();
+	}
+}
+
+void ASSCharacterBase::OnRep_ServerCharacterbDead()
+{
+	if (bDead)
+	{
+		SetDead();
 	}
 }
 

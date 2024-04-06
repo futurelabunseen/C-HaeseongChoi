@@ -4,6 +4,7 @@
 #include "Character/Animation/SSAnimInstance.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Character/SSCharacterBase.h"
 
 USSAnimInstance::USSAnimInstance()
 {
@@ -49,5 +50,11 @@ void USSAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		GroundSpeed = Velocity.Size2D();
 		bIsIdle = GroundSpeed < MovingThreashould;
 		SetAimRotation(DeltaSeconds);
+	}
+
+	ASSCharacterBase* OwningCharacter = Cast<ASSCharacterBase>(TryGetPawnOwner());
+	if (OwningCharacter)
+	{
+		bIsDead = OwningCharacter->bDead;
 	}
 }

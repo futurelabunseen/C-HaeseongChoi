@@ -35,14 +35,6 @@ ASSCharacterNonPlayer::ASSCharacterNonPlayer(const FObjectInitializer& ObjectIni
 	{
 		GetMesh()->SetAnimInstanceClass(AnimInstanceClassRef.Class);
 	}
-
-	// Dead Montage
-	static ConstructorHelpers::FObjectFinder<UAnimMontage> DeadMontageRef(
-		TEXT("/Game/SuperSoldier/Characters/Monsters/Kraken/Animations/AM_Dead.AM_Dead"));
-	if (DeadMontageRef.Object)
-	{
-		DeadMontage = DeadMontageRef.Object;
-	}
 }
 
 void ASSCharacterNonPlayer::SetDead()

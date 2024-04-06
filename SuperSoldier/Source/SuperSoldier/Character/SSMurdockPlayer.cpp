@@ -68,6 +68,6 @@ void ASSMurdockPlayer::BeginPlay()
 	Super::BeginPlay();
 
 	// Remove Gun
-	//GetMesh()->HideBoneByName(TEXT("bot_hand"), EPhysBodyOp::PBO_None);
+	GetMesh()->HideBoneByName(TEXT("bot_hand"), EPhysBodyOp::PBO_None);
 	GetMesh()->HideBoneByName(TEXT("trap_handle"), EPhysBodyOp::PBO_None);
 }

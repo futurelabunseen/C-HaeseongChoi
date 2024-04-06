@@ -139,9 +139,13 @@ public:
 // RPC Section
 protected:
 	void RpcPlayAnimation(UAnimMontage* MontageToPlay);
+	void RpcJumpToSection(UAnimMontage* MontageToPlay, FName SectionName);
 
 	UFUNCTION(Client, Unreliable)
 	void ClientRpcPlayAnimation(ASSCharacterPlayer* CharacterToPlay, UAnimMontage* MontageToPlay);
+
+	UFUNCTION(Client, Unreliable)
+	void ClientRpcJumpToSection(ASSCharacterPlayer* CharacterToPlay, UAnimMontage* MontageToPlay, FName SectionName);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerRpcFire();
@@ -155,5 +159,15 @@ protected:
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerRpcThrow();
 
-	
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerRpcCalling();
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerRpcEndCalling();
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerRpcStrataReady();
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerRpcStrataThrow();
 };

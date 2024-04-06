@@ -319,6 +319,8 @@ void ASSCharacterPlayer::Fire(const FInputActionValue& Value)
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 		AnimInstance->Montage_Play(StrataThrowMontage, AnimationSpeedRate);
 
+		ServerRpcStrataThrow();
+
 		FOnMontageEnded EndDelegate;
 		EndDelegate.BindUObject(this, &ASSCharacterPlayer::AttemptSprintEndDelegate);
 		AnimInstance->Montage_SetEndDelegate(EndDelegate, StrataThrowMontage);
@@ -368,6 +370,8 @@ void ASSCharacterPlayer::Call(const FInputActionValue& Value)
 			UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 			AnimInstance->Montage_Play(CallMontage, AnimationSpeedRate);
 
+			ServerRpcCalling();
+
 			FOnMontageEnded EndDelegate;
 			EndDelegate.BindUObject(this, &ASSCharacterPlayer::EndCalling);
 			AnimInstance->Montage_SetEndDelegate(EndDelegate, CallMontage);
@@ -383,6 +387,7 @@ void ASSCharacterPlayer::Call(const FInputActionValue& Value)
 			if (bNotAlreadyPlaying)
 			{
 				AnimInstance->Montage_JumpToSection(TEXT("End"), CallMontage);
+				ServerRpcEndCalling();
 			}
 
 			InputSequence.Reset();
@@ -397,10 +402,20 @@ void ASSCharacterPlayer::EndCalling(UAnimMontage* TargetMontage, bool IsProperly
 		bReadyForThrowingStrata = true;
 		bChangeMontageForThrowingStrata = false;
 
-		// 다른 방법 필요
-		GetMesh()->HideBoneByName(TEXT("bot_hand"), EPhysBodyOp::PBO_None);
+		const float AnimationSpeedRate = 1.0f;
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		AnimInstance->Montage_Play(StrataReadyMontage, AnimationSpeedRate);
 
-		FString StrataIndicatorPath = TEXT("/Game/SuperSoldier/Props/BP_StrataIndicator.BP_StrataIndicator_C");
+		ServerRpcStrataReady();
+
+		FOnMontageEnded EndDelegate;
+		EndDelegate.BindUObject(this, &ASSCharacterPlayer::EndStrata);
+		AnimInstance->Montage_SetEndDelegate(EndDelegate, StrataReadyMontage);
+
+		// 다른 방법 필요
+		// GetMesh()->HideBoneByName(TEXT("bot_hand"), EPhysBodyOp::PBO_None);
+
+		/*FString StrataIndicatorPath = TEXT("/Game/SuperSoldier/Props/BP_StrataIndicator.BP_StrataIndicator_C");
 		UClass* StrataIndicatorClass = StaticLoadClass(UObject::StaticClass(), nullptr, *StrataIndicatorPath);
 
 		if (StrataIndicatorClass)
@@ -414,15 +429,7 @@ void ASSCharacterPlayer::EndCalling(UAnimMontage* TargetMontage, bool IsProperly
 				FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepRelative, true);
 				CurStrataIndicator->AttachToComponent(PlayerSkeletalMesh, AttachmentRules, SocketName);
 			}
-		}
-
-		const float AnimationSpeedRate = 1.0f;
-		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-		AnimInstance->Montage_Play(StrataReadyMontage, AnimationSpeedRate);
-
-		FOnMontageEnded EndDelegate;
-		EndDelegate.BindUObject(this, &ASSCharacterPlayer::EndStrata);
-		AnimInstance->Montage_SetEndDelegate(EndDelegate, StrataReadyMontage);
+		}*/
 	}
 	else
 	{
@@ -438,7 +445,7 @@ void ASSCharacterPlayer::EndStrata(UAnimMontage* TargetMontage, bool IsProperlyE
 	bReadyForThrowingStrata = false;
 
 	// 다른 방법 필요
-	GetMesh()->UnHideBoneByName(TEXT("bot_hand"));
+	// GetMesh()->UnHideBoneByName(TEXT("bot_hand"));
 }
 
 void ASSCharacterPlayer::TranslateInput(const FInputActionValue& Value)
@@ -537,15 +544,16 @@ bool ASSCharacterPlayer::MatchingInput()
 					if (InputSequenceNum == StrataCommandArrNum)
 					{
 						UE_LOG(LogTemp, Log, TEXT("Matching Success!!!!"))
-							Stratagem->ActivateStratagem();
+						Stratagem->ActivateStratagem();
 
 						UE_LOG(LogTemp, Log, TEXT("Reset InputSequence"))
-							InputSequence.Reset();
+						InputSequence.Reset();
 
 						UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 						if (AnimInstance)
 						{
 							AnimInstance->Montage_JumpToSection(TEXT("End"), CallMontage);
+							ServerRpcEndCalling();
 						}
 
 						bChangeMontageForThrowingStrata = true;
@@ -655,6 +663,45 @@ void ASSCharacterPlayer::RpcPlayAnimation(UAnimMontage* MontageToPlay)
 	}
 }
 
+void ASSCharacterPlayer::RpcJumpToSection(UAnimMontage* MontageToPlay, FName SectionName)
+{
+	for (APlayerController* PlayerController : TActorRange<APlayerController>(GetWorld()))
+	{
+		if (PlayerController && GetController() != PlayerController)
+		{
+			if (!PlayerController->IsLocalController())
+			{
+				ASSCharacterPlayer* OtherPlayer = Cast<ASSCharacterPlayer>(PlayerController->GetPawn());
+
+				if (OtherPlayer)
+				{
+					OtherPlayer->ClientRpcJumpToSection(this, FireMontage, SectionName);
+				}
+			}
+		}
+	}
+}
+
+void ASSCharacterPlayer::ClientRpcJumpToSection_Implementation(ASSCharacterPlayer* CharacterToPlay, UAnimMontage* MontageToPlay, FName SectionName)
+{
+	if (CharacterToPlay)
+	{
+		const float AnimationSpeedRate = 1.0f;
+		UAnimInstance* AnimInstance = CharacterToPlay->GetMesh()->GetAnimInstance();
+		FName CurSection = AnimInstance->Montage_GetCurrentSection(MontageToPlay);
+
+		if (CurSection != NAME_None)
+		{
+			bool bNotAlreadyPlaying = CurSection.Compare(SectionName) != 0;
+
+			if (bNotAlreadyPlaying)
+			{
+				AnimInstance->Montage_JumpToSection(SectionName, CallMontage);
+			}
+		}
+	}
+}
+
 void ASSCharacterPlayer::ClientRpcPlayAnimation_Implementation(ASSCharacterPlayer* CharacterToPlay, UAnimMontage* MontageToPlay)
 {
 	if (CharacterToPlay)
@@ -729,4 +776,68 @@ void ASSCharacterPlayer::ServerRpcThrow_Implementation()
 	AnimInstance->Montage_Play(ThrowMontage, AnimationSpeedRate);
 
 	RpcPlayAnimation(ThrowMontage);
+}
+
+bool ASSCharacterPlayer::ServerRpcCalling_Validate()
+{
+	return true;
+}
+
+void ASSCharacterPlayer::ServerRpcCalling_Implementation()
+{
+	const float AnimationSpeedRate = 1.0f;
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	AnimInstance->Montage_Play(CallMontage, AnimationSpeedRate);
+
+	RpcPlayAnimation(CallMontage);
+}
+
+bool ASSCharacterPlayer::ServerRpcEndCalling_Validate()
+{
+	return true;
+}
+
+void ASSCharacterPlayer::ServerRpcEndCalling_Implementation()
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	FName CurSection = AnimInstance->Montage_GetCurrentSection(CallMontage);
+
+	if (CurSection != NAME_None)
+	{
+		bool bNotAlreadyPlaying = CurSection.Compare(FName(TEXT("End"))) != 0;
+
+		if (bNotAlreadyPlaying)
+		{
+			AnimInstance->Montage_JumpToSection(TEXT("End"), CallMontage);
+			RpcJumpToSection(CallMontage, TEXT("End"));
+		}
+	}
+}
+
+bool ASSCharacterPlayer::ServerRpcStrataReady_Validate()
+{
+	return true;
+}
+
+void ASSCharacterPlayer::ServerRpcStrataReady_Implementation()
+{
+	const float AnimationSpeedRate = 1.0f;
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	AnimInstance->Montage_Play(StrataReadyMontage, AnimationSpeedRate);
+
+	RpcPlayAnimation(StrataReadyMontage);
+}
+
+bool ASSCharacterPlayer::ServerRpcStrataThrow_Validate()
+{
+	return true;
+}
+
+void ASSCharacterPlayer::ServerRpcStrataThrow_Implementation()
+{
+	const float AnimationSpeedRate = 1.0f;
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	AnimInstance->Montage_Play(StrataThrowMontage, AnimationSpeedRate);
+
+	RpcPlayAnimation(StrataThrowMontage);
 }

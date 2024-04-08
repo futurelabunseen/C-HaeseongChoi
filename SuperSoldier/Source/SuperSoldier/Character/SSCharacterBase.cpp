@@ -79,7 +79,7 @@ void ASSCharacterBase::Dissolve()
 
 		if (!DynamicMaterialIndices.IsEmpty())
 		{
-			const float TimerRate = 0.022f;		// 10초 45프레임 업데이트
+			const float TimerRate = DissolveDuration / 60.0f;		// DissolveDuration동안 60번 업데이트
 			DissolveStartTime = GetWorld()->GetTimeSeconds();
 			GetWorld()->GetTimerManager().SetTimer(DissolveTimerHandle, this, &ASSCharacterBase::UpdateDissolveProgress, TimerRate, true);
 		}

@@ -620,8 +620,8 @@ void ASSCharacterPlayer::ReleaseThrowable()
 		if (ThrowFunction)
 		{
 			FVector ThrowDirection = GetActorForwardVector();
-			FRotator PitchRotator = FRotator(GetControlRotation().Pitch, 0.0f, 0.0f);
-			ThrowDirection = PitchRotator.RotateVector(ThrowDirection);
+			FVector RotateVector = GetActorRightVector() * (-1.0f);
+			ThrowDirection = ThrowDirection.RotateAngleAxis(GetControlRotation().Pitch, RotateVector);
 			ThrowDirection.Normalize();
 
 			CurStrataIndicator->ProcessEvent(ThrowFunction, &ThrowDirection);
@@ -848,9 +848,10 @@ void ASSCharacterPlayer::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 
 	FVector ShowDirection = GetActorForwardVector();
-	FRotator PitchRotator = FRotator(GetControlRotation().Pitch, 0.0f, 0.0f);
-	ShowDirection = PitchRotator.RotateVector(ShowDirection);
+	ShowDirection = ShowDirection.RotateAngleAxis(GetControlRotation().Pitch, GetActorRightVector() * (-1.0f));
 	ShowDirection.Normalize();
 
-	DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + ShowDirection * 5000.0f, FColor::Emerald, false);
+	// DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + ShowDirection * 5000.0f, FColor::Emerald, false, 3.0f);
+	// UE_LOG(LogTemp, Log, TEXT("ShowDirection : %s"), *ShowDirection.ToString())
+	// UE_LOG(LogTemp, Log, TEXT("Pitch : %f"), GetControlRotation().Pitch)
 }

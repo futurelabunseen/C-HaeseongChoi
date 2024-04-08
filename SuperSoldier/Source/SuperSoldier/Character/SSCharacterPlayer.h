@@ -170,4 +170,6 @@ protected:
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerRpcStrataThrow();
+
+	virtual void Tick(float DeltaSeconds) override;
 };

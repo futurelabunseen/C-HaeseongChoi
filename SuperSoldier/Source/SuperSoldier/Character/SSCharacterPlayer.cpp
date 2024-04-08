@@ -411,25 +411,6 @@ void ASSCharacterPlayer::EndCalling(UAnimMontage* TargetMontage, bool IsProperly
 		FOnMontageEnded EndDelegate;
 		EndDelegate.BindUObject(this, &ASSCharacterPlayer::EndStrata);
 		AnimInstance->Montage_SetEndDelegate(EndDelegate, StrataReadyMontage);
-
-		// 다른 방법 필요
-		// GetMesh()->HideBoneByName(TEXT("bot_hand"), EPhysBodyOp::PBO_None);
-
-		/*FString StrataIndicatorPath = TEXT("/Game/SuperSoldier/Props/BP_StrataIndicator.BP_StrataIndicator_C");
-		UClass* StrataIndicatorClass = StaticLoadClass(UObject::StaticClass(), nullptr, *StrataIndicatorPath);
-
-		if (StrataIndicatorClass)
-		{
-			CurStrataIndicator = GetWorld()->SpawnActor<AActor>(StrataIndicatorClass);
-
-			USkeletalMeshComponent* PlayerSkeletalMesh = GetMesh();
-			if (PlayerSkeletalMesh)
-			{
-				FName SocketName = TEXT("Socket_StrataIndicator");
-				FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepRelative, true);
-				CurStrataIndicator->AttachToComponent(PlayerSkeletalMesh, AttachmentRules, SocketName);
-			}
-		}*/
 	}
 	else
 	{
@@ -638,7 +619,11 @@ void ASSCharacterPlayer::ReleaseThrowable()
 
 		if (ThrowFunction)
 		{
-			FVector ThrowDirection = FVector(1.0f, 0.0f, 0.0f);
+			FVector ThrowDirection = GetActorForwardVector();
+			FRotator PitchRotator = FRotator(GetControlRotation().Pitch, 0.0f, 0.0f);
+			ThrowDirection = PitchRotator.RotateVector(ThrowDirection);
+			ThrowDirection.Normalize();
+
 			CurStrataIndicator->ProcessEvent(ThrowFunction, &ThrowDirection);
 		}
 	}
@@ -826,6 +811,22 @@ void ASSCharacterPlayer::ServerRpcStrataReady_Implementation()
 	AnimInstance->Montage_Play(StrataReadyMontage, AnimationSpeedRate);
 
 	RpcPlayAnimation(StrataReadyMontage);
+
+	FString StrataIndicatorPath = TEXT("/Game/SuperSoldier/Props/BP_StrataIndicator.BP_StrataIndicator_C");
+	UClass* StrataIndicatorClass = StaticLoadClass(UObject::StaticClass(), nullptr, *StrataIndicatorPath);
+
+	if (StrataIndicatorClass)
+	{
+		CurStrataIndicator = GetWorld()->SpawnActor<AActor>(StrataIndicatorClass);
+
+		USkeletalMeshComponent* PlayerSkeletalMesh = GetMesh();
+		if (PlayerSkeletalMesh)
+		{
+			FName SocketName = TEXT("Socket_StrataIndicator");
+			FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepRelative, true);
+			CurStrataIndicator->AttachToComponent(PlayerSkeletalMesh, AttachmentRules, SocketName);
+		}
+	}
 }
 
 bool ASSCharacterPlayer::ServerRpcStrataThrow_Validate()
@@ -840,4 +841,16 @@ void ASSCharacterPlayer::ServerRpcStrataThrow_Implementation()
 	AnimInstance->Montage_Play(StrataThrowMontage, AnimationSpeedRate);
 
 	RpcPlayAnimation(StrataThrowMontage);
+}
+
+void ASSCharacterPlayer::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	FVector ShowDirection = GetActorForwardVector();
+	FRotator PitchRotator = FRotator(GetControlRotation().Pitch, 0.0f, 0.0f);
+	ShowDirection = PitchRotator.RotateVector(ShowDirection);
+	ShowDirection.Normalize();
+
+	DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + ShowDirection * 5000.0f, FColor::Emerald, false);
 }

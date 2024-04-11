@@ -258,12 +258,6 @@ void ASSCharacterPlayer::Look(const FInputActionValue& Value)
 
 	AddControllerYawInput(LookAxisVector.X);
 	AddControllerPitchInput(LookAxisVector.Y);
-
-	FRotator ControlRotation = GetControlRotation();
-	FRotator ActorRotation = GetActorRotation();
-	FRotator DeltaRotation = ControlRotation - ActorRotation;
-
-	UE_LOG(LogTemp, Log, TEXT("%s"), *DeltaRotation.ToString());
 }
 
 void ASSCharacterPlayer::SetSprintToMovementComponent(bool bNewSprint)
@@ -324,6 +318,10 @@ void ASSCharacterPlayer::Fire(const FInputActionValue& Value)
 		const float AnimationSpeedRate = 1.0f;
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 		AnimInstance->Montage_Play(StrataThrowMontage, AnimationSpeedRate);
+
+		FRotator ControlRotation = GetControlRotation();
+		FRotator CurRotation = GetActorRotation();
+		SetActorRotation(FRotator(CurRotation.Pitch, ControlRotation.Yaw, CurRotation.Roll));
 
 		ServerRpcStrataThrow();
 
@@ -854,6 +852,10 @@ void ASSCharacterPlayer::ServerRpcStrataThrow_Implementation()
 	const float AnimationSpeedRate = 1.0f;
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	AnimInstance->Montage_Play(StrataThrowMontage, AnimationSpeedRate);
+
+	FRotator ControlRotation = GetControlRotation();
+	FRotator CurRotation = GetActorRotation();
+	SetActorRotation(FRotator(CurRotation.Pitch, ControlRotation.Yaw, CurRotation.Roll));
 
 	RpcPlayAnimation(StrataThrowMontage);
 }

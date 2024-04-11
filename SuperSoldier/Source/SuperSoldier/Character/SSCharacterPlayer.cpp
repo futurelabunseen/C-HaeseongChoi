@@ -13,13 +13,12 @@
 #include "Character/SSCharacterControlData.h"
 #include "Physics/SSColision.h"
 #include "Engine/DamageEvents.h"
-
 #include "Core/SSGameInstance.h"
 #include "Strata/SSStratagemManager.h"
-
 #include "SuperSoldier.h"
 #include "EngineUtils.h"
 #include "SSCharacterMovementComponent.h"
+#include "Net/UnrealNetwork.h"
 
 ASSCharacterPlayer::ASSCharacterPlayer(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer.SetDefaultSubobjectClass<USSCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
@@ -34,7 +33,7 @@ ASSCharacterPlayer::ASSCharacterPlayer(const FObjectInitializer& ObjectInitializ
 
 	// Movement
 	GetCharacterMovement()->bOrientRotationToMovement = true;
-	GetCharacterMovement()->RotationRate = FRotator(0.0f, 350.0f, 0.0f);
+	GetCharacterMovement()->RotationRate = FRotator(0.0f, 270.0f, 0.0f);
 	GetCharacterMovement()->MaxWalkSpeed = 400.0f;
 	GetCharacterMovement()->MinAnalogWalkSpeed = 20.0f;
 	GetCharacterMovement()->BrakingDecelerationWalking = 2000.0f;
@@ -255,15 +254,8 @@ void ASSCharacterPlayer::Move(const FInputActionValue& Value)
 void ASSCharacterPlayer::Look(const FInputActionValue& Value)
 {
 	FVector2D LookAxisVector = Value.Get<FVector2D>();
-
 	AddControllerYawInput(LookAxisVector.X);
 	AddControllerPitchInput(LookAxisVector.Y);
-
-	FRotator ControlRotation = GetControlRotation();
-	FRotator ActorRotation = GetActorRotation();
-	FRotator DeltaRotation = ControlRotation - ActorRotation;
-
-	UE_LOG(LogTemp, Log, TEXT("%s"), *DeltaRotation.ToString());
 }
 
 void ASSCharacterPlayer::SetSprintToMovementComponent(bool bNewSprint)

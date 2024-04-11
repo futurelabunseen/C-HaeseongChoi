@@ -12,8 +12,8 @@ ASSCharacterNonPlayer::ASSCharacterNonPlayer(const FObjectInitializer& ObjectIni
 	GetCapsuleComponent()->InitCapsuleSize(200.f, 200.0f);
 
 	// Movement
-	GetCharacterMovement()->bOrientRotationToMovement = true;
-	GetCharacterMovement()->RotationRate = FRotator(0.0f, 350.0f, 0.0f);
+	GetCharacterMovement()->bUseControllerDesiredRotation = true;
+	GetCharacterMovement()->RotationRate = FRotator(0.0f, 270.0f, 0.0f);
 	GetCharacterMovement()->MaxWalkSpeed = 400.0f;
 	GetCharacterMovement()->MinAnalogWalkSpeed = 20.0f;
 	GetCharacterMovement()->BrakingDecelerationWalking = 2000.0f;

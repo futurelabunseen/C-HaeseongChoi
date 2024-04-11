@@ -57,6 +57,12 @@ void USSCharacterMovementComponent::Aiming()
 void USSCharacterMovementComponent::OnMovementUpdated(float DeltaSeconds, const FVector& OldLocation, const FVector& OldVelocity)
 {
 	Super::OnMovementUpdated(DeltaSeconds, OldLocation, OldVelocity);
+	
+	/*if (FMath::IsNearlyZero(Velocity.Size2D()))
+		CharacterOwner->bUseControllerRotationYaw = true;
+	else
+		CharacterOwner->bUseControllerRotationYaw = false;*/
+
 	Sprint();
 	Aiming();
 }

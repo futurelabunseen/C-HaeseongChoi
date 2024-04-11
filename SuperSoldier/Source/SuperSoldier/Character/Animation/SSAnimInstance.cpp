@@ -24,18 +24,18 @@ void USSAnimInstance::NativeInitializeAnimation()
 
 void USSAnimInstance::SetAimRotation(float DeltaSeconds)
 {
-	FRotator ControlRotation = Owner->GetControlRotation();
-	FRotator ActorRotation = Owner->GetActorRotation();
-	FRotator DeltaRotation = ControlRotation - ActorRotation;
-	DeltaRotation.Normalize();
-
-	FRotator CurRotator = FRotator(AimPitch, AimYaw, 0.0f);
-
-	FRotator ResultRotator = FMath::RInterpTo(CurRotator, DeltaRotation, DeltaSeconds, 15.0f);
-
-	AimPitch = ResultRotator.Pitch;
-	AimYaw = ResultRotator.Yaw;
-
+	// FRotator ControlRotation = Owner->GetControlRotation();
+	// FRotator ActorRotation = Owner->GetActorRotation();
+	// FRotator DeltaRotation = ControlRotation - ActorRotation;
+	// DeltaRotation.Normalize();
+	// 
+	// FRotator CurRotator = FRotator(AimPitch, AimYaw, 0.0f);
+	// 
+	// FRotator ResultRotator = FMath::RInterpTo(CurRotator, DeltaRotation, DeltaSeconds, 15.0f);
+	// 
+	// AimPitch = ResultRotator.Pitch;
+	// AimYaw = ResultRotator.Yaw;
+	
 	// AimPitch = FMath::ClampAngle(ResultRotator.Pitch, -90.0f, 90.0f);
 	// AimYaw = FMath::ClampAngle(ResultRotator.Yaw, -90.0f, 90.0f);
 }

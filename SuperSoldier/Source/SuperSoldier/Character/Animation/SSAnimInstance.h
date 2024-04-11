@@ -41,10 +41,4 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Character)
 	float MovingThreashould;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Character)
-	float AimPitch;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Character)
-	float AimYaw;
 };

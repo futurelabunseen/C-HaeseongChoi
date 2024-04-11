@@ -51,7 +51,7 @@ protected:
 	virtual void OnMovementUpdated(float DeltaSeconds, const FVector& OldLocation, const FVector& OldVelocity) override;
 
 	virtual class FNetworkPredictionData_Client* GetPredictionData_Client() const override;
-	virtual void UpdateFromCompressedFlags(uint8 Flags) override;;
+	virtual void UpdateFromCompressedFlags(uint8 Flags) override;
 public:
 	// Whether Client's Sprint
 	// Will be replicated to server

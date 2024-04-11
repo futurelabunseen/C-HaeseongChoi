@@ -41,8 +41,8 @@ float ASSCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 {
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
-	SetDead();
-
+	bDead = true;
+	OnRep_ServerCharacterbDead();
 	return DamageAmount;
 }
 
@@ -52,7 +52,6 @@ void ASSCharacterBase::ReleaseThrowable()
 
 void ASSCharacterBase::SetDead()
 {
-	bDead = true;
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 	SetActorEnableCollision(false);
 }

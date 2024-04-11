@@ -43,7 +43,7 @@ ASSCharacterPlayer::ASSCharacterPlayer(const FObjectInitializer& ObjectInitializ
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
 	CameraBoom->TargetArmLength = 500.0f;
-	CameraBoom->SetRelativeLocation(FVector(0.0f, 50.0f, 0.0f));
+	CameraBoom->SocketOffset = FVector(0.0f, 50.0f, 0.0f);
 	CameraBoom->bUsePawnControlRotation = true;
 
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
@@ -235,7 +235,7 @@ void ASSCharacterPlayer::SetCharacterControlData(const USSCharacterControlData* 
 		CrosshairWidget->SetVisibility(ESlateVisibility::Hidden);
 	
 	CameraBoom->TargetArmLength = CharacterControlData->TargetArmLength;
-	CameraBoom->SetRelativeLocation(CharacterControlData->RelativeLocation);
+	CameraBoom->SocketOffset = CharacterControlData->RelativeLocation;
 }
 
 void ASSCharacterPlayer::Move(const FInputActionValue& Value)
@@ -258,6 +258,12 @@ void ASSCharacterPlayer::Look(const FInputActionValue& Value)
 
 	AddControllerYawInput(LookAxisVector.X);
 	AddControllerPitchInput(LookAxisVector.Y);
+
+	FRotator ControlRotation = GetControlRotation();
+	FRotator ActorRotation = GetActorRotation();
+	FRotator DeltaRotation = ControlRotation - ActorRotation;
+
+	UE_LOG(LogTemp, Log, TEXT("%s"), *DeltaRotation.ToString());
 }
 
 void ASSCharacterPlayer::SetSprintToMovementComponent(bool bNewSprint)
@@ -619,9 +625,13 @@ void ASSCharacterPlayer::ReleaseThrowable()
 
 		if (ThrowFunction)
 		{
-			FVector ThrowDirection = GetActorForwardVector();
-			FVector RotateVector = GetActorRightVector() * (-1.0f);
-			ThrowDirection = ThrowDirection.RotateAngleAxis(GetControlRotation().Pitch, RotateVector);
+			// Throw Camera Direction Vector
+			FVector CameraLocation;
+			FRotator CameraRotation;
+			GetController()->GetPlayerViewPoint(CameraLocation, CameraRotation);
+			
+			FVector ThrowPos = CameraLocation + CameraRotation.Vector() * 2000.0f;
+			FVector ThrowDirection = ThrowPos - CurStrataIndicator->GetActorLocation();
 			ThrowDirection.Normalize();
 
 			CurStrataIndicator->ProcessEvent(ThrowFunction, &ThrowDirection);
@@ -823,7 +833,12 @@ void ASSCharacterPlayer::ServerRpcStrataReady_Implementation()
 		if (PlayerSkeletalMesh)
 		{
 			FName SocketName = TEXT("Socket_StrataIndicator");
-			FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepRelative, true);
+			FAttachmentTransformRules AttachmentRules(
+				EAttachmentRule::SnapToTarget, 
+				EAttachmentRule::SnapToTarget, 
+				EAttachmentRule::KeepRelative, 
+				true);
+
 			CurStrataIndicator->AttachToComponent(PlayerSkeletalMesh, AttachmentRules, SocketName);
 		}
 	}
@@ -847,11 +862,7 @@ void ASSCharacterPlayer::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	FVector ShowDirection = GetActorForwardVector();
-	ShowDirection = ShowDirection.RotateAngleAxis(GetControlRotation().Pitch, GetActorRightVector() * (-1.0f));
-	ShowDirection.Normalize();
-
-	// DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + ShowDirection * 5000.0f, FColor::Emerald, false, 3.0f);
+	// DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Emerald, false, 3.0f);
 	// UE_LOG(LogTemp, Log, TEXT("ShowDirection : %s"), *ShowDirection.ToString())
 	// UE_LOG(LogTemp, Log, TEXT("Pitch : %f"), GetControlRotation().Pitch)
 }

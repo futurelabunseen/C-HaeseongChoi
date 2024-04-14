@@ -10,12 +10,14 @@ UCLASS()
 class SUPERSOLDIER_API ASSStrataIndicator : public AActor
 {
 	GENERATED_BODY()
-	
 public:	
 	ASSStrataIndicator();
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<class UStaticMeshComponent> StrataIndicatorMesh;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<class UNiagaraComponent> StrataIndicatorBeam;
 protected:
 	virtual void BeginPlay() override;
 protected:

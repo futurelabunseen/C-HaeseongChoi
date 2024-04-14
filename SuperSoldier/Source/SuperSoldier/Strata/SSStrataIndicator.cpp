@@ -2,15 +2,19 @@
 
 
 #include "Strata/SSStrataIndicator.h"
-#include "Components/StaticMeshComponent.h"
 #include "SuperSoldier.h"
+#include "Components/StaticMeshComponent.h"
+#include "NiagaraComponent.h"
 
 ASSStrataIndicator::ASSStrataIndicator()
 {
 	StrataIndicatorMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StrataIndicatorMesh"));
-
 	RootComponent = StrataIndicatorMesh;
 
+	StrataIndicatorBeam = CreateDefaultSubobject<UNiagaraComponent>(TEXT("StrataIndicatorBeam"));
+	StrataIndicatorBeam->SetupAttachment(RootComponent);
+
+	// Add Static Mesh Component
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> StrataIndicatorMeshRef(TEXT("/Game/SuperSoldier/Props/SM_StrataIndicator.SM_StrataIndicator"));
 	if (StrataIndicatorMeshRef.Object)
 	{
@@ -23,6 +27,14 @@ ASSStrataIndicator::ASSStrataIndicator()
 		StrataIndicatorMesh->SetCollisionProfileName(TEXT("SSStrataIndicator"));
 	}
 
+	// Add Niagara Component
+	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> StrataIndicatorBeamRef(TEXT("/Game/SuperSoldier/Props/NS_StrataIndicatorBeam.NS_StrataIndicatorBeam"));
+	if (StrataIndicatorBeamRef.Object)
+	{
+		StrataIndicatorBeam->SetAsset(StrataIndicatorBeamRef.Object);
+		StrataIndicatorBeam->SetAutoActivate(false);
+	}
+
 	bReplicates = true;
 	SetReplicateMovement(true);
 }
@@ -30,6 +42,9 @@ ASSStrataIndicator::ASSStrataIndicator()
 void ASSStrataIndicator::BeginPlay()
 {
 	StrataIndicatorMesh->OnComponentHit.AddDynamic(this, &ASSStrataIndicator::OnHit);
+
+	FLinearColor StrataIndicatorBeamColor(20.0f, 0.0f, 0.0f, 1.0f);
+	StrataIndicatorBeam->SetVariableLinearColor(TEXT("User.Color"), StrataIndicatorBeamColor);
 
 	if(HasAuthority())
 	{
@@ -39,13 +54,20 @@ void ASSStrataIndicator::BeginPlay()
 
 void ASSStrataIndicator::Throw(FVector Direction)
 {
+	const float ThrowSpeed = 2000.0f;
 	StrataIndicatorMesh->SetSimulatePhysics(true);
 	StrataIndicatorMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	StrataIndicatorMesh->SetPhysicsLinearVelocity(Direction * 2000.0f);
+	StrataIndicatorMesh->SetPhysicsLinearVelocity(Direction * ThrowSpeed);
 }
 
 void ASSStrataIndicator::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
+	FVector StrataIndicatorBeamEnd = GetActorLocation();
+	StrataIndicatorBeamEnd.Z += 2000.0f;
+
+	StrataIndicatorBeam->SetVectorParameter(TEXT("User.Beam End"), StrataIndicatorBeamEnd);
+	StrataIndicatorBeam->Activate();
+
 	StrataIndicatorMesh->SetSimulatePhysics(false);
 	StrataIndicatorMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }

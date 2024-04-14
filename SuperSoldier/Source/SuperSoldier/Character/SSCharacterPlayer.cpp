@@ -2,24 +2,24 @@
 
 
 #include "Character/SSCharacterPlayer.h"
-#include "Components/CapsuleComponent.h"
-#include "Camera/CameraComponent.h"
-#include "GameFramework/SpringArmComponent.h"
+#include "SuperSoldier.h"
+#include "EngineUtils.h"
 #include "InputMappingContext.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Camera/CameraComponent.h"
+#include "Components/CapsuleComponent.h"
+#include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "Blueprint/UserWidget.h"
 #include "Character/SSCharacterControlData.h"
-#include "Physics/SSColision.h"
-#include "Engine/DamageEvents.h"
-
-#include "Core/SSGameInstance.h"
-#include "Strata/SSStratagemManager.h"
-
-#include "SuperSoldier.h"
-#include "EngineUtils.h"
 #include "SSCharacterMovementComponent.h"
+#include "Blueprint/UserWidget.h"
+#include "Core/SSGameInstance.h"
+#include "Engine/DamageEvents.h"
+#include "Physics/SSColision.h"
+#include "Strata/SSStratagemManager.h"
+#include "Strata/SSStrataIndicator.h"
+
 
 ASSCharacterPlayer::ASSCharacterPlayer(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer.SetDefaultSubobjectClass<USSCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
@@ -820,7 +820,7 @@ void ASSCharacterPlayer::ServerRpcStrataReady_Implementation()
 
 	RpcPlayAnimation(StrataReadyMontage);
 
-	FString StrataIndicatorPath = TEXT("/Game/SuperSoldier/Props/BP_StrataIndicator.BP_StrataIndicator_C");
+	FString StrataIndicatorPath = TEXT("/Script/SuperSoldier.SSStrataIndicator");
 	UClass* StrataIndicatorClass = StaticLoadClass(UObject::StaticClass(), nullptr, *StrataIndicatorPath);
 
 	if (StrataIndicatorClass)

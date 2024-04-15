@@ -23,7 +23,7 @@ ASSStrataIndicator::ASSStrataIndicator()
 
 		StrataIndicatorMesh->SetSimulatePhysics(false);
 		StrataIndicatorMesh->SetGenerateOverlapEvents(false);
-		StrataIndicatorMesh->SetNotifyRigidBodyCollision(true);
+		StrataIndicatorMesh->SetNotifyRigidBodyCollision(false);
 		StrataIndicatorMesh->SetCollisionProfileName(TEXT("SSStrataIndicator"));
 	}
 
@@ -48,6 +48,7 @@ void ASSStrataIndicator::BeginPlay()
 
 	if(HasAuthority())
 	{
+		StrataIndicatorMesh->SetNotifyRigidBodyCollision(true);
 		StrataIndicatorMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 }
@@ -56,7 +57,7 @@ void ASSStrataIndicator::Throw(FVector Direction)
 {
 	const float ThrowSpeed = 2000.0f;
 	StrataIndicatorMesh->SetSimulatePhysics(true);
-	StrataIndicatorMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	StrataIndicatorMesh->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
 	StrataIndicatorMesh->SetPhysicsLinearVelocity(Direction * ThrowSpeed);
 }
 
@@ -64,10 +65,21 @@ void ASSStrataIndicator::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherA
 {
 	FVector StrataIndicatorBeamEnd = GetActorLocation();
 	StrataIndicatorBeamEnd.Z += 2000.0f;
+	SetToShowStrataBeam(StrataIndicatorBeamEnd);
 
-	StrataIndicatorBeam->SetVectorParameter(TEXT("User.Beam End"), StrataIndicatorBeamEnd);
+	NetMulticastRpcShowStrataBeam(StrataIndicatorBeamEnd);
+}
+
+void ASSStrataIndicator::SetToShowStrataBeam(FVector BeamEnd)
+{
+	StrataIndicatorBeam->SetVectorParameter(TEXT("User.Beam End"), BeamEnd);
 	StrataIndicatorBeam->Activate();
 
 	StrataIndicatorMesh->SetSimulatePhysics(false);
 	StrataIndicatorMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
+
+void ASSStrataIndicator::NetMulticastRpcShowStrataBeam_Implementation(FVector_NetQuantize BeamEnd)
+{
+	SetToShowStrataBeam(BeamEnd);
 }

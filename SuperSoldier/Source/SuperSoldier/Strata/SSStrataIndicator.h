@@ -26,4 +26,9 @@ protected:
 
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+
+	void SetToShowStrataBeam(FVector BeamEnd);
+
+	UFUNCTION(NetMulticast, Unreliable)
+	void NetMulticastRpcShowStrataBeam(FVector_NetQuantize BeamEnd);
 };

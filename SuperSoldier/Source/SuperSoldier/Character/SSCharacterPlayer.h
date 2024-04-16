@@ -97,8 +97,9 @@ protected:
 	bool bReadyForThrowingStrata;
 	bool bChangeMontageForThrowingStrata;
 
+	int32 SelectedStrataIndex;
 	TArray<EStrataCommand> InputSequence;
-	TArray<ISSStratagemInterface*> AvailableStratagems;
+	TArray<std::pair<FName, ISSStratagemInterface*>> AvailableStratagems;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
 	TObjectPtr<class UAnimMontage> CallMontage;
@@ -134,7 +135,7 @@ protected:
 // Throw Section
 public:
 	virtual void ReleaseThrowable() override;
-	TObjectPtr<class AActor> CurStrataIndicator;
+	TObjectPtr<class ASSStrataIndicator> CurStrataIndicator;
 
 // RPC Section
 protected:
@@ -166,7 +167,7 @@ protected:
 	void ServerRpcEndCalling();
 
 	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerRpcStrataReady();
+	void ServerRpcStrataReady(const FName& StratagemName);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerRpcStrataThrow();

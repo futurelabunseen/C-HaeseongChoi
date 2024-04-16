@@ -5,6 +5,7 @@
 #include "SuperSoldier.h"
 #include "Components/StaticMeshComponent.h"
 #include "NiagaraComponent.h"
+#include "Interface/SSStratagemInterface.h"
 
 ASSStrataIndicator::ASSStrataIndicator()
 {
@@ -67,6 +68,9 @@ void ASSStrataIndicator::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherA
 	StrataIndicatorBeamEnd.Z += 2000.0f;
 	SetToShowStrataBeam(StrataIndicatorBeamEnd);
 
+	// Delay And Activate
+	CurStratagem->ActivateStratagem();
+	
 	NetMulticastRpcShowStrataBeam(StrataIndicatorBeamEnd);
 }
 
@@ -77,6 +81,11 @@ void ASSStrataIndicator::SetToShowStrataBeam(FVector BeamEnd)
 
 	StrataIndicatorMesh->SetSimulatePhysics(false);
 	StrataIndicatorMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
+
+void ASSStrataIndicator::SetStratagem(ISSStratagemInterface* NewStratagem)
+{
+	CurStratagem = NewStratagem;
 }
 
 void ASSStrataIndicator::NetMulticastRpcShowStrataBeam_Implementation(FVector_NetQuantize BeamEnd)

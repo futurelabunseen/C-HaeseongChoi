@@ -173,7 +173,7 @@ void ASSCharacterPlayer::BeginPlay()
 	ISSStratagemInterface* DefaultStratagem = StratagemManager->GetStratagem(FName(TEXT("Stratagem")));
 	if (DefaultStratagem)
 	{
-		AvailableStratagems.Add(DefaultStratagem);
+		AvailableStratagems.Add(std::make_pair(FName(TEXT("Stratagem")), DefaultStratagem));
 	}
 
 	// If Locally Controlled
@@ -410,7 +410,8 @@ void ASSCharacterPlayer::EndCalling(UAnimMontage* TargetMontage, bool IsProperly
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 		AnimInstance->Montage_Play(StrataReadyMontage, AnimationSpeedRate);
 
-		ServerRpcStrataReady();
+		FName StrataNameToActivate = AvailableStratagems[SelectedStrataIndex].first;
+		ServerRpcStrataReady(StrataNameToActivate);
 
 		FOnMontageEnded EndDelegate;
 		EndDelegate.BindUObject(this, &ASSCharacterPlayer::EndStrata);
@@ -495,7 +496,7 @@ bool ASSCharacterPlayer::MatchingInput()
 		{
 			if (AvailableStratagems.IsValidIndex(i))
 			{
-				ISSStratagemInterface* Stratagem = AvailableStratagems[i];
+				ISSStratagemInterface* Stratagem = AvailableStratagems[i].second;
 
 				const TArray<EStrataCommand> StrataCommandArr = Stratagem->GetCommandSequence();
 
@@ -529,7 +530,7 @@ bool ASSCharacterPlayer::MatchingInput()
 					if (InputSequenceNum == StrataCommandArrNum)
 					{
 						UE_LOG(LogTemp, Log, TEXT("Matching Success!!!!"))
-						Stratagem->ActivateStratagem();
+						SelectedStrataIndex = i;
 
 						UE_LOG(LogTemp, Log, TEXT("Reset InputSequence"))
 						InputSequence.Reset();
@@ -807,12 +808,12 @@ void ASSCharacterPlayer::ServerRpcEndCalling_Implementation()
 	}
 }
 
-bool ASSCharacterPlayer::ServerRpcStrataReady_Validate()
+bool ASSCharacterPlayer::ServerRpcStrataReady_Validate(const FName& StratagemName)
 {
 	return true;
 }
 
-void ASSCharacterPlayer::ServerRpcStrataReady_Implementation()
+void ASSCharacterPlayer::ServerRpcStrataReady_Implementation(const FName& StratagemName)
 {
 	const float AnimationSpeedRate = 1.0f;
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
@@ -820,21 +821,23 @@ void ASSCharacterPlayer::ServerRpcStrataReady_Implementation()
 
 	RpcPlayAnimation(StrataReadyMontage);
 
-	FString StrataIndicatorPath = TEXT("/Script/SuperSoldier.SSStrataIndicator");
-	UClass* StrataIndicatorClass = StaticLoadClass(UObject::StaticClass(), nullptr, *StrataIndicatorPath);
+	CurStrataIndicator = GetWorld()->SpawnActor<ASSStrataIndicator>(ASSStrataIndicator::StaticClass());
 
-	if (StrataIndicatorClass)
+	USSGameInstance* SSGameInstance = Cast<USSGameInstance>(GetGameInstance());
+	USSStratagemManager* StratagemManager = SSGameInstance->GetStratagemManager();
+	ISSStratagemInterface* SelectedStratagem = StratagemManager->GetStratagem(StratagemName);
+	CurStrataIndicator->SetStratagem(SelectedStratagem);
+
+	if (CurStrataIndicator)
 	{
-		CurStrataIndicator = GetWorld()->SpawnActor<AActor>(StrataIndicatorClass);
-
 		USkeletalMeshComponent* PlayerSkeletalMesh = GetMesh();
 		if (PlayerSkeletalMesh)
 		{
 			FName SocketName = TEXT("Socket_StrataIndicator");
 			FAttachmentTransformRules AttachmentRules(
-				EAttachmentRule::SnapToTarget, 
-				EAttachmentRule::SnapToTarget, 
-				EAttachmentRule::KeepRelative, 
+				EAttachmentRule::SnapToTarget,
+				EAttachmentRule::SnapToTarget,
+				EAttachmentRule::KeepRelative,
 				true);
 
 			CurStrataIndicator->AttachToComponent(PlayerSkeletalMesh, AttachmentRules, SocketName);
@@ -863,8 +866,4 @@ void ASSCharacterPlayer::ServerRpcStrataThrow_Implementation()
 void ASSCharacterPlayer::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
-
-	// DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Emerald, false, 3.0f);
-	// UE_LOG(LogTemp, Log, TEXT("ShowDirection : %s"), *ShowDirection.ToString())
-	// UE_LOG(LogTemp, Log, TEXT("Pitch : %f"), GetControlRotation().Pitch)
 }

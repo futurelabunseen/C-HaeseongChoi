@@ -31,4 +31,7 @@ protected:
 
 	UFUNCTION(NetMulticast, Unreliable)
 	void NetMulticastRpcShowStrataBeam(FVector_NetQuantize BeamEnd);
+public:
+	class ISSStratagemInterface* CurStratagem;
+	void SetStratagem(class ISSStratagemInterface* NewStratagem);
 };

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Components/TimelineComponent.h"
 #include "Interface/SSAnimationAttackInterface.h"
 #include "SSCharacterBase.generated.h"
 
@@ -23,6 +24,7 @@ public:
 	ASSCharacterBase(const FObjectInitializer& ObjectInitializer);
 protected:
 	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaSeconds) override;
 protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
@@ -40,13 +42,20 @@ protected:
 	virtual void SetDead();
 
 	void Dissolve();
-	void UpdateDissolveProgress();
 
+	UFUNCTION()
+	void UpdateDissolveProgress(const float Value);
+
+protected:
+	const float DissolveDelayTime = 5.0f;
 	TArray<uint32> DynamicMaterialIndices;
-	FTimerHandle DissolveTimerHandle;
-	float DissolveDelayTime = 5.0f;
-	float DissolveStartTime;
-	float DissolveDuration = 6.0f;
+
+	UPROPERTY(EditAnywhere) // Timeline 생성
+	FTimeline DissolveTimeline;
+
+	UPROPERTY(EditAnywhere) // Timeline 커브
+	TObjectPtr<UCurveFloat> DissolveCurveFloat;
+
 public:
 	UPROPERTY(ReplicatedUsing = OnRep_ServerCharacterbDead)
 	uint8 bDead : 1;

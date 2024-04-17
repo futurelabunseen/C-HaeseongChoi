@@ -170,10 +170,10 @@ void ASSCharacterPlayer::BeginPlay()
 	// Register Stratagem
 	USSGameInstance* SSGameInstance = Cast<USSGameInstance>(GetGameInstance());
 	USSStratagemManager* StratagemManager = SSGameInstance->GetStratagemManager();
-	ISSStratagemInterface* DefaultStratagem = StratagemManager->GetStratagem(FName(TEXT("Stratagem")));
+	ISSStratagemInterface* DefaultStratagem = StratagemManager->GetStratagem(FName(TEXT("PrecisionStrike")));
 	if (DefaultStratagem)
 	{
-		AvailableStratagems.Add(std::make_pair(FName(TEXT("Stratagem")), DefaultStratagem));
+		AvailableStratagems.Add(std::make_pair(FName(TEXT("PrecisionStrike")), DefaultStratagem));
 	}
 
 	// If Locally Controlled

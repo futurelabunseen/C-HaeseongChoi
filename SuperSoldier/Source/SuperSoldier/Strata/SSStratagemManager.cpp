@@ -3,7 +3,7 @@
 
 #include "SSStratagemManager.h"
 #include "Interface/SSStratagemInterface.h"
-#include "SSStratagem.h"
+#include "Strata/SSStratPrecisionStrike.h"
 
 USSStratagemManager::USSStratagemManager()
 {
@@ -12,10 +12,10 @@ USSStratagemManager::USSStratagemManager()
 void USSStratagemManager::InitializeStratagem()
 {
 	// 스트라타젬 전체 목록 초기화
-	USSStratagem* Stratagem = NewObject<USSStratagem>();
+	USSStratPrecisionStrike* Stratagem = NewObject<USSStratPrecisionStrike>();
 	if (Stratagem)
 	{
-		StratagemMap.Add(FName(TEXT("Stratagem")), Stratagem);
+		StratagemMap.Add(FName(TEXT("PrecisionStrike")), Stratagem);
 	}
 }
 

@@ -34,4 +34,5 @@ protected:
 public:
 	class ISSStratagemInterface* CurStratagem;
 	void SetStratagem(class ISSStratagemInterface* NewStratagem);
+	void ActivateStrataAndDestroy();
 };

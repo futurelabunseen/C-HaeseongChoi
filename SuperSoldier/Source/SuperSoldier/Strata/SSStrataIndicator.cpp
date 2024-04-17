@@ -42,6 +42,8 @@ ASSStrataIndicator::ASSStrataIndicator()
 
 void ASSStrataIndicator::BeginPlay()
 {
+	Super::BeginPlay();
+
 	StrataIndicatorMesh->OnComponentHit.AddDynamic(this, &ASSStrataIndicator::OnHit);
 
 	FLinearColor StrataIndicatorBeamColor(20.0f, 0.0f, 0.0f, 1.0f);
@@ -69,8 +71,9 @@ void ASSStrataIndicator::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherA
 	SetToShowStrataBeam(StrataIndicatorBeamEnd);
 
 	// Delay And Activate
-	CurStratagem->ActivateStratagem();
-	
+	FTimerHandle StrataActiveTimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(StrataActiveTimerHandle, this, &ASSStrataIndicator::ActivateStrataAndDestroy, CurStratagem->GetDelayTime(), false);
+
 	NetMulticastRpcShowStrataBeam(StrataIndicatorBeamEnd);
 }
 
@@ -86,6 +89,12 @@ void ASSStrataIndicator::SetToShowStrataBeam(FVector BeamEnd)
 void ASSStrataIndicator::SetStratagem(ISSStratagemInterface* NewStratagem)
 {
 	CurStratagem = NewStratagem;
+}
+
+void ASSStrataIndicator::ActivateStrataAndDestroy()
+{
+	CurStratagem->ActivateStratagem(GetWorld(), GetActorLocation());
+	Destroy();
 }
 
 void ASSStrataIndicator::NetMulticastRpcShowStrataBeam_Implementation(FVector_NetQuantize BeamEnd)

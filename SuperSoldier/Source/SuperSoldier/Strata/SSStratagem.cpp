@@ -5,18 +5,14 @@
 
 USSStratagem::USSStratagem()
 {
-	ArrCommand.Add(EStrataCommand::UP);
-	ArrCommand.Add(EStrataCommand::RIGHT);
-	ArrCommand.Add(EStrataCommand::DOWN);
-	ArrCommand.Add(EStrataCommand::LEFT);
+	DelayTime = 0.0f;
 }
 
 const TArray<EStrataCommand>& USSStratagem::GetCommandSequence() const
 {
-	return ArrCommand;
+	return CommandArray;
 }
 
-void USSStratagem::ActivateStratagem()
+void USSStratagem::ActivateStratagem(UWorld* const CurWorld, const FVector& TargetLocation)
 {
-	UE_LOG(LogTemp, Log, TEXT("ActivateStratagem"))
 }

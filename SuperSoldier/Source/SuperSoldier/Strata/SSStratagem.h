@@ -17,9 +17,12 @@ class SUPERSOLDIER_API USSStratagem : public UObject, public ISSStratagemInterfa
 public:
 	USSStratagem();
 
+	virtual const float& GetDelayTime() const override { return DelayTime; }
 	virtual const TArray<EStrataCommand>& GetCommandSequence() const;
-	virtual void ActivateStratagem() override;
+	virtual void ActivateStratagem(UWorld* const CurWorld, const FVector& TargetLocation) override;
 protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Strata, Meta = (AllowPrivateAccess = "true"))
-	TArray<EStrataCommand> ArrCommand;
+	float DelayTime;
+	float CoolTime;
+
+	TArray<EStrataCommand> CommandArray;
 };

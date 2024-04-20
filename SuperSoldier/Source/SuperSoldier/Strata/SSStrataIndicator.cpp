@@ -67,7 +67,7 @@ void ASSStrataIndicator::Throw(FVector Direction)
 void ASSStrataIndicator::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	FVector StrataIndicatorBeamEnd = GetActorLocation();
-	StrataIndicatorBeamEnd.Z += 2000.0f;
+	StrataIndicatorBeamEnd.Z += 8000.0f;
 	SetToShowStrataBeam(StrataIndicatorBeamEnd);
 
 	// Delay And Activate

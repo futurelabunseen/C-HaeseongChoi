@@ -33,6 +33,11 @@ ASSStrataRocket::ASSStrataRocket()
     SetReplicateMovement(true);
 }
 
+ASSStrataRocket::~ASSStrataRocket()
+{
+    UE_LOG(LogTemp, Log, TEXT("Destroy"))
+}
+
 void ASSStrataRocket::BeginPlay()
 {
 	Super::BeginPlay();
@@ -64,7 +69,7 @@ void ASSStrataRocket::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActo
 {
     if (HasAuthority() && Hit.bBlockingHit)
     {
-        PlayEffect(Hit.Location, (Hit.ImpactNormal).ToOrientationRotator());
+        NetMulticastRpcPlayEffect(Hit.Location, (Hit.ImpactNormal).ToOrientationRotator());
 
         TArray<AActor*> OverlappingActors;
         DamageBox->GetOverlappingActors(OverlappingActors, ASSCharacterBase::StaticClass());
@@ -78,11 +83,14 @@ void ASSStrataRocket::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActo
             OverlappingCharater->TakeDamage(AttackDamage, DamageEvent, nullptr, nullptr);
         }
 
-        Destroy();
+        SetActorHiddenInGame(true);
+        SetActorTickEnabled(false);
+        RocketStaticMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+        SetLifeSpan(2.0f);
     }
 }
 
-void ASSStrataRocket::PlayEffect_Implementation(FVector_NetQuantize Location, FRotator Rotation)
+void ASSStrataRocket::NetMulticastRpcPlayEffect_Implementation(FVector_NetQuantize Location, FRotator Rotation)
 {
     if (ExplosionSystem)
     {

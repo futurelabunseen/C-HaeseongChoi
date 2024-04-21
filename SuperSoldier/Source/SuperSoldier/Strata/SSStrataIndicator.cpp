@@ -66,14 +66,12 @@ void ASSStrataIndicator::Throw(FVector Direction)
 
 void ASSStrataIndicator::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	FVector StrataIndicatorBeamEnd = GetActorLocation();
-	StrataIndicatorBeamEnd.Z += 8000.0f;
-	SetToShowStrataBeam(StrataIndicatorBeamEnd);
-
 	// Delay And Activate
 	FTimerHandle StrataActiveTimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(StrataActiveTimerHandle, this, &ASSStrataIndicator::ActivateStrataAndDestroy, CurStratagem->GetDelayTime(), false);
 
+	FVector StrataIndicatorBeamEnd = GetActorLocation();
+	StrataIndicatorBeamEnd.Z += 8000.0f;
 	NetMulticastRpcShowStrataBeam(StrataIndicatorBeamEnd);
 }
 
@@ -81,9 +79,6 @@ void ASSStrataIndicator::SetToShowStrataBeam(FVector BeamEnd)
 {
 	StrataIndicatorBeam->SetVectorParameter(TEXT("User.Beam End"), BeamEnd);
 	StrataIndicatorBeam->Activate();
-
-	StrataIndicatorMesh->SetSimulatePhysics(false);
-	StrataIndicatorMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 void ASSStrataIndicator::SetStratagem(ISSStratagemInterface* NewStratagem)
@@ -100,4 +95,7 @@ void ASSStrataIndicator::ActivateStrataAndDestroy()
 void ASSStrataIndicator::NetMulticastRpcShowStrataBeam_Implementation(FVector_NetQuantize BeamEnd)
 {
 	SetToShowStrataBeam(BeamEnd);
+
+	StrataIndicatorMesh->SetSimulatePhysics(false);
+	StrataIndicatorMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }

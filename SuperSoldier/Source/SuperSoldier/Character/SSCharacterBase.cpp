@@ -112,13 +112,12 @@ void ASSCharacterBase::Dissolve()
 
 void ASSCharacterBase::UpdateDissolveProgress(const float Value)
 {
-	const double Lerp = UKismetMathLibrary::Lerp(0, 1, Value);
 	for (const auto& DynamicMaterialIndex : DynamicMaterialIndices)
 	{
 		UMaterialInstanceDynamic* DynamicMaterial = Cast<UMaterialInstanceDynamic>(GetMesh()->GetMaterial(DynamicMaterialIndex));
-		DynamicMaterial->SetScalarParameterValue("DissolveParams", Lerp);
+		DynamicMaterial->SetScalarParameterValue("DissolveParams", Value);
 	}
-	if (Lerp >= 1.f)
+	if (Value >= 1.f)
 	{
 		Destroy();
 	}

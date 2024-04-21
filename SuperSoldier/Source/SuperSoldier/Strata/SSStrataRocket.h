@@ -13,7 +13,7 @@ class SUPERSOLDIER_API ASSStrataRocket : public AActor
 	
 public:	
 	ASSStrataRocket();
-
+    ~ASSStrataRocket();
 protected:
 	virtual void BeginPlay() override;
 
@@ -46,5 +46,5 @@ public:
     void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
     UFUNCTION(NetMulticast, Unreliable)
-    void PlayEffect(FVector_NetQuantize Location, FRotator Rotation);
+    void NetMulticastRpcPlayEffect(FVector_NetQuantize Location, FRotator Rotation);
 };

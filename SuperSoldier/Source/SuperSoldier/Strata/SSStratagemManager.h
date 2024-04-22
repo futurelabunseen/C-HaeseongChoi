@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
-#include "Interface/SSStratagemInterface.h"
 #include "SSStratagemManager.generated.h"
 
 /**
@@ -18,8 +17,8 @@ public:
 	USSStratagemManager();
 
 	void InitializeStratagem();
-	ISSStratagemInterface* GetStratagem(const FName& StratagemName);
+	class USSStratagem* GetStratagem(const FName& StratagemName);
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Strata, Meta = (AllowPrivateAccess = "true"))
-	TMap<FName, TScriptInterface<ISSStratagemInterface>> StratagemMap;
+	TMap<FName, TObjectPtr<class USSStratagem>> StratagemMap;
 };

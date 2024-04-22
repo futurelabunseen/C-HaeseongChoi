@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Character/SSCharacterBase.h"
 #include "InputActionValue.h"
-#include "Interface/SSStratagemInterface.h"
+#include "Strata/SSStratagem.h"
 #include "SSCharacterPlayer.generated.h"
 
 /**
@@ -99,7 +99,7 @@ protected:
 
 	int32 SelectedStrataIndex;
 	TArray<EStrataCommand> InputSequence;
-	TArray<std::pair<FName, ISSStratagemInterface*>> AvailableStratagems;
+	TArray<std::pair<FName, USSStratagem*>> AvailableStratagems;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
 	TObjectPtr<class UAnimMontage> CallMontage;

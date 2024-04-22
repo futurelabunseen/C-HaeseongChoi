@@ -5,7 +5,7 @@
 #include "SuperSoldier.h"
 #include "Components/StaticMeshComponent.h"
 #include "NiagaraComponent.h"
-#include "Interface/SSStratagemInterface.h"
+#include "Strata/SSStratagem.h"
 
 ASSStrataIndicator::ASSStrataIndicator()
 {
@@ -81,7 +81,7 @@ void ASSStrataIndicator::SetToShowStrataBeam(FVector BeamEnd)
 	StrataIndicatorBeam->Activate();
 }
 
-void ASSStrataIndicator::SetStratagem(ISSStratagemInterface* NewStratagem)
+void ASSStrataIndicator::SetStratagem(USSStratagem* NewStratagem)
 {
 	CurStratagem = NewStratagem;
 }

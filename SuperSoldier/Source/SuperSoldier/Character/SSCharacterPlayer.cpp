@@ -170,7 +170,7 @@ void ASSCharacterPlayer::BeginPlay()
 	// Register Stratagem
 	USSGameInstance* SSGameInstance = Cast<USSGameInstance>(GetGameInstance());
 	USSStratagemManager* StratagemManager = SSGameInstance->GetStratagemManager();
-	ISSStratagemInterface* DefaultStratagem = StratagemManager->GetStratagem(FName(TEXT("PrecisionStrike")));
+	USSStratagem* DefaultStratagem = StratagemManager->GetStratagem(FName(TEXT("PrecisionStrike")));
 	if (DefaultStratagem)
 	{
 		AvailableStratagems.Add(std::make_pair(FName(TEXT("PrecisionStrike")), DefaultStratagem));
@@ -496,7 +496,7 @@ bool ASSCharacterPlayer::MatchingInput()
 		{
 			if (AvailableStratagems.IsValidIndex(i))
 			{
-				ISSStratagemInterface* Stratagem = AvailableStratagems[i].second;
+				USSStratagem* Stratagem = AvailableStratagems[i].second;
 
 				const TArray<EStrataCommand> StrataCommandArr = Stratagem->GetCommandSequence();
 
@@ -825,7 +825,7 @@ void ASSCharacterPlayer::ServerRpcStrataReady_Implementation(const FName& Strata
 
 	USSGameInstance* SSGameInstance = Cast<USSGameInstance>(GetGameInstance());
 	USSStratagemManager* StratagemManager = SSGameInstance->GetStratagemManager();
-	ISSStratagemInterface* SelectedStratagem = StratagemManager->GetStratagem(StratagemName);
+	USSStratagem* SelectedStratagem = StratagemManager->GetStratagem(StratagemName);
 	CurStrataIndicator->SetStratagem(SelectedStratagem);
 
 	if (CurStrataIndicator)

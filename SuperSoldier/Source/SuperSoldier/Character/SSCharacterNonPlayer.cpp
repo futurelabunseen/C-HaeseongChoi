@@ -4,6 +4,7 @@
 #include "SSCharacterNonPlayer.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "AI/SSAIController.h"
 
 ASSCharacterNonPlayer::ASSCharacterNonPlayer(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -35,6 +36,10 @@ ASSCharacterNonPlayer::ASSCharacterNonPlayer(const FObjectInitializer& ObjectIni
 	{
 		GetMesh()->SetAnimInstanceClass(AnimInstanceClassRef.Class);
 	}
+
+	// AIController
+	AIControllerClass = ASSAIController::StaticClass();
+	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 }
 
 void ASSCharacterNonPlayer::SetDead()

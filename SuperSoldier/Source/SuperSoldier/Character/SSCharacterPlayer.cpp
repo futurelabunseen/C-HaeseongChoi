@@ -557,13 +557,11 @@ void ASSCharacterPlayer::ProcessCommandInput(const FInputActionValue& Value)
 	if (bCalling)
 	{
 		TranslateInput(Value);
-	}
-
-	if (!MatchingInput())
-	{
-		UE_LOG(LogTemp, Log, TEXT("Matching Fail Reset InputSequence"))
-
-		InputSequence.Reset();
+		if (!MatchingInput())
+		{
+			UE_LOG(LogTemp, Log, TEXT("Matching Fail Reset InputSequence"))
+			InputSequence.Reset();
+		}
 	}
 }
 

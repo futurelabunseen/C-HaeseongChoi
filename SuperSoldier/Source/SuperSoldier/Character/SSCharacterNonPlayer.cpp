@@ -37,6 +37,13 @@ ASSCharacterNonPlayer::ASSCharacterNonPlayer(const FObjectInitializer& ObjectIni
 		GetMesh()->SetAnimInstanceClass(AnimInstanceClassRef.Class);
 	}
 
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> AttackMontageRef(
+		TEXT("/Game/SuperSoldier/Characters/Monsters/Kraken/Animations/AM_KrakenAttack.AM_KrakenAttack"));
+	if (AttackMontageRef.Object)
+	{
+		AttackMontage = AttackMontageRef.Object;
+	}
+
 	// AIController
 	AIControllerClass = ASSAIController::StaticClass();
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
@@ -48,4 +55,30 @@ void ASSCharacterNonPlayer::SetDead()
 
 	FTimerHandle DeadTimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(DeadTimerHandle, this, &ASSCharacterNonPlayer::Dissolve, DissolveDelayTime, false);
+}
+
+void ASSCharacterNonPlayer::Attack()
+{
+	const float AnimationSpeedRate = 1.5f;
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	AnimInstance->Montage_Play(AttackMontage, AnimationSpeedRate);
+
+	FOnMontageEnded EndDelegate;
+	EndDelegate.BindUObject(this, &ASSCharacterNonPlayer::NotifyAttackActionEnd);
+	AnimInstance->Montage_SetEndDelegate(EndDelegate, AttackMontage);
+}
+
+void ASSCharacterNonPlayer::AttackHitCheck()
+{
+	UE_LOG(LogTemp, Log, TEXT("AttackHitCheck"))
+}
+
+void ASSCharacterNonPlayer::NotifyAttackActionEnd(UAnimMontage* TargetMontage, bool IsProperlyEnded)
+{
+	OnAttackFinished.ExecuteIfBound();
+}
+
+void ASSCharacterNonPlayer::SetAIAttackDelegate(const FAICharacterAttackFinished& InOnAttackFinished)
+{
+	OnAttackFinished = InOnAttackFinished;
 }

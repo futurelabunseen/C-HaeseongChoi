@@ -6,6 +6,8 @@
 #include "Character/SSCharacterBase.h"
 #include "SSCharacterNonPlayer.generated.h"
 
+DECLARE_DELEGATE(FAICharacterAttackFinished);
+
 /**
  * 
  */
@@ -15,7 +17,18 @@ class SUPERSOLDIER_API ASSCharacterNonPlayer : public ASSCharacterBase
 	GENERATED_BODY()
 public:
 	ASSCharacterNonPlayer(const FObjectInitializer& ObjectInitializer);
-	
 protected:
 	virtual void SetDead() override;
+
+public:
+	void Attack();
+	void AttackHitCheck() override;
+
+	void NotifyAttackActionEnd(UAnimMontage* TargetMontage, bool IsProperlyEnded);
+	virtual void SetAIAttackDelegate(const FAICharacterAttackFinished& InOnAttackFinished);
+protected:
+	FAICharacterAttackFinished OnAttackFinished;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
+	TObjectPtr<class UAnimMontage> AttackMontage;
 };

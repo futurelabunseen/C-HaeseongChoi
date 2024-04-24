@@ -18,9 +18,9 @@ public:
 protected:
 	virtual void OnPossess(APawn* InPawn) override;
 private:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY()
 	TObjectPtr<class UBlackboardData> BBAsset;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY()
 	TObjectPtr<class UBehaviorTree> BTAsset;
 };

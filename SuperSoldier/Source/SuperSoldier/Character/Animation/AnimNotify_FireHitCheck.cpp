@@ -4,7 +4,7 @@
 #include "Character/Animation/AnimNotify_FireHitCheck.h"
 #include "Interface/SSAnimationAttackInterface.h"
 
-void UAnimNotify_FireHitCheck::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
+void UAnimNotify_AttackHitCheck::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
 {
 	Super::Notify(MeshComp, Animation, EventReference);
 

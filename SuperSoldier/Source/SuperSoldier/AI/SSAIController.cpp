@@ -25,6 +25,8 @@ ASSAIController::ASSAIController()
 
 void ASSAIController::OnPossess(APawn* InPawn)
 {
+	Super::OnPossess(InPawn);
+
 	UBlackboardComponent* BlackboardPtr = Blackboard.Get();
 	if (UseBlackboard(BBAsset, BlackboardPtr))
 	{

@@ -10,7 +10,7 @@
  * 
  */
 UCLASS()
-class SUPERSOLDIER_API UAnimNotify_FireHitCheck : public UAnimNotify
+class SUPERSOLDIER_API UAnimNotify_AttackHitCheck : public UAnimNotify
 {
 	GENERATED_BODY()
 protected:

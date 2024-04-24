@@ -10,7 +10,17 @@ public class SuperSoldier : ModuleRules
 
 		PublicIncludePaths.AddRange(new string[] { "SuperSoldier" });
 
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "UMG", "Niagara" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", 
+			"CoreUObject", 
+			"Engine", 
+			"InputCore", 
+			"EnhancedInput", 
+			"UMG", 
+			"Niagara", 
+			"NavigationSystem",
+			"AIModule",
+			"GameplayTasks"
+		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 

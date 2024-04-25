@@ -23,13 +23,27 @@ ASSAIController::ASSAIController()
 	}
 }
 
-void ASSAIController::OnPossess(APawn* InPawn)
+void ASSAIController::RunAI()
 {
-	Super::OnPossess(InPawn);
-
 	UBlackboardComponent* BlackboardPtr = Blackboard.Get();
 	if (UseBlackboard(BBAsset, BlackboardPtr))
 	{
 		RunBehaviorTree(BTAsset);
 	}
+}
+
+void ASSAIController::StopAI()
+{
+	UBehaviorTreeComponent* BTComponent = Cast<UBehaviorTreeComponent>(BrainComponent);
+	if (BTComponent)
+	{
+		BTComponent->StopTree();
+	}
+}
+
+void ASSAIController::OnPossess(APawn* InPawn)
+{
+	Super::OnPossess(InPawn);
+
+	RunAI();
 }

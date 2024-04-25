@@ -15,6 +15,9 @@ class SUPERSOLDIER_API ASSAIController : public AAIController
 	GENERATED_BODY()
 public:
 	ASSAIController();
+
+	void RunAI();
+	void StopAI();
 protected:
 	virtual void OnPossess(APawn* InPawn) override;
 private:

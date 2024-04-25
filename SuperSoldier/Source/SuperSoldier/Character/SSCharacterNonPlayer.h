@@ -25,13 +25,13 @@ protected:
 protected:
 	FAICharacterActionFinished OnActionFinished;
 
+	UFUNCTION(NetMulticast, Unreliable)
+	void NetMulticastRpcShowAnimationMontage(UAnimMontage* MontageToPlay, FName SectionName, const float AnimationSpeedRate);
+
 // Attack Section
 public:
 	void Attack();
 	void AttackHitCheck() override;
-
-	UFUNCTION(NetMulticast, Unreliable)
-	void NetMulticastRpcShowAttackAnimation();
 
 	void NotifyActionEnd(UAnimMontage* TargetMontage, bool IsProperlyEnded);
 	virtual void SetAIActionDelegate(const FAICharacterActionFinished& InOnActionFinished);
@@ -46,14 +46,5 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
 	TObjectPtr<class UAnimMontage> TurnInPlaceMontage;
 
-	UPROPERTY(EditAnywhere)
-	FTimeline TurnInPlaceTimeline;
-
-	UPROPERTY(EditAnywhere)
-	TObjectPtr<UCurveFloat> TurnInPlaceCurveFloat;
-
-	FRotator TurnInPlaceBeginRotation;
-
-	UFUNCTION()
-	void UpdateTurnInPlaceProgress(const float Value);
+	bool bTurnInPlace;
 };

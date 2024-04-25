@@ -44,7 +44,5 @@ void UBTService_SetTarget::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* No
                 BlackboardComp->SetValueAsObject(TEXT("TargetPlayer"), ClosestPlayer);
             }
         }
-
-        UE_LOG(LogTemp, Log, TEXT("Set Target"))
     }
 }

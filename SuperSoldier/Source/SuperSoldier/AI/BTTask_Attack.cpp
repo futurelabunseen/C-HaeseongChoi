@@ -4,6 +4,7 @@
 #include "BTTask_Attack.h"
 #include "AIController.h"
 #include "Character/SSCharacterNonPlayer.h"
+#include "BehaviorTree/BlackboardComponent.h"
 
 UBTTask_Attack::UBTTask_Attack()
 {
@@ -26,14 +27,20 @@ EBTNodeResult::Type UBTTask_Attack::ExecuteTask(UBehaviorTreeComponent& OwnerCom
         return EBTNodeResult::Failed;
     }
 
-    FAICharacterAttackFinished OnAttackFinished;
-    OnAttackFinished.BindLambda(
+    APawn* TargetPawn = Cast<APawn>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(TEXT("TargetPlayer")));
+    if (nullptr == TargetPawn)
+    {
+        return EBTNodeResult::Failed;
+    }
+
+    FAICharacterActionFinished OnActionFinished;
+    OnActionFinished.BindLambda(
         [&]()
         {
             FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
         });
 
-    CharacterNonPlayer->SetAIAttackDelegate(OnAttackFinished);
+    CharacterNonPlayer->SetAIActionDelegate(OnActionFinished);
     CharacterNonPlayer->Attack();
 
     return EBTNodeResult::InProgress;

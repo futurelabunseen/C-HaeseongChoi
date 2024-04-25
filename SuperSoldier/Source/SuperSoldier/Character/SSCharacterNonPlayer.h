@@ -6,7 +6,7 @@
 #include "Character/SSCharacterBase.h"
 #include "SSCharacterNonPlayer.generated.h"
 
-DECLARE_DELEGATE(FAICharacterAttackFinished);
+DECLARE_DELEGATE(FAICharacterActionFinished);
 
 /**
  * 
@@ -18,8 +18,14 @@ class SUPERSOLDIER_API ASSCharacterNonPlayer : public ASSCharacterBase
 public:
 	ASSCharacterNonPlayer(const FObjectInitializer& ObjectInitializer);
 protected:
+	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaSeconds) override;
+protected:
 	virtual void SetDead() override;
+protected:
+	FAICharacterActionFinished OnActionFinished;
 
+// Attack Section
 public:
 	void Attack();
 	void AttackHitCheck() override;
@@ -27,11 +33,27 @@ public:
 	UFUNCTION(NetMulticast, Unreliable)
 	void NetMulticastRpcShowAttackAnimation();
 
-	void NotifyAttackActionEnd(UAnimMontage* TargetMontage, bool IsProperlyEnded);
-	virtual void SetAIAttackDelegate(const FAICharacterAttackFinished& InOnAttackFinished);
+	void NotifyActionEnd(UAnimMontage* TargetMontage, bool IsProperlyEnded);
+	virtual void SetAIActionDelegate(const FAICharacterActionFinished& InOnActionFinished);
 protected:
-	FAICharacterAttackFinished OnAttackFinished;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
 	TObjectPtr<class UAnimMontage> AttackMontage;
+
+// TurnInPlace Section
+public:
+	void TurnInPlace(bool bTurnRight);
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
+	TObjectPtr<class UAnimMontage> TurnInPlaceMontage;
+
+	UPROPERTY(EditAnywhere)
+	FTimeline TurnInPlaceTimeline;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UCurveFloat> TurnInPlaceCurveFloat;
+
+	FRotator TurnInPlaceBeginRotation;
+
+	UFUNCTION()
+	void UpdateTurnInPlaceProgress(const float Value);
 };

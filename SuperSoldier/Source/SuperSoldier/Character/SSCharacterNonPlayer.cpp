@@ -5,6 +5,7 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "AI/SSAIController.h"
+#include "BehaviorTree/BlackboardComponent.h"
 
 ASSCharacterNonPlayer::ASSCharacterNonPlayer(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -47,6 +48,38 @@ ASSCharacterNonPlayer::ASSCharacterNonPlayer(const FObjectInitializer& ObjectIni
 	// AIController
 	AIControllerClass = ASSAIController::StaticClass();
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+
+	static ConstructorHelpers::FObjectFinder<UCurveFloat> TurnInPlaceCurveFloatRef(
+		TEXT("/Game/SuperSoldier/Curves/TurnInPlaceCurve.TurnInPlaceCurve"));
+	if (TurnInPlaceCurveFloatRef.Object)
+	{
+		TurnInPlaceCurveFloat = TurnInPlaceCurveFloatRef.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> TurnInPlaceMontageRef(
+		TEXT("/Game/SuperSoldier/Characters/Monsters/Kraken/Animations/AM_KrakenTurn.AM_KrakenTurn"));
+	if (TurnInPlaceMontageRef.Object)
+	{
+		TurnInPlaceMontage = TurnInPlaceMontageRef.Object;
+	}
+}
+
+void ASSCharacterNonPlayer::BeginPlay()
+{
+	Super::BeginPlay();
+	if (TurnInPlaceCurveFloat)
+	{
+		FOnTimelineFloat TimelineProgress;
+		TimelineProgress.BindDynamic(this, &ASSCharacterNonPlayer::UpdateTurnInPlaceProgress);
+		TurnInPlaceTimeline.AddInterpFloat(TurnInPlaceCurveFloat, TimelineProgress);
+	}
+}
+
+void ASSCharacterNonPlayer::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	TurnInPlaceTimeline.TickTimeline(DeltaSeconds);
 }
 
 void ASSCharacterNonPlayer::SetDead()
@@ -66,7 +99,7 @@ void ASSCharacterNonPlayer::Attack()
 	NetMulticastRpcShowAttackAnimation();
 
 	FOnMontageEnded EndDelegate;
-	EndDelegate.BindUObject(this, &ASSCharacterNonPlayer::NotifyAttackActionEnd);
+	EndDelegate.BindUObject(this, &ASSCharacterNonPlayer::NotifyActionEnd);
 	AnimInstance->Montage_SetEndDelegate(EndDelegate, AttackMontage);
 }
 
@@ -85,12 +118,58 @@ void ASSCharacterNonPlayer::NetMulticastRpcShowAttackAnimation_Implementation()
 	AnimInstance->Montage_Play(AttackMontage, AnimationSpeedRate);
 }
 
-void ASSCharacterNonPlayer::NotifyAttackActionEnd(UAnimMontage* TargetMontage, bool IsProperlyEnded)
+void ASSCharacterNonPlayer::NotifyActionEnd(UAnimMontage* TargetMontage, bool IsProperlyEnded)
 {
-	OnAttackFinished.ExecuteIfBound();
+	OnActionFinished.ExecuteIfBound();
 }
 
-void ASSCharacterNonPlayer::SetAIAttackDelegate(const FAICharacterAttackFinished& InOnAttackFinished)
+void ASSCharacterNonPlayer::SetAIActionDelegate(const FAICharacterActionFinished& InOnActionFinished)
 {
-	OnAttackFinished = InOnAttackFinished;
+	OnActionFinished = InOnActionFinished;
+}
+
+void ASSCharacterNonPlayer::TurnInPlace(bool bTurnRight)
+{
+	const float AnimationSpeedRate = 2.0f;
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	AnimInstance->Montage_Play(TurnInPlaceMontage, AnimationSpeedRate);
+
+	if (bTurnRight)
+	{
+		AnimInstance->Montage_JumpToSection(TEXT("TurnRight"), TurnInPlaceMontage);
+	}
+
+	TurnInPlaceBeginRotation = GetActorRotation();
+
+	SetActorTickEnabled(true);
+	TurnInPlaceTimeline.PlayFromStart();
+}
+
+void ASSCharacterNonPlayer::UpdateTurnInPlaceProgress(const float Value)
+{
+	AAIController* CustomController = Cast<AAIController>(GetController());
+	if (CustomController)
+	{
+		UObject* TargetPlayerPtr = CustomController->GetBlackboardComponent()->GetValueAsObject(TEXT("TargetPlayer"));
+		APawn* TargetPawn = Cast<APawn>(TargetPlayerPtr);
+
+		if (TargetPawn)
+		{
+			FVector ToTargetVec = TargetPawn->GetActorLocation() - GetActorLocation();
+			ToTargetVec.Z = 0.0f;
+
+			FRotator ToTargetRot = FRotationMatrix::MakeFromX(ToTargetVec).Rotator();
+
+			const float LerpT = FMath::Clamp(Value, 0.0f, 1.0f);
+			FRotator NewRotator = FMath::Lerp(TurnInPlaceBeginRotation, ToTargetRot, LerpT);
+
+			SetActorRotation(NewRotator);
+		}
+	}
+
+	if (Value >= 1.f)
+	{
+		SetActorTickEnabled(false);
+		OnActionFinished.ExecuteIfBound();
+	}
 }

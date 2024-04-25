@@ -16,5 +16,6 @@ class SUPERSOLDIER_API UBTTask_TurnToTarget : public UBTTaskNode
 public:
 	UBTTask_TurnToTarget();
 
+	void TurnToTarget();
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 };

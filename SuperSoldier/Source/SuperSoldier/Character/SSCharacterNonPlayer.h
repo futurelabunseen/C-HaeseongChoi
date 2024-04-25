@@ -24,6 +24,9 @@ public:
 	void Attack();
 	void AttackHitCheck() override;
 
+	UFUNCTION(NetMulticast, Unreliable)
+	void NetMulticastRpcShowAttackAnimation();
+
 	void NotifyAttackActionEnd(UAnimMontage* TargetMontage, bool IsProperlyEnded);
 	virtual void SetAIAttackDelegate(const FAICharacterAttackFinished& InOnAttackFinished);
 protected:

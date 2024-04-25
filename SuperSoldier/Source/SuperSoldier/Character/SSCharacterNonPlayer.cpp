@@ -52,7 +52,7 @@ ASSCharacterNonPlayer::ASSCharacterNonPlayer(const FObjectInitializer& ObjectIni
 void ASSCharacterNonPlayer::SetDead()
 {
 	Super::SetDead();
-
+	
 	FTimerHandle DeadTimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(DeadTimerHandle, this, &ASSCharacterNonPlayer::Dissolve, DissolveDelayTime, false);
 }
@@ -63,6 +63,8 @@ void ASSCharacterNonPlayer::Attack()
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	AnimInstance->Montage_Play(AttackMontage, AnimationSpeedRate);
 
+	NetMulticastRpcShowAttackAnimation();
+
 	FOnMontageEnded EndDelegate;
 	EndDelegate.BindUObject(this, &ASSCharacterNonPlayer::NotifyAttackActionEnd);
 	AnimInstance->Montage_SetEndDelegate(EndDelegate, AttackMontage);
@@ -70,7 +72,17 @@ void ASSCharacterNonPlayer::Attack()
 
 void ASSCharacterNonPlayer::AttackHitCheck()
 {
-	UE_LOG(LogTemp, Log, TEXT("AttackHitCheck"))
+	if (HasAuthority())
+	{
+		UE_LOG(LogTemp, Log, TEXT("AttackHitCheck"))
+	}
+}
+
+void ASSCharacterNonPlayer::NetMulticastRpcShowAttackAnimation_Implementation()
+{
+	const float AnimationSpeedRate = 1.5f;
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	AnimInstance->Montage_Play(AttackMontage, AnimationSpeedRate);
 }
 
 void ASSCharacterNonPlayer::NotifyAttackActionEnd(UAnimMontage* TargetMontage, bool IsProperlyEnded)

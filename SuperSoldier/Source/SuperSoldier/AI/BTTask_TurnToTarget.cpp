@@ -35,10 +35,18 @@ EBTNodeResult::Type UBTTask_TurnToTarget::ExecuteTask(UBehaviorTreeComponent& Ow
 
     FVector ToTargetVec = TargetPawn->GetActorLocation() - ControllingPawn->GetActorLocation();
     ToTargetVec.Z = 0.0f;
+    ToTargetVec.Normalize();
 
-    FRotator ToTargetRot = FRotationMatrix::MakeFromX(ToTargetVec).Rotator();
+    FVector CrossVec = FVector::CrossProduct(ToTargetVec, ControllingPawn->GetActorForwardVector());
+    bool bTurnRight = CrossVec.Z < 0.0f;
+
+    /*UE_LOG(LogTemp, Log, TEXT("ToTargetVec : %s"), *ToTargetVec.ToString());
+    UE_LOG(LogTemp, Log, TEXT("ForwardVec : %s"), *ControllingPawn->GetActorForwardVector().ToString());
+    UE_LOG(LogTemp, Log, TEXT("CrossVec : %s"), *CrossVec.ToString());*/
+
+    /*FRotator ToTargetRot = FRotationMatrix::MakeFromX(ToTargetVec).Rotator();
     double YawDelta = ToTargetRot.Yaw - ControllingPawn->GetActorRotation().Yaw;
-    bool bTurnRight = YawDelta > 0.0f;
+    bool bTurnRight = YawDelta > 0.0f;*/
 
     FAICharacterActionFinished OnActionFinished;
     OnActionFinished.BindLambda(

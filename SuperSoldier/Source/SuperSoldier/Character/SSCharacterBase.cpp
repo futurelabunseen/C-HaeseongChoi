@@ -100,6 +100,11 @@ void ASSCharacterBase::ReleaseThrowable()
 
 void ASSCharacterBase::SetDead()
 {
+	if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
+	{
+		AnimInstance->StopAllMontages(false);
+	}
+
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 	SetActorEnableCollision(false);
 }

@@ -6,6 +6,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "AI/SSAIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "SuperSoldier.h"
 
 ASSCharacterNonPlayer::ASSCharacterNonPlayer(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -82,7 +83,7 @@ void ASSCharacterNonPlayer::Tick(float DeltaSeconds)
 				ToTargetVec.Z = 0.0f;
 
 				FRotator ToTargetRot = FRotationMatrix::MakeFromX(ToTargetVec).Rotator();
-				FRotator NewRotator = FMath::RInterpTo(GetActorRotation(), ToTargetRot, DeltaSeconds, 2.0f);
+				FRotator NewRotator = FMath::RInterpTo(GetActorRotation(), ToTargetRot, DeltaSeconds, 4.0f);
 
 				SetActorRotation(NewRotator);
 
@@ -138,10 +139,6 @@ void ASSCharacterNonPlayer::Attack()
 
 void ASSCharacterNonPlayer::AttackHitCheck()
 {
-	if (HasAuthority())
-	{
-		UE_LOG(LogTemp, Log, TEXT("AttackHitCheck"))
-	}
 }
 
 void ASSCharacterNonPlayer::NotifyActionEnd(UAnimMontage* TargetMontage, bool IsProperlyEnded)
@@ -166,11 +163,11 @@ void ASSCharacterNonPlayer::TurnInPlace(bool bTurnRight)
 	if (bTurnRight)
 	{
 		AnimInstance->Montage_JumpToSection(TEXT("TurnRight"), TurnInPlaceMontage);
-		NetMulticastRpcShowAnimationMontage(AttackMontage, TEXT("TurnRight"), AnimationSpeedRate);
+		NetMulticastRpcShowAnimationMontage(TurnInPlaceMontage, TEXT("TurnRight"), AnimationSpeedRate);
 	}
 
 	else
 	{
-		NetMulticastRpcShowAnimationMontage(AttackMontage, TEXT(""), AnimationSpeedRate);
+		NetMulticastRpcShowAnimationMontage(TurnInPlaceMontage, TEXT(""), AnimationSpeedRate);
 	}
 }

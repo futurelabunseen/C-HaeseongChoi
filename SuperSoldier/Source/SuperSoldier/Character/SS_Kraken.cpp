@@ -51,6 +51,7 @@ ASS_Kraken::ASS_Kraken(const FObjectInitializer& ObjectInitializer)
 	GetMesh()->SetRelativeScale3D(FVector(0.4f, 0.4f, 0.4f));
 
 	// AI
+	AttackRange = 620.0f;
 	AIControllerClass = ASSKrakenAIController::StaticClass();
 }
 

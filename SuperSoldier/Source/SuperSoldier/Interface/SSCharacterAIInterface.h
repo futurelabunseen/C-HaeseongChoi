@@ -24,6 +24,7 @@ class SUPERSOLDIER_API ISSCharacterAIInterface
 // Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 	virtual void SetAIActionDelegate(const FAICharacterActionFinished& InOnActionFinished) = 0;
-
 	virtual void TurnInPlace(bool bTurnRight) = 0;
+
+	virtual float GetAttackRange() = 0;
 };

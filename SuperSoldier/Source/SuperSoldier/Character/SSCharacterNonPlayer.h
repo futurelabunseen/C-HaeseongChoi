@@ -45,4 +45,10 @@ protected:
 	TObjectPtr<class UAnimMontage> TurnInPlaceMontage;
 
 	bool bTurnInPlace;
+
+// AI Section
+public:
+	virtual float GetAttackRange() override;
+protected:
+	float AttackRange;
 };

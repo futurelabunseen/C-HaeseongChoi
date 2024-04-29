@@ -3,7 +3,7 @@
 
 #include "AI/BTDecorator_AttackInRange.h"
 #include "AIController.h"
-#include "Character/SSCharacterNonPlayer.h"
+#include "Interface/SSCharacterAIInterface.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
 UBTDecorator_AttackInRange::UBTDecorator_AttackInRange()
@@ -21,10 +21,10 @@ bool UBTDecorator_AttackInRange::CalculateRawConditionValue(UBehaviorTreeCompone
         return false;
     }
 
-    ASSCharacterNonPlayer* CharacterNonPlayer = Cast<ASSCharacterNonPlayer>(ControllingPawn);
-    if (nullptr == CharacterNonPlayer)
+    ISSCharacterAIInterface* AICharacter = Cast<ISSCharacterAIInterface>(ControllingPawn);
+    if (nullptr == AICharacter)
     {
-        return false;
+        return EBTNodeResult::Failed;
     }
 
     APawn* TargetPawn = Cast<APawn>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(TEXT("TargetPlayer")));
@@ -34,7 +34,8 @@ bool UBTDecorator_AttackInRange::CalculateRawConditionValue(UBehaviorTreeCompone
     }
 
     float DistanceToTarget = ControllingPawn->GetDistanceTo(TargetPawn);
-    const float AttackRange = 620.0f;
+    
+    const float AttackRange = AICharacter->GetAttackRange();
     bResult = (DistanceToTarget <= AttackRange);
     
 	return bResult;

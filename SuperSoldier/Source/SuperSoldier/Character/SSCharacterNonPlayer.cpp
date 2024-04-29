@@ -86,3 +86,8 @@ void ASSCharacterNonPlayer::SetAIActionDelegate(const FAICharacterActionFinished
 void ASSCharacterNonPlayer::TurnInPlace(bool bTurnRight)
 {
 }
+
+float ASSCharacterNonPlayer::GetAttackRange()
+{
+	return AttackRange;
+}

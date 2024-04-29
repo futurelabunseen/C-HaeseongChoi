@@ -14,13 +14,6 @@ ASSAIController::ASSAIController()
 	{
 		BBAsset = BlackboardDataRef.Object;
 	}
-
-	static ConstructorHelpers::FObjectFinder<UBehaviorTree> BehaviorTreeRef(
-		TEXT("/Game/SuperSoldier/AI/BT_Enemy.BT_Enemy"));
-	if (BehaviorTreeRef.Object)
-	{
-		BTAsset = BehaviorTreeRef.Object;
-	}
 }
 
 void ASSAIController::RunAI()

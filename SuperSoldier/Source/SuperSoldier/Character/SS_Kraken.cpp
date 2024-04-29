@@ -4,7 +4,7 @@
 #include "Character/SS_Kraken.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "AI/SSAIController.h"
+#include "AI/SSKrakenAIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
 ASS_Kraken::ASS_Kraken(const FObjectInitializer& ObjectInitializer)
@@ -49,6 +49,9 @@ ASS_Kraken::ASS_Kraken(const FObjectInitializer& ObjectInitializer)
 	// Mesh & AnimInstance
 	GetMesh()->SetRelativeLocationAndRotation(FVector(-10.0f, 0.0f, -199.0f), FRotator(0.0f, -90.0f, 0.0f));
 	GetMesh()->SetRelativeScale3D(FVector(0.4f, 0.4f, 0.4f));
+
+	// AI
+	AIControllerClass = ASSKrakenAIController::StaticClass();
 }
 
 void ASS_Kraken::Tick(float DeltaSeconds)

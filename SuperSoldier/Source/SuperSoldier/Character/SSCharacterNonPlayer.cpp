@@ -18,7 +18,6 @@ ASSCharacterNonPlayer::ASSCharacterNonPlayer(const FObjectInitializer& ObjectIni
 	GetCharacterMovement()->BrakingDecelerationWalking = 2000.0f;
 
 	// AI
-	AIControllerClass = ASSAIController::StaticClass();
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 }
 

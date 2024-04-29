@@ -20,7 +20,7 @@ public:
 	void StopAI();
 protected:
 	virtual void OnPossess(APawn* InPawn) override;
-private:
+
 	UPROPERTY()
 	TObjectPtr<class UBlackboardData> BBAsset;
 

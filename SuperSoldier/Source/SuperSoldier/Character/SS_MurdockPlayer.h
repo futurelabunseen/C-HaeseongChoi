@@ -4,17 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "Character/SSCharacterPlayer.h"
-#include "SSMurdockPlayer.generated.h"
+#include "SS_MurdockPlayer.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class SUPERSOLDIER_API ASSMurdockPlayer : public ASSCharacterPlayer
+class SUPERSOLDIER_API ASS_MurdockPlayer : public ASSCharacterPlayer
 {
 	GENERATED_BODY()
 public:
-	ASSMurdockPlayer(const FObjectInitializer& ObjectInitializer);
+	ASS_MurdockPlayer(const FObjectInitializer& ObjectInitializer);
 protected:
 	virtual void BeginPlay() override;
 };

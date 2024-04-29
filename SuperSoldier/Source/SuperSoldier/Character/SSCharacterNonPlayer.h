@@ -4,15 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Character/SSCharacterBase.h"
+#include "Interface/SSCharacterAIInterface.h"
 #include "SSCharacterNonPlayer.generated.h"
-
-DECLARE_DELEGATE(FAICharacterActionFinished);
-
 /**
  * 
  */
 UCLASS()
-class SUPERSOLDIER_API ASSCharacterNonPlayer : public ASSCharacterBase
+class SUPERSOLDIER_API ASSCharacterNonPlayer : public ASSCharacterBase, public ISSCharacterAIInterface
 {
 	GENERATED_BODY()
 public:
@@ -34,14 +32,14 @@ public:
 	void AttackHitCheck() override;
 
 	void NotifyActionEnd(UAnimMontage* TargetMontage, bool IsProperlyEnded);
-	virtual void SetAIActionDelegate(const FAICharacterActionFinished& InOnActionFinished);
+	virtual void SetAIActionDelegate(const FAICharacterActionFinished& InOnActionFinished) override;
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
 	TObjectPtr<class UAnimMontage> AttackMontage;
 
 // TurnInPlace Section
 public:
-	void TurnInPlace(bool bTurnRight);
+	virtual void TurnInPlace(bool bTurnRight) override;
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
 	TObjectPtr<class UAnimMontage> TurnInPlaceMontage;

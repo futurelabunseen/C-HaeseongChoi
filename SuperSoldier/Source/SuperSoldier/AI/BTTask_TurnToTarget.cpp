@@ -3,7 +3,7 @@
 
 #include "AI/BTTask_TurnToTarget.h"
 #include "AIController.h"
-#include "Character/SSCharacterNonPlayer.h"
+#include "Interface/SSCharacterAIInterface.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
 UBTTask_TurnToTarget::UBTTask_TurnToTarget()
@@ -21,8 +21,8 @@ EBTNodeResult::Type UBTTask_TurnToTarget::ExecuteTask(UBehaviorTreeComponent& Ow
         return EBTNodeResult::Failed;
     }
 
-    ASSCharacterNonPlayer* CharacterNonPlayer = Cast<ASSCharacterNonPlayer>(ControllingPawn);
-    if (nullptr == CharacterNonPlayer)
+    ISSCharacterAIInterface* AICharacter = Cast<ISSCharacterAIInterface>(ControllingPawn);
+    if (nullptr == AICharacter)
     {
         return EBTNodeResult::Failed;
     }
@@ -55,8 +55,8 @@ EBTNodeResult::Type UBTTask_TurnToTarget::ExecuteTask(UBehaviorTreeComponent& Ow
             FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
         });
 
-    CharacterNonPlayer->SetAIActionDelegate(OnActionFinished);
-    CharacterNonPlayer->TurnInPlace(bTurnRight);
+    AICharacter->SetAIActionDelegate(OnActionFinished);
+    AICharacter->TurnInPlace(bTurnRight);
 
 	return EBTNodeResult::InProgress;
 }

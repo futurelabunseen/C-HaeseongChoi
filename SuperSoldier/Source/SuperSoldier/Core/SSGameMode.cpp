@@ -12,7 +12,7 @@ ASSGameMode::ASSGameMode()
 {
 	// Set Character
 	static ConstructorHelpers::FClassFinder<APawn> DefaultPawnClassRef(
-		TEXT("/Script/SuperSoldier.SSMurdockPlayer"));
+		TEXT("/Script/SuperSoldier.SS_MurdockPlayer"));
 	if (DefaultPawnClassRef.Class)
 	{
 		DefaultPawnClass = DefaultPawnClassRef.Class;

@@ -1,9 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Character/SSMurdockPlayer.h"
+#include "Character/SS_MurdockPlayer.h"
 
-ASSMurdockPlayer::ASSMurdockPlayer(const FObjectInitializer& ObjectInitializer)
+ASS_MurdockPlayer::ASS_MurdockPlayer(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
 	// Mesh & AnimInstance
@@ -63,7 +63,7 @@ ASSMurdockPlayer::ASSMurdockPlayer(const FObjectInitializer& ObjectInitializer)
 	}
 }
 
-void ASSMurdockPlayer::BeginPlay()
+void ASS_MurdockPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 

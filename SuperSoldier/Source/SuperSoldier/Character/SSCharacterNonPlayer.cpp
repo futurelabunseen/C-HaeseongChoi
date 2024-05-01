@@ -60,7 +60,6 @@ void ASSCharacterNonPlayer::Attack()
 {
 	const float AnimationSpeedRate = 1.5f;
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	AnimInstance->Montage_Play(AttackMontage, AnimationSpeedRate);
 
 	NetMulticastRpcShowAnimationMontage(AttackMontage, TEXT(""), AnimationSpeedRate);
 

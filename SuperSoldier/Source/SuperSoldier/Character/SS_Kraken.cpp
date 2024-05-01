@@ -96,11 +96,9 @@ void ASS_Kraken::TurnInPlace(bool bTurnRight)
 
 	const float AnimationSpeedRate = 2.0f;
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	AnimInstance->Montage_Play(TurnInPlaceMontage, AnimationSpeedRate);
 
 	if (bTurnRight)
 	{
-		AnimInstance->Montage_JumpToSection(TEXT("TurnRight"), TurnInPlaceMontage);
 		NetMulticastRpcShowAnimationMontage(TurnInPlaceMontage, TEXT("TurnRight"), AnimationSpeedRate);
 	}
 

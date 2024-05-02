@@ -648,7 +648,7 @@ void ASSCharacterPlayer::RpcPlayAnimation(UAnimMontage* MontageToPlay)
 
 				if (OtherPlayer)
 				{
-					OtherPlayer->ClientRpcPlayAnimation(this, FireMontage);
+					OtherPlayer->ClientRpcPlayAnimation(this, MontageToPlay);
 				}
 			}
 		}
@@ -667,7 +667,7 @@ void ASSCharacterPlayer::RpcJumpToSection(UAnimMontage* MontageToPlay, FName Sec
 
 				if (OtherPlayer)
 				{
-					OtherPlayer->ClientRpcJumpToSection(this, FireMontage, SectionName);
+					OtherPlayer->ClientRpcJumpToSection(this, MontageToPlay, SectionName);
 				}
 			}
 		}
@@ -711,10 +711,6 @@ bool ASSCharacterPlayer::ServerRpcFire_Validate()
 
 void ASSCharacterPlayer::ServerRpcFire_Implementation()
 {
-	const float AnimationSpeedRate = 1.0f;
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	AnimInstance->Montage_Play(FireMontage, AnimationSpeedRate);
-
 	RpcPlayAnimation(FireMontage);
 }
 
@@ -777,10 +773,6 @@ bool ASSCharacterPlayer::ServerRpcCalling_Validate()
 
 void ASSCharacterPlayer::ServerRpcCalling_Implementation()
 {
-	const float AnimationSpeedRate = 1.0f;
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	AnimInstance->Montage_Play(CallMontage, AnimationSpeedRate);
-
 	RpcPlayAnimation(CallMontage);
 }
 
@@ -791,19 +783,7 @@ bool ASSCharacterPlayer::ServerRpcEndCalling_Validate()
 
 void ASSCharacterPlayer::ServerRpcEndCalling_Implementation()
 {
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	FName CurSection = AnimInstance->Montage_GetCurrentSection(CallMontage);
-
-	if (CurSection != NAME_None)
-	{
-		bool bNotAlreadyPlaying = CurSection.Compare(FName(TEXT("End"))) != 0;
-
-		if (bNotAlreadyPlaying)
-		{
-			AnimInstance->Montage_JumpToSection(TEXT("End"), CallMontage);
-			RpcJumpToSection(CallMontage, TEXT("End"));
-		}
-	}
+	RpcJumpToSection(CallMontage, TEXT("End"));
 }
 
 bool ASSCharacterPlayer::ServerRpcStrataReady_Validate(const FName& StratagemName)
@@ -813,10 +793,6 @@ bool ASSCharacterPlayer::ServerRpcStrataReady_Validate(const FName& StratagemNam
 
 void ASSCharacterPlayer::ServerRpcStrataReady_Implementation(const FName& StratagemName)
 {
-	const float AnimationSpeedRate = 1.0f;
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	AnimInstance->Montage_Play(StrataReadyMontage, AnimationSpeedRate);
-
 	RpcPlayAnimation(StrataReadyMontage);
 
 	CurStrataIndicator = GetWorld()->SpawnActor<ASSStrataIndicator>(ASSStrataIndicator::StaticClass());
@@ -850,13 +826,13 @@ bool ASSCharacterPlayer::ServerRpcStrataThrow_Validate()
 
 void ASSCharacterPlayer::ServerRpcStrataThrow_Implementation()
 {
-	const float AnimationSpeedRate = 1.0f;
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	AnimInstance->Montage_Play(StrataThrowMontage, AnimationSpeedRate);
-
 	FRotator ControlRotation = GetControlRotation();
 	FRotator CurRotation = GetActorRotation();
 	SetActorRotation(FRotator(CurRotation.Pitch, ControlRotation.Yaw, CurRotation.Roll));
+
+	const float AnimationSpeedRate = 1.0f;
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	AnimInstance->Montage_Play(StrataThrowMontage, AnimationSpeedRate);
 
 	RpcPlayAnimation(StrataThrowMontage);
 }

@@ -57,6 +57,8 @@ ASS_Kraken::ASS_Kraken(const FObjectInitializer& ObjectInitializer)
 
 void ASS_Kraken::Tick(float DeltaSeconds)
 {
+	Super::Tick(DeltaSeconds);
+
 	if (bTurnInPlace && HasAuthority())
 	{
 		AAIController* CustomController = Cast<AAIController>(GetController());

@@ -17,9 +17,10 @@ public:
 	USSAnimInstance();
 protected:
 	virtual void NativeInitializeAnimation() override;
-	void SetAimRotation(float DeltaSeconds);
-
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
+
+	void SetPitchOffset();
+	void SetYawOffset();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Character)
 	TObjectPtr<class ACharacter> Owner;
@@ -42,9 +43,41 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Character)
 	float MovingThreashould;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Character)
-	float AimPitch;
+// TurnInPlace
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
+	float Direction = 0.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Character)
-	float AimYaw;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
+	float Pitch = 0.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
+	float YawActual = 0.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
+	float Yaw = 0.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
+	float RootYawOffset = 0.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
+	float DistanceCurveValue = 0.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
+	float MaxTurnAngle = 90.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
+	FName DistanceCurve = TEXT("DistanceCurve");
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
+	FName TurnInPlace = TEXT("Turn");
+
+	float YawLastTick = 0.f;
+	float YawChangeOverFrame = 0.f;
+	float DistanceCurveValueLastFrame = 0.f;
+	float TurnDirection = 0.f;
+	float ABSRootYawOffset = 0.f;
+	float DistanceCurveDifference = 0.f;
+	float YawToSubtract = 0.f;
+	float YawMultiplier = 0.f;
 };

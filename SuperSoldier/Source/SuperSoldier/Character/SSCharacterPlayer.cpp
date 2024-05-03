@@ -256,8 +256,39 @@ void ASSCharacterPlayer::Look(const FInputActionValue& Value)
 {
 	FVector2D LookAxisVector = Value.Get<FVector2D>();
 
+	FRotator DeltaRotation = GetControlRotation() - GetActorRotation();
+	DeltaRotation.Normalize();
+
+	// YawDelta = DeltaRotation.Yaw;
+	// PitchDelta = DeltaRotation.Pitch;
+	
+	// ServerRpcSetYawPitchDelta(YawDelta, PitchDelta);
+
 	AddControllerYawInput(LookAxisVector.X);
 	AddControllerPitchInput(LookAxisVector.Y);
+}
+
+void ASSCharacterPlayer::ClientRpcSetYawPitchDelta_Implementation(ASSCharacterPlayer* CharacterToSet, float NewYawDelta, float NewPitchDelta)
+{
+	CharacterToSet->YawDelta = NewYawDelta;
+	CharacterToSet->PitchDelta = NewPitchDelta;
+}
+
+void ASSCharacterPlayer::ServerRpcSetYawPitchDelta_Implementation(float NewYawDelta, float NewPitchDelta)
+{
+	YawDelta = NewYawDelta;
+	PitchDelta = NewPitchDelta;
+
+	for (APlayerController* PlayerController : TActorRange<APlayerController>(GetWorld()))
+	{
+		if (PlayerController && GetController() != PlayerController)
+		{
+			if (ASSCharacterPlayer* OtherPlayer = Cast<ASSCharacterPlayer>(PlayerController->GetPawn()))
+			{
+				OtherPlayer->ClientRpcSetYawPitchDelta(this, NewYawDelta, NewPitchDelta);
+			}
+		}
+	}
 }
 
 void ASSCharacterPlayer::SetSprintToMovementComponent(bool bNewSprint)

@@ -29,10 +29,14 @@ void USSCharacterMovementComponent::Sprint()
 		if (bSprint)
 		{
 			MaxWalkSpeed = SprintSpeed;
+			CharacterOwner->bUseControllerRotationYaw = false;
+			bOrientRotationToMovement = true;
 		}
 		else
 		{
 			MaxWalkSpeed = WalkSpeed;
+			CharacterOwner->bUseControllerRotationYaw = true;
+			bOrientRotationToMovement = false;
 		}
 	}
 }
@@ -41,24 +45,16 @@ void USSCharacterMovementComponent::Aiming()
 {
 	if (CharacterOwner)
 	{
-		if (bAiming)
-		{
-			CharacterOwner->bUseControllerRotationYaw = true;
-			bOrientRotationToMovement = false;
-		}
-		else
-		{
-			CharacterOwner->bUseControllerRotationYaw = false;
-			bOrientRotationToMovement = true;
-		}
+		CharacterOwner->bUseControllerRotationYaw = true;
+		bOrientRotationToMovement = false;
 	}
 }
 
 void USSCharacterMovementComponent::OnMovementUpdated(float DeltaSeconds, const FVector& OldLocation, const FVector& OldVelocity)
 {
 	Super::OnMovementUpdated(DeltaSeconds, OldLocation, OldVelocity);
-	Sprint();
 	Aiming();
+	Sprint();
 }
 
 FNetworkPredictionData_Client* USSCharacterMovementComponent::GetPredictionData_Client() const

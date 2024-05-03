@@ -40,6 +40,12 @@ protected:
 	TObjectPtr<class UCameraComponent> FollowCamera;
 
 // Input Section
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Input)
+	float YawDelta;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Input)
+	float PitchDelta;
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputMappingContext> NormalInputMappingContext;
@@ -53,6 +59,11 @@ protected:
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 
+	UFUNCTION(Server, Unreliable)
+	void ServerRpcSetYawPitchDelta(float NewYawDelta, float NewPitchDelta);
+
+	UFUNCTION(Client, Unreliable)
+	void ClientRpcSetYawPitchDelta(ASSCharacterPlayer* CharacterToSet, float NewYawDelta, float NewPitchDelta);
 // Sprint Section
 protected:
 	bool bSprintKeyPressing;

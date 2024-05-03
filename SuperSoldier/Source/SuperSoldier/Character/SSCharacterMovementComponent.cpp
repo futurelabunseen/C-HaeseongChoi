@@ -43,11 +43,7 @@ void USSCharacterMovementComponent::Sprint()
 
 void USSCharacterMovementComponent::Aiming()
 {
-	if (CharacterOwner)
-	{
-		CharacterOwner->bUseControllerRotationYaw = true;
-		bOrientRotationToMovement = false;
-	}
+	// Do Nothing..?
 }
 
 void USSCharacterMovementComponent::OnMovementUpdated(float DeltaSeconds, const FVector& OldLocation, const FVector& OldVelocity)

@@ -74,6 +74,7 @@ Plugins/*/Intermediate/*
 DerivedDataCache/*
 
 # Oversized files
+Content/Agora
 Content/ParagonWraith
 Content/ParagonMurdock
 Content/AnimStarterPack

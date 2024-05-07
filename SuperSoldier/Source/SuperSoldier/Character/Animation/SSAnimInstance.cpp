@@ -59,17 +59,17 @@ void USSAnimInstance::SetPitchOffset()
 
 void USSAnimInstance::SetYawOffset()
 {
-	YawLastTick = Yaw;
-	Yaw = Owner->GetActorRotation().Yaw;
-
-	if (GroundSpeed > 0.f || IsAnyMontagePlaying())
-	{
-		RootYawOffset = 0.0f;
-		return;
-	}
-
 	if (Owner)
 	{
+		YawLastTick = Yaw;
+		Yaw = Owner->GetActorRotation().Yaw;
+
+		if (GroundSpeed > 0.f || IsAnyMontagePlaying())
+		{
+			RootYawOffset = 0.0f;
+			return;
+		}
+
 		YawChangeOverFrame = YawLastTick - Yaw;
 
 		RootYawOffset = UKismetMathLibrary::NormalizeAxis(RootYawOffset + YawChangeOverFrame);

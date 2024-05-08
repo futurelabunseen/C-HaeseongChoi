@@ -91,6 +91,7 @@ float ASSCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 
 	bDead = true;
 	OnRep_ServerCharacterbDead();
+
 	return DamageAmount;
 }
 
@@ -133,6 +134,11 @@ void ASSCharacterBase::OnRep_ServerCharacterbDead()
 	if (bDead)
 	{
 		SetDead();
+
+		if (IsLocallyControlled())
+		{
+			bUseControllerRotationYaw = false;
+		}
 	}
 }
 

@@ -16,6 +16,9 @@ class SUPERSOLDIER_API ASS_Kraken : public ASSCharacterNonPlayer
 public:
 	ASS_Kraken(const FObjectInitializer& ObjectInitializer);
 protected:
+	const float MeshScale = 0.4f;
+protected:
+	virtual void AttackHitCheck() override;
 	virtual void Tick(float DeltaSeconds) override;
 
 // TurnInPlace Section

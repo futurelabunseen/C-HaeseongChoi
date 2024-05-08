@@ -6,6 +6,9 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "AI/SSKrakenAIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "Physics/SSColision.h"
+#include "Engine/DamageEvents.h"
+#include "Character/SSCharacterPlayer.h"
 
 ASS_Kraken::ASS_Kraken(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -48,11 +51,56 @@ ASS_Kraken::ASS_Kraken(const FObjectInitializer& ObjectInitializer)
 
 	// Mesh & AnimInstance
 	GetMesh()->SetRelativeLocationAndRotation(FVector(-10.0f, 0.0f, -199.0f), FRotator(0.0f, -90.0f, 0.0f));
-	GetMesh()->SetRelativeScale3D(FVector(0.4f, 0.4f, 0.4f));
+	GetMesh()->SetRelativeScale3D(FVector(MeshScale, MeshScale, MeshScale));
 
 	// AI
-	AttackRange = 620.0f;
+	AttackRange = 1550.0f * MeshScale;
 	AIControllerClass = ASSKrakenAIController::StaticClass();
+}
+
+void ASS_Kraken::AttackHitCheck()
+{
+	Super::AttackHitCheck();
+
+	if (HasAuthority())
+	{
+		FVector CollisionBoxCenter = GetActorLocation() + GetActorForwardVector() * 1200.0f * MeshScale;
+		FVector CollisionBoxExtent = FVector(580.0f * MeshScale, 400.0f * MeshScale, 340.0f * MeshScale);
+
+
+		FCollisionQueryParams CollisionParams;
+		CollisionParams.AddIgnoredActor(this);
+
+		TArray<FOverlapResult> OverlapResults;
+		FCollisionShape CollisionBox = FCollisionShape::MakeBox(CollisionBoxExtent);
+
+		bool bHitDetected = GetWorld()->OverlapMultiByChannel(
+			OverlapResults,
+			CollisionBoxCenter,
+			GetActorQuat(),
+			CCHANNEL_SSACTION,
+			CollisionBox,
+			CollisionParams);
+
+
+#if ENABLE_DRAW_DEBUG
+		FColor DrawColor = bHitDetected ? FColor::Green : FColor::Red;
+		DrawDebugBox(GetWorld(), CollisionBoxCenter, CollisionBoxExtent, GetActorRotation().Quaternion(), DrawColor, false, 2.0f);
+#endif
+	
+		for (const FOverlapResult& OverlapResult : OverlapResults)
+		{
+			AActor* OverlapActor = OverlapResult.GetActor();
+			ASSCharacterPlayer* CharacterPlayer = Cast<ASSCharacterPlayer>(OverlapActor);
+
+			if (CharacterPlayer)
+			{
+				FDamageEvent DamageEvent;
+				const float AttackDamage = 30.0f;
+				CharacterPlayer->TakeDamage(AttackDamage, DamageEvent, GetController(), this);
+			}
+		}
+	}
 }
 
 void ASS_Kraken::Tick(float DeltaSeconds)

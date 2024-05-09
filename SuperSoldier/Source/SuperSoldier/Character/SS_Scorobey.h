@@ -15,4 +15,6 @@ class SUPERSOLDIER_API ASS_Scorobey : public ASSCharacterNonPlayer
 	GENERATED_BODY()
 public:
 	ASS_Scorobey(const FObjectInitializer& ObjectInitializer);
+protected:
+	virtual void AttackHitCheck() override;
 };

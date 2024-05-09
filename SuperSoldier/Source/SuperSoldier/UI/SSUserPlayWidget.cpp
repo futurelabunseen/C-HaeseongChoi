@@ -18,6 +18,8 @@ void USSUserPlayWidget::NativeConstruct()
 
 	CrossHairImage = Cast<UImage>(GetWidgetFromName(TEXT("ImgCrossHair")));
 	ensure(CrossHairImage);
+
+	CrossHairImage->SetVisibility(ESlateVisibility::Hidden);
 }
 
 void USSUserPlayWidget::UpdateHPBar(float NewCurrentHP)
@@ -27,5 +29,17 @@ void USSUserPlayWidget::UpdateHPBar(float NewCurrentHP)
 	if (HPProgressBar)
 	{
 		HPProgressBar->SetPercent(NewCurrentHP / MaxHP);
+	}
+}
+
+void USSUserPlayWidget::UpdateCrossHair(bool bAiming)
+{
+	if (bAiming)
+	{
+		CrossHairImage->SetVisibility(ESlateVisibility::Visible);
+	}
+	else
+	{
+		CrossHairImage->SetVisibility(ESlateVisibility::Hidden);
 	}
 }

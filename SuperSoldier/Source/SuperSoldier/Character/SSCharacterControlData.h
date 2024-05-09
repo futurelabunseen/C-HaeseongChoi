@@ -21,7 +21,4 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = SpringArm)
 	FVector RelativeLocation;
-
-	UPROPERTY(EditAnywhere, Category = Widget)
-	uint32 bCrosshairVisibility : 1;
 };

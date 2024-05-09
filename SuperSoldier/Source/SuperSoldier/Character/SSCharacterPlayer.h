@@ -8,6 +8,8 @@
 #include "Strata/SSStratagem.h"
 #include "SSCharacterPlayer.generated.h"
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnAimingDelegate, bool);
+
 /**
  * 
  */
@@ -78,6 +80,7 @@ protected:
 // Aim Section
 protected:
 	bool bAiming;
+	FOnAimingDelegate OnAiming;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> AimAction;
@@ -150,6 +153,10 @@ protected:
 
 public:
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+
+// Widget Section
+public:
+	virtual void SetupCharacterWidget(class USSUserPlayWidget* InUserWidget);
 
 // RPC Section
 protected:

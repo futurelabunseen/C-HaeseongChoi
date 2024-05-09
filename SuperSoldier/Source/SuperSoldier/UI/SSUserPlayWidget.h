@@ -25,6 +25,9 @@ public:
 	UFUNCTION()
 	void UpdateHPBar(float NewCurrentHP);
 
+	UFUNCTION()
+	void UpdateCrossHair(bool bAiming);
+
 protected:
 	UPROPERTY()
 	TObjectPtr<class UImage> CrossHairImage;

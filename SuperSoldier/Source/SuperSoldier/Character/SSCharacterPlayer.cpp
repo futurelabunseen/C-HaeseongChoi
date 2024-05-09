@@ -19,7 +19,7 @@
 #include "Physics/SSColision.h"
 #include "Strata/SSStratagemManager.h"
 #include "Strata/SSStrataIndicator.h"
-
+#include "UI/SSUserPlayWidget.h"
 
 ASSCharacterPlayer::ASSCharacterPlayer(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer.SetDefaultSubobjectClass<USSCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
@@ -174,12 +174,6 @@ void ASSCharacterPlayer::BeginPlay()
 		if (PlayerController)
 		{
 			EnableInput(PlayerController);
-
-			/*if (CrosshairWidget)
-			{
-				CrosshairWidget->AddToViewport();
-				CrosshairWidget->SetVisibility(ESlateVisibility::Hidden);
-			}*/
 		}
 
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem =
@@ -221,10 +215,6 @@ void ASSCharacterPlayer::AttemptSprintEndDelegate(UAnimMontage* TargetMontage, b
 
 void ASSCharacterPlayer::SetCharacterControlData(const USSCharacterControlData* CharacterControlData)
 {
-	/*CharacterControlData->bCrosshairVisibility ? 
-		CrosshairWidget->SetVisibility(ESlateVisibility::Visible) : 
-		CrosshairWidget->SetVisibility(ESlateVisibility::Hidden);*/
-	
 	CameraBoom->TargetArmLength = CharacterControlData->TargetArmLength;
 	CameraBoom->SocketOffset = CharacterControlData->RelativeLocation;
 }
@@ -312,6 +302,7 @@ void ASSCharacterPlayer::Sprint(const FInputActionValue& Value)
 void ASSCharacterPlayer::Aim(const FInputActionValue& Value)
 {
 	bAiming = Value.Get<bool>();
+	OnAiming.Broadcast(bAiming);
 	SetAimingToMovementComponent(bAiming);
 
 	if (bAiming)
@@ -666,6 +657,16 @@ float ASSCharacterPlayer::TakeDamage(float DamageAmount, FDamageEvent const& Dam
 	RpcPlayAnimation(HitReactMontage);
 
 	return Result;
+}
+
+void ASSCharacterPlayer::SetupCharacterWidget(USSUserPlayWidget* InUserWidget)
+{
+	Super::SetupCharacterWidget(InUserWidget);
+
+	if (InUserWidget)
+	{
+		OnAiming.AddUObject(InUserWidget, &USSUserPlayWidget::UpdateCrossHair);
+	}
 }
 
 void ASSCharacterPlayer::RpcPlayAnimation(UAnimMontage* MontageToPlay)

@@ -2,11 +2,14 @@
 
 
 #include "Character/CharacterStat/SSCharacterStatComponent.h"
+#include "Net/UnrealNetwork.h"
 
 USSCharacterStatComponent::USSCharacterStatComponent()
 {
 	MaxHP = 200.0f;
 	CurrentHP = MaxHP;
+
+	SetIsReplicated(true);
 }
 
 void USSCharacterStatComponent::BeginPlay()
@@ -14,6 +17,13 @@ void USSCharacterStatComponent::BeginPlay()
 	Super::BeginPlay();
 
 	SetHP(MaxHP);
+}
+
+void USSCharacterStatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(USSCharacterStatComponent, CurrentHP);
 }
 
 void USSCharacterStatComponent::SetHP(float NewHP)
@@ -25,8 +35,16 @@ void USSCharacterStatComponent::SetHP(float NewHP)
 	{
 		OnHpZero.Broadcast();
 	}
+}
 
-	UE_LOG(LogTemp, Log, TEXT("Current HP : %f"), CurrentHP)
+void USSCharacterStatComponent::OnRep_CurrentHP()
+{
+	OnHpChanged.Broadcast(CurrentHP);
+
+	if (CurrentHP <= KINDA_SMALL_NUMBER)
+	{
+		OnHpZero.Broadcast();
+	}
 }
 
 float USSCharacterStatComponent::ApplyDamage(float InDamage)

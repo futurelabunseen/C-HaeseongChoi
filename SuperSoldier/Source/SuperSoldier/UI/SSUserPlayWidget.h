@@ -21,6 +21,8 @@ protected:
 
 public:
 	FORCEINLINE void SetMaxHP(float NewMaxHP) { MaxHP = NewMaxHP; }
+
+	UFUNCTION()
 	void UpdateHPBar(float NewCurrentHP);
 
 protected:

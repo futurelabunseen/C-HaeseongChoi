@@ -17,20 +17,24 @@ public:
 	USSCharacterStatComponent();
 protected:
 	virtual void BeginPlay() override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 public:		
 	FOnHPZeroDelegate OnHpZero;
 	FOnHPChangedDelegate OnHpChanged;
 
 	FORCEINLINE float GetMaxHP() { return MaxHP; }
 	FORCEINLINE float GetCurrentHP() { return CurrentHP; }
+
+	float ApplyDamage(float InDamage);
 protected:
 	void SetHP(float NewHP);
 
 	UPROPERTY(VisibleInstanceOnly, Category = Stat)
 	float MaxHP;
 
-	UPROPERTY(Transient, VisibleInstanceOnly, Category = Stat)
+	UPROPERTY(Transient, ReplicatedUsing = OnRep_CurrentHP, VisibleInstanceOnly, Category = Stat)
 	float CurrentHP;
-public:
-	float ApplyDamage(float InDamage);
+
+	UFUNCTION()
+	void OnRep_CurrentHP();
 };

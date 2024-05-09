@@ -24,8 +24,8 @@ protected:
 // UI Widget Section
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = UI, Meta = (AllowPrivateAccess = "true"))
-	TSubclassOf<class UUserWidget> UserPlayWidgetClass;
+	TSubclassOf<class USSUserPlayWidget> UserPlayWidgetClass;
 
 	UPROPERTY()
-	TObjectPtr<class UUserWidget> UserPlayWidget;
+	TObjectPtr<class USSUserPlayWidget> UserPlayWidget;
 };

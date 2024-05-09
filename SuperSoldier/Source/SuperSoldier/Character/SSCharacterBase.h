@@ -33,6 +33,10 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Stat, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class USSCharacterStatComponent> Stat;
 
+// Widget Section
+public:
+	virtual void SetupCharacterWidget(class USSUserPlayWidget* InUserWidget);
+
 // Attack Hit Section
 protected:
 	virtual void AttackHitCheck() override;

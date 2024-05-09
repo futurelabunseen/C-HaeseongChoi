@@ -9,6 +9,7 @@
 #include "Net/UnrealNetwork.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Character/CharacterStat/SSCharacterStatComponent.h"
+#include "UI/SSUserPlayWidget.h"
 
 // Sets default values
 ASSCharacterBase::ASSCharacterBase(const FObjectInitializer& ObjectInitializer)
@@ -84,6 +85,16 @@ void ASSCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(ASSCharacterBase, bDead);
+}
+
+void ASSCharacterBase::SetupCharacterWidget(USSUserPlayWidget* InUserWidget)
+{
+	if (InUserWidget)
+	{
+		Stat->OnHpChanged.AddUObject(InUserWidget, &USSUserPlayWidget::UpdateHPBar);
+		InUserWidget->SetMaxHP(Stat->GetMaxHP());
+		InUserWidget->UpdateHPBar(Stat->GetCurrentHP());
+	}
 }
 
 void ASSCharacterBase::AttackHitCheck()

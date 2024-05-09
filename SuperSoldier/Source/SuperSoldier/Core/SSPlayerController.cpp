@@ -3,17 +3,17 @@
 
 #include "Core/SSPlayerController.h"
 #include "SuperSoldier.h"
-#include "Components/WidgetComponent.h"
+#include "UI/SSUserPlayWidget.h"
+#include "Character/SSCharacterBase.h"
 
 ASSPlayerController::ASSPlayerController()
 {
 	// Widget Component
-	static ConstructorHelpers::FClassFinder<UUserWidget> UserPlayWidgetRef(
+	static ConstructorHelpers::FClassFinder<USSUserPlayWidget> UserPlayWidgetRef(
 		TEXT("/Game/SuperSoldier/UI/WBP_PlayWidget.WBP_PlayWidget_C"));
 	if (UserPlayWidgetRef.Class)
 	{
 		UserPlayWidgetClass = UserPlayWidgetRef.Class;
-		
 	}
 }
 
@@ -30,9 +30,15 @@ void ASSPlayerController::BeginPlay()
 
 	if (IsLocalController())
 	{
-		UserPlayWidget = CreateWidget<UUserWidget>(this, UserPlayWidgetClass);
+		UserPlayWidget = CreateWidget<USSUserPlayWidget>(this, UserPlayWidgetClass);
 		UserPlayWidget->AddToViewport();
 		UserPlayWidget->SetVisibility(ESlateVisibility::Visible);
+
+		ASSCharacterBase* SSCharacter = Cast<ASSCharacterBase>(GetCharacter());
+		if (SSCharacter)
+		{
+			SSCharacter->SetupCharacterWidget(UserPlayWidget);
+		}
 	}
 }
 

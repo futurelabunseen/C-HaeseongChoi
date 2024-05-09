@@ -19,7 +19,7 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
 protected:
-	virtual void SetDead() override;
+	virtual void OnDead() override;
 protected:
 	FAICharacterActionFinished OnActionFinished;
 

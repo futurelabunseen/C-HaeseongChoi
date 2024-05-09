@@ -8,6 +8,7 @@
 #include "Physics/SSColision.h"
 #include "Net/UnrealNetwork.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Character/CharacterStat/SSCharacterStatComponent.h"
 
 // Sets default values
 ASSCharacterBase::ASSCharacterBase(const FObjectInitializer& ObjectInitializer)
@@ -22,6 +23,10 @@ ASSCharacterBase::ASSCharacterBase(const FObjectInitializer& ObjectInitializer)
 	// Mesh
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 	GetMesh()->SetCollisionProfileName(TEXT("NoCollision"));
+
+	// Stat
+	Stat = CreateDefaultSubobject<USSCharacterStatComponent>(TEXT("Stat"));
+	Stat->OnHpZero.AddUObject(this, &ASSCharacterBase::SetDead);
 
 	// DissolveCurve
 	static ConstructorHelpers::FObjectFinder<UCurveFloat> DissolveCurveFloatRef(
@@ -89,9 +94,8 @@ float ASSCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 {
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
-	bDead = true;
-	OnRep_ServerCharacterbDead();
-
+	Stat->ApplyDamage(DamageAmount);
+	
 	return DamageAmount;
 }
 
@@ -101,6 +105,18 @@ void ASSCharacterBase::ReleaseThrowable()
 
 void ASSCharacterBase::SetDead()
 {
+	bDead = true;
+	OnRep_ServerCharacterbDead();
+}
+
+void ASSCharacterBase::Dissolve()
+{
+	SetActorTickEnabled(true);
+	DissolveTimeline.PlayFromStart();
+}
+
+void ASSCharacterBase::OnDead()
+{
 	if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
 	{
 		AnimInstance->StopAllMontages(false);
@@ -108,12 +124,6 @@ void ASSCharacterBase::SetDead()
 
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 	SetActorEnableCollision(false);
-}
-
-void ASSCharacterBase::Dissolve()
-{
-	SetActorTickEnabled(true);
-	DissolveTimeline.PlayFromStart();
 }
 
 void ASSCharacterBase::UpdateDissolveProgress(const float Value)
@@ -133,7 +143,7 @@ void ASSCharacterBase::OnRep_ServerCharacterbDead()
 {
 	if (bDead)
 	{
-		SetDead();
+		OnDead();
 
 		if (IsLocallyControlled())
 		{

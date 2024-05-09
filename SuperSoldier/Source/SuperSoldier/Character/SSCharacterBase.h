@@ -28,6 +28,11 @@ protected:
 protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+// Stat Section
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Stat, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class USSCharacterStatComponent> Stat;
+
 // Attack Hit Section
 protected:
 	virtual void AttackHitCheck() override;
@@ -40,9 +45,11 @@ public:
 
 // Dead Section
 protected:
-	virtual void SetDead();
-
+	void SetDead();
 	void Dissolve();
+
+	UFUNCTION()
+	virtual void OnDead();
 
 	UFUNCTION()
 	void UpdateDissolveProgress(const float Value);

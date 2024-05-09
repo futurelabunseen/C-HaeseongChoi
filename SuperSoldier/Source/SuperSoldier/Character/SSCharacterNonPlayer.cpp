@@ -31,9 +31,9 @@ void ASSCharacterNonPlayer::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 }
 
-void ASSCharacterNonPlayer::SetDead()
+void ASSCharacterNonPlayer::OnDead()
 {
-	Super::SetDead();
+	Super::OnDead();
 
 	ASSAIController* AIController = Cast<ASSAIController>(GetController());
 	if (AIController)

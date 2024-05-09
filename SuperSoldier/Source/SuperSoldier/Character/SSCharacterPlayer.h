@@ -134,11 +134,6 @@ protected:
 	bool MatchingInput();
 	void ProcessCommandInput(const FInputActionValue& Value);
 
-// Crosshair Section
-protected:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Widget, Meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UUserWidget> CrosshairWidget;
-
 // Attack Hit Section
 protected:
 	virtual void AttackHitCheck() override;

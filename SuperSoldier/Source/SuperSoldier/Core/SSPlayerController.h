@@ -13,8 +13,19 @@ UCLASS()
 class SUPERSOLDIER_API ASSPlayerController : public APlayerController
 {
 	GENERATED_BODY()
+public:
+	ASSPlayerController();
+	virtual void BeginPlay() override;
+
 protected:
 	virtual void PostInitializeComponents() override;
 	virtual void PostNetInit() override;
-	virtual void BeginPlay() override;
+
+// UI Widget Section
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = UI, Meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<class UUserWidget> UserPlayWidgetClass;
+
+	UPROPERTY()
+	TObjectPtr<class UUserWidget> UserPlayWidget;
 };

@@ -123,15 +123,6 @@ ASSCharacterPlayer::ASSCharacterPlayer(const FObjectInitializer& ObjectInitializ
 		CommandAction = CommandActionRef.Object;
 	}
 
-	// Widget (maybe Transfer to somewhere)
-	static ConstructorHelpers::FClassFinder<UUserWidget> CrosshairWidgetRef(
-		TEXT("/Game/SuperSoldier/UI/HUD.HUD_C"));
-
-	if (CrosshairWidgetRef.Class)
-	{
-		CrosshairWidget = CreateWidget<UUserWidget>(GetWorld(), CrosshairWidgetRef.Class);
-	}
-
 	// Character Control Data
 	static ConstructorHelpers::FObjectFinder<USSCharacterControlData> NormalModeRef(
 		TEXT("/Game/SuperSoldier/Characters/CharacterControl/DA_NormalMode.DA_NormalMode"));
@@ -184,11 +175,11 @@ void ASSCharacterPlayer::BeginPlay()
 		{
 			EnableInput(PlayerController);
 
-			if (CrosshairWidget)
+			/*if (CrosshairWidget)
 			{
 				CrosshairWidget->AddToViewport();
 				CrosshairWidget->SetVisibility(ESlateVisibility::Hidden);
-			}
+			}*/
 		}
 
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem =
@@ -230,9 +221,9 @@ void ASSCharacterPlayer::AttemptSprintEndDelegate(UAnimMontage* TargetMontage, b
 
 void ASSCharacterPlayer::SetCharacterControlData(const USSCharacterControlData* CharacterControlData)
 {
-	CharacterControlData->bCrosshairVisibility ? 
+	/*CharacterControlData->bCrosshairVisibility ? 
 		CrosshairWidget->SetVisibility(ESlateVisibility::Visible) : 
-		CrosshairWidget->SetVisibility(ESlateVisibility::Hidden);
+		CrosshairWidget->SetVisibility(ESlateVisibility::Hidden);*/
 	
 	CameraBoom->TargetArmLength = CharacterControlData->TargetArmLength;
 	CameraBoom->SocketOffset = CharacterControlData->RelativeLocation;

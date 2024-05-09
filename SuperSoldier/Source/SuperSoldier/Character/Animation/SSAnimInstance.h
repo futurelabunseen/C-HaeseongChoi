@@ -37,6 +37,12 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Character)
 	uint8 bIsIdle : 1;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
+	FName FullBody = TEXT("FullBody");
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Character)
+	uint8 bIsFullBody : 1;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Character)
 	uint8 bIsDead : 1;
 
@@ -71,6 +77,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
 	FName TurnInPlace = TEXT("Turn");
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
+	FName ResetRootYaw = TEXT("ResetRootYaw");
 
 	float YawLastTick = 0.f;
 	float YawChangeOverFrame = 0.f;

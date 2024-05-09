@@ -148,6 +148,14 @@ public:
 	virtual void ReleaseThrowable() override;
 	TObjectPtr<class ASSStrataIndicator> CurStrataIndicator;
 
+// HitReact Section
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
+	TObjectPtr<class UAnimMontage> HitReactMontage;
+
+public:
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+
 // RPC Section
 protected:
 	void RpcPlayAnimation(UAnimMontage* MontageToPlay);

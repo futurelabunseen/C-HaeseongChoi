@@ -45,6 +45,7 @@ void USSAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	SetYawOffset();
 
 	YawActual = RootYawOffset * -1.0f;
+	bIsFullBody = GetCurveValue(FullBody) > 0.f;
 }
 
 void USSAnimInstance::SetPitchOffset()
@@ -64,7 +65,7 @@ void USSAnimInstance::SetYawOffset()
 		YawLastTick = Yaw;
 		Yaw = Owner->GetActorRotation().Yaw;
 
-		if (GroundSpeed > 0.f || IsAnyMontagePlaying())
+		if (GroundSpeed > 0.f || GetCurveValue(ResetRootYaw) > 0.f)
 		{
 			RootYawOffset = 0.0f;
 			return;

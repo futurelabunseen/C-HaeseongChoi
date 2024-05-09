@@ -61,6 +61,13 @@ ASS_MurdockPlayer::ASS_MurdockPlayer(const FObjectInitializer& ObjectInitializer
 	{
 		StrataThrowMontage = StrataThrowMontageRef.Object;
 	}
+
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> HitReactMontageRef(
+		TEXT("/Game/SuperSoldier/Characters/Murdock/Animations/AM_HitReact.AM_HitReact"));
+	if (HitReactMontageRef.Object)
+	{
+		HitReactMontage = HitReactMontageRef.Object;
+	}
 }
 
 void ASS_MurdockPlayer::BeginPlay()

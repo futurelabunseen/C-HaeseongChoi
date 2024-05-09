@@ -667,6 +667,16 @@ void ASSCharacterPlayer::ReleaseThrowable()
 	}
 }
 
+float ASSCharacterPlayer::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	float Result = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+	ClientRpcPlayAnimation(this, HitReactMontage);
+	RpcPlayAnimation(HitReactMontage);
+
+	return Result;
+}
+
 void ASSCharacterPlayer::RpcPlayAnimation(UAnimMontage* MontageToPlay)
 {
 	for (APlayerController* PlayerController : TActorRange<APlayerController>(GetWorld()))

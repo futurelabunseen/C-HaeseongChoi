@@ -79,7 +79,7 @@ void ASSStrataRocket::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActo
             ASSCharacterBase* OverlappingCharater = Cast<ASSCharacterBase>(OverlappingActor);
 
             FDamageEvent DamageEvent;
-            const float AttackDamage = 30.0f;
+            const float AttackDamage = 2000.0f;
             OverlappingCharater->TakeDamage(AttackDamage, DamageEvent, nullptr, nullptr);
         }
 

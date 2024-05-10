@@ -20,7 +20,6 @@ ASSStrataIndicator::ASSStrataIndicator()
 	if (StrataIndicatorMeshRef.Object)
 	{
 		StrataIndicatorMesh->SetStaticMesh(StrataIndicatorMeshRef.Object);
-		StrataIndicatorMesh->SetMassOverrideInKg(NAME_None, 10.0f, true);
 
 		StrataIndicatorMesh->SetSimulatePhysics(false);
 		StrataIndicatorMesh->SetGenerateOverlapEvents(false);
@@ -45,6 +44,7 @@ void ASSStrataIndicator::BeginPlay()
 	Super::BeginPlay();
 
 	StrataIndicatorMesh->OnComponentHit.AddDynamic(this, &ASSStrataIndicator::OnHit);
+	StrataIndicatorMesh->SetMassOverrideInKg(NAME_None, 10.0f, true);
 
 	FLinearColor StrataIndicatorBeamColor(20.0f, 0.0f, 0.0f, 1.0f);
 	StrataIndicatorBeam->SetVariableLinearColor(TEXT("User.Color"), StrataIndicatorBeamColor);

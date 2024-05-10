@@ -8,14 +8,13 @@ USSCharacterStatComponent::USSCharacterStatComponent()
 {
 	MaxHP = 200.0f;
 	CurrentHP = MaxHP;
-
-	SetIsReplicated(true);
 }
 
 void USSCharacterStatComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
+	SetIsReplicated(true);
 	SetHP(MaxHP);
 }
 

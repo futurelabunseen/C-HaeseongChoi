@@ -21,20 +21,28 @@ void UBTService_SetTarget::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* No
 
     if (ControllingPawn)
     {
-        TArray<AActor*> PlayerCharacters;
-        UGameplayStatics::GetAllActorsOfClass(GetWorld(), ASSCharacterPlayer::StaticClass(), PlayerCharacters);
+        TArray<AActor*> Actors;
+        UGameplayStatics::GetAllActorsOfClass(GetWorld(), ASSCharacterPlayer::StaticClass(), Actors);
 
-        if (!PlayerCharacters.IsEmpty())
+        if (!Actors.IsEmpty())
         {
-            AActor* ClosestPlayer = nullptr;
+            ASSCharacterPlayer* ClosestPlayer = nullptr;
             float ClosestDistance = MAX_FLT;
-            for (AActor* Player : PlayerCharacters)
+            for (AActor* Actor : Actors)
             {
-                float Distance = FVector::Dist(ControllingPawn->GetActorLocation(), Player->GetActorLocation());
-                if (Distance < ClosestDistance)
+                if (ASSCharacterPlayer* PlayerCharacter = Cast<ASSCharacterPlayer>(Actor))
                 {
-                    ClosestPlayer = Player;
-                    ClosestDistance = Distance;
+                    if (PlayerCharacter->bDead)
+                    {
+                        continue;
+                    }
+
+                    float Distance = FVector::Dist(ControllingPawn->GetActorLocation(), PlayerCharacter->GetActorLocation());
+                    if (Distance < ClosestDistance)
+                    {
+                        ClosestPlayer = PlayerCharacter;
+                        ClosestDistance = Distance;
+                    }
                 }
             }
 

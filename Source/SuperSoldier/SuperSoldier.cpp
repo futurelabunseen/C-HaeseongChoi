@@ -3,6 +3,6 @@
 #include "SuperSoldier.h"
 #include "Modules/ModuleManager.h"
 
-// д╚ев╟М╦╝ ╩Щ╪╨
+// Л╧╢М┘▄ЙЁ═К╕╛ Л┐²Л└╠
 DEFINE_LOG_CATEGORY(LogSSNetwork)
 IMPLEMENT_PRIMARY_GAME_MODULE( FDefaultGameModuleImpl, SuperSoldier, "SuperSoldier" );

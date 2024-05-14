@@ -7,13 +7,13 @@
 #define LOG_LOCALROLEINFO *(UEnum::GetValueAsString(TEXT("Engine.ENetRole"), GetLocalRole()))
 #define LOG_REMOTEROLEINFO *(UEnum::GetValueAsString(TEXT("Engine.ENetRole"), GetRemoteRole()))
 
-// NetMode¸¦ °¡Á®¿À´Â ¸ÅÅ©·Î
+// NetModeë¥¼ ê°€ì ¸ì˜¤ëŠ” ë§¤í¬ë¡œ
 #define LOG_NETMODEINFO ((GetNetMode() == NM_Client) ? *FString::Printf(TEXT("CLIENT%d"), GPlayInEditorID) : (GetNetMode() == ENetMode::NM_Standalone) ? TEXT("STANDALONE") : TEXT("SERVER"))
 
-// ¾î¶² ÇÔ¼öÀÎÁö Á¤º¸¸¦ ¾Ë ¼ö ÀÖ´Â ¿¹¾à¾î
+// ì–´ë–¤ í•¨ìˆ˜ì¸ì§€ ì •ë³´ë¥¼ ì•Œ ìˆ˜ ìˆëŠ” ì˜ˆì•½ì–´
 #define LOG_CALLINFO ANSI_TO_TCHAR(__FUNCTION__)
 
 #define SS_LOG(LogCat, Verbosity, Format, ...) UE_LOG(LogCat, Verbosity, TEXT("[%s][%s/%s] %s %s"), LOG_NETMODEINFO, LOG_LOCALROLEINFO, LOG_REMOTEROLEINFO, LOG_CALLINFO, *FString::Printf(Format, ##__VA_ARGS__))
 
-// Ä«Å×°í¸® »ı¼º
+// ì¹´í…Œê³ ë¦¬ ìƒì„±
 DECLARE_LOG_CATEGORY_EXTERN(LogSSNetwork, Log, All);

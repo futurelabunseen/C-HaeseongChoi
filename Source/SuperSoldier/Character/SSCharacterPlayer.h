@@ -179,9 +179,6 @@ protected:
 	void ServerRpcNotifyFireHit(const FHitResult& HitResult);
 
 	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerRpcNotifyMiss(FVector_NetQuantize TraceStart, FVector_NetQuantize TraceEnd);
-
-	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerRpcThrow();
 
 	UFUNCTION(Server, Reliable, WithValidation)

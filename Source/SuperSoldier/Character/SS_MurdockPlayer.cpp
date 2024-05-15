@@ -85,7 +85,7 @@ void ASS_MurdockPlayer::BeginPlay()
 	MainWeapon->AttachToComponent(
 		GetMesh(), 
 		FAttachmentTransformRules::SnapToTargetIncludingScale, 
-		SocketName);
+		MainWeapon->GetTargetSocketName());
 
 	MainWeapon->RegisterComponent();
 }

@@ -19,12 +19,16 @@ protected:
 	virtual void BeginPlay() override;
 		
 public:
+	FORCEINLINE FName GetTargetSocketName();
 	FORCEINLINE UStaticMeshComponent* GetMesh();
 protected:
+	UPROPERTY()
+	FName TargetSocketName;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<class UStaticMeshComponent> WeaponMesh;
 
 // Attack Section
-protected:
-	virtual bool AttackHitCheck();
+public:
+	virtual const FHitResult AttackHitCheck();
 };

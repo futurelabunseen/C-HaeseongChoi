@@ -22,12 +22,17 @@ void USSWeaponComponent::BeginPlay()
 	}
 }
 
+FName USSWeaponComponent::GetTargetSocketName()
+{
+	return FName();
+}
+
 UStaticMeshComponent* USSWeaponComponent::GetMesh()
 {
 	return WeaponMesh;
 }
 
-bool USSWeaponComponent::AttackHitCheck()
+const FHitResult USSWeaponComponent::AttackHitCheck()
 {
-	return false;
+	return FHitResult();
 }

@@ -18,6 +18,6 @@ public:
 	USSWeaponComponent_Rifle();
 
 // Attack Section
-protected:
-	virtual bool AttackHitCheck();
+public:
+	virtual const FHitResult AttackHitCheck();
 };

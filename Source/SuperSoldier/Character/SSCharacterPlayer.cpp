@@ -16,7 +16,7 @@
 #include "Blueprint/UserWidget.h"
 #include "Core/SSGameInstance.h"
 #include "Engine/DamageEvents.h"
-#include "Physics/SSColision.h"
+#include "Weapon/SSWeaponComponent.h"
 #include "Strata/SSStratagemManager.h"
 #include "Strata/SSStrataIndicator.h"
 #include "UI/SSUserPlayWidget.h"
@@ -580,45 +580,14 @@ void ASSCharacterPlayer::ProcessCommandInput(const FInputActionValue& Value)
 
 void ASSCharacterPlayer::AttackHitCheck()
 {
-	if (IsLocallyControlled())
+	if (IsLocallyControlled() && MainWeapon)
 	{
-		FVector CameraLocation;
-		FRotator CameraRotation;
-		GetController()->GetPlayerViewPoint(CameraLocation, CameraRotation);
-
-		FVector TraceStart = CameraLocation;
-		FVector TraceEnd = TraceStart + CameraRotation.Vector() * 5000.0f;
-
-		FHitResult HitResult;
-		FCollisionQueryParams TraceParams(FName(TEXT("Attack")), false, this);
-
-		bool HitDetected = GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, CCHANNEL_SSACTION, TraceParams);
-
-		if (HasAuthority())
+		FHitResult HitResult = MainWeapon->AttackHitCheck();
+		
+		if (HitResult.bBlockingHit)
 		{
-			if (HitDetected)
-			{
-				FDamageEvent DamageEvent;
-				const float AttackDamage = 30.0f;
-				HitResult.GetActor()->TakeDamage(AttackDamage, DamageEvent, GetController(), this);
-			}
+			ServerRpcNotifyFireHit(HitResult);
 		}
-		else
-		{
-			if (HitDetected)
-			{
-				ServerRpcNotifyFireHit(HitResult);
-			}
-			else
-			{
-				ServerRpcNotifyMiss(TraceStart, TraceEnd);
-			}
-		}
-	
-#if ENABLE_DRAW_DEBUG
-		FColor DrawColor = HitDetected ? FColor::Green : FColor::Red;
-		DrawDebugLine(GetWorld(), TraceStart, TraceEnd, DrawColor, false, 5.0f);
-#endif
 	}
 }
 
@@ -770,19 +739,6 @@ void ASSCharacterPlayer::ServerRpcNotifyFireHit_Implementation(const FHitResult&
 			HitResult.GetActor()->TakeDamage(AttackDamage, DamageEvent, GetController(), this);
 		}
 	}
-}
-
-bool ASSCharacterPlayer::ServerRpcNotifyMiss_Validate(FVector_NetQuantize TraceStart, FVector_NetQuantize TraceEnd)
-{
-#if ENABLE_DRAW_DEBUG
-	// DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Cyan, false, 5.0f);
-#endif
-	return true;
-}
-
-void ASSCharacterPlayer::ServerRpcNotifyMiss_Implementation(FVector_NetQuantize TraceStart, FVector_NetQuantize TraceEnd)
-{
-
 }
 
 bool ASSCharacterPlayer::ServerRpcThrow_Validate()

@@ -2,6 +2,7 @@
 
 
 #include "Character/SS_MurdockPlayer.h"
+#include "Weapon/SSWeaponComponent_Rifle.h"
 
 ASS_MurdockPlayer::ASS_MurdockPlayer(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -74,7 +75,17 @@ void ASS_MurdockPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// Remove Gun
-	GetMesh()->HideBoneByName(TEXT("bot_hand"), EPhysBodyOp::PBO_None);
+	// Remove Gun Mesh
+	GetMesh()->HideBoneByName(TEXT("gun"), EPhysBodyOp::PBO_None);
 	GetMesh()->HideBoneByName(TEXT("trap_handle"), EPhysBodyOp::PBO_None);
+
+	MainWeapon = NewObject<USSWeaponComponent_Rifle>(this);
+
+	FName SocketName = TEXT("Socket_Weapon");
+	MainWeapon->AttachToComponent(
+		GetMesh(), 
+		FAttachmentTransformRules::SnapToTargetIncludingScale, 
+		SocketName);
+
+	MainWeapon->RegisterComponent();
 }

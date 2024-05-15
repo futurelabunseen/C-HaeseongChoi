@@ -90,6 +90,9 @@ protected:
 
 // Fire & Throw Section
 protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
+	TObjectPtr<class USSWeaponComponent> MainWeapon;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
 	TObjectPtr<class UAnimMontage> FireMontage;
 

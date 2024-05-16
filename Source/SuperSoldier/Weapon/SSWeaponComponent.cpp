@@ -24,7 +24,7 @@ void USSWeaponComponent::BeginPlay()
 
 FName USSWeaponComponent::GetTargetSocketName()
 {
-	return FName();
+	return TargetSocketName;
 }
 
 UStaticMeshComponent* USSWeaponComponent::GetMesh()

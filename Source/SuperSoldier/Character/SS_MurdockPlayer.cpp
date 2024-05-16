@@ -81,7 +81,6 @@ void ASS_MurdockPlayer::BeginPlay()
 
 	MainWeapon = NewObject<USSWeaponComponent_Rifle>(this);
 
-	FName SocketName = TEXT("Socket_Weapon");
 	MainWeapon->AttachToComponent(
 		GetMesh(), 
 		FAttachmentTransformRules::SnapToTargetIncludingScale, 

@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimNotifies/AnimNotify.h"
-#include "AnimNotify_FireHitCheck.generated.h"
+#include "AnimNotify_ProcessAttack.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class SUPERSOLDIER_API UAnimNotify_AttackHitCheck : public UAnimNotify
+class SUPERSOLDIER_API UAnimNotify_ProcessAttack : public UAnimNotify
 {
 	GENERATED_BODY()
 protected:

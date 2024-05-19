@@ -40,6 +40,8 @@ public:
 // Attack Hit Section
 protected:
 	virtual void AttackHitCheck() override;
+	virtual void ShowAttackEffect() override;
+
 public:
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
@@ -62,10 +64,10 @@ protected:
 	const float DissolveDelayTime = 5.0f;
 	TArray<uint32> DynamicMaterialIndices;
 
-	UPROPERTY(EditAnywhere) // Timeline ª˝º∫
+	UPROPERTY(EditAnywhere) // Timeline ÏÉùÏÑ±
 	FTimeline DissolveTimeline;
 
-	UPROPERTY(EditAnywhere) // Timeline ƒø∫Í
+	UPROPERTY(EditAnywhere) // Timeline Ïª§Î∏å
 	TObjectPtr<UCurveFloat> DissolveCurveFloat;
 
 public:

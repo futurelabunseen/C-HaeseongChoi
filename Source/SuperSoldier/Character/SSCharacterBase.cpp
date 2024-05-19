@@ -101,6 +101,10 @@ void ASSCharacterBase::AttackHitCheck()
 {
 }
 
+void ASSCharacterBase::ShowAttackEffect()
+{
+}
+
 float ASSCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);

@@ -1,10 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Character/Animation/AnimNotify_FireHitCheck.h"
+#include "Character/Animation/AnimNotify_ProcessAttack.h"
 #include "Interface/SSAnimationAttackInterface.h"
 
-void UAnimNotify_AttackHitCheck::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
+void UAnimNotify_ProcessAttack::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
 {
 	Super::Notify(MeshComp, Animation, EventReference);
 
@@ -15,6 +15,7 @@ void UAnimNotify_AttackHitCheck::Notify(USkeletalMeshComponent* MeshComp, UAnimS
 		if (AttackPawn)
 		{
 			AttackPawn->AttackHitCheck();
+			AttackPawn->ShowAttackEffect();
 		}
 	}
 }

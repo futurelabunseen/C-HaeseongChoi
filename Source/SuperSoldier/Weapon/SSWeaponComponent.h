@@ -31,4 +31,14 @@ protected:
 // Attack Section
 public:
 	virtual const FHitResult AttackHitCheck();
+	virtual void ShowAttackEffect();
+protected:
+	UPROPERTY()
+	FName MuzzleSocketName;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<class UParticleSystem> MuzzleFlashParticleEffect;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<class UParticleSystem> HitParticleEffect;
 };

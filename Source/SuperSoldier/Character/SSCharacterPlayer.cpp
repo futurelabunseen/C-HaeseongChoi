@@ -344,7 +344,7 @@ void ASSCharacterPlayer::Fire(const FInputActionValue& Value)
 		return;
 	}
 
-	// ¾Ö´Ï¸ŞÀÌ¼Ç ¸ùÅ¸ÁÖ°¡ Àç»ı ÁßÀÌ ¾Æ´Ï°í, Á¶ÁØ ÁßÀÌ¶ó¸é °İ¹ß
+	// ì• ë‹ˆë©”ì´ì…˜ ëª½íƒ€ì£¼ê°€ ì¬ìƒ ì¤‘ì´ ì•„ë‹ˆê³ , ì¡°ì¤€ ì¤‘ì´ë¼ë©´ ê²©ë°œ
 	if (!GetAnyMontagePlaying() && bAiming)
 	{
 		const float AnimationSpeedRate = 1.0f;
@@ -396,7 +396,7 @@ void ASSCharacterPlayer::Call(const FInputActionValue& Value)
 
 		else
 		{
-			// ÇöÀç Àç»ıÁßÀÎ ¼½¼ÇÀÌ End°¡ ¾Æ´Ï¸é End ¼½¼ÇÀ» Àç»ı
+			// í˜„ì¬ ì¬ìƒì¤‘ì¸ ì„¹ì…˜ì´ Endê°€ ì•„ë‹ˆë©´ End ì„¹ì…˜ì„ ì¬ìƒ
 			UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 			FName CurSection = AnimInstance->Montage_GetCurrentSection(CallMontage);
 			bool bNotAlreadyPlaying = CurSection.Compare(FName(TEXT("End"))) != 0;
@@ -443,7 +443,7 @@ void ASSCharacterPlayer::EndStrata(UAnimMontage* TargetMontage, bool IsProperlyE
 {
 	bReadyForThrowingStrata = false;
 
-	// ´Ù¸¥ ¹æ¹ı ÇÊ¿ä
+	// ë‹¤ë¥¸ ë°©ë²• í•„ìš”
 	// GetMesh()->UnHideBoneByName(TEXT("bot_hand"));
 }
 
@@ -504,7 +504,7 @@ bool ASSCharacterPlayer::MatchingInput()
 	bool bSuccessMatching = false;
 	if (!AvailableStratagems.IsEmpty())
 	{
-		// »ç¿ë °¡´ÉÇÑ ½ºÆ®¶óÅ¸ÁªÀ» ¼øÈ¸, ¸ÅÄª
+		// ì‚¬ìš© ê°€ëŠ¥í•œ ìŠ¤íŠ¸ë¼íƒ€ì ¬ì„ ìˆœíšŒ, ë§¤ì¹­
 		for (int i = 0; i < AvailableStratagems.Num(); ++i)
 		{
 			if (AvailableStratagems.IsValidIndex(i))
@@ -513,13 +513,13 @@ bool ASSCharacterPlayer::MatchingInput()
 
 				const TArray<EStrataCommand> StrataCommandArr = Stratagem->GetCommandSequence();
 
-				// ½ºÆ®¶óÅ¸Áª Ä¿¸Çµå ¼öº¸´Ù, ÇöÀç ÀÔ·Â Ä¿¸Çµå ¼ö°¡ ¸¹À¸¸é °Ë»çÇÒ ÇÊ¿ä°¡ ¾øÀ½
+				// ìŠ¤íŠ¸ë¼íƒ€ì ¬ ì»¤ë§¨ë“œ ìˆ˜ë³´ë‹¤, í˜„ì¬ ì…ë ¥ ì»¤ë§¨ë“œ ìˆ˜ê°€ ë§ìœ¼ë©´ ê²€ì‚¬í•  í•„ìš”ê°€ ì—†ìŒ
 				if (InputSequence.Num() > StrataCommandArr.Num())
 				{
 					continue;
 				}
 
-				// ÀÔ·Â Ä¿¸Çµå ¼ö¸¸Å­ ¼øÈ¸ ÇÏ¸é¼­, ½ºÆ®¶óÅ¸Áª Ä¿¸Çµå¿Í ºñ±³
+				// ì…ë ¥ ì»¤ë§¨ë“œ ìˆ˜ë§Œí¼ ìˆœíšŒ í•˜ë©´ì„œ, ìŠ¤íŠ¸ë¼íƒ€ì ¬ ì»¤ë§¨ë“œì™€ ë¹„êµ
 				bool bAllInputCommandMatching = true;
 				for (int j = 0; j < InputSequence.Num(); ++j)
 				{
@@ -530,13 +530,13 @@ bool ASSCharacterPlayer::MatchingInput()
 					}
 				}
 
-				// ¸ğµç Ä¿¸Çµå°¡ ¸ÅÄªÀÌ ¼º°øÇßÀ» °æ¿ì
+				// ëª¨ë“  ì»¤ë§¨ë“œê°€ ë§¤ì¹­ì´ ì„±ê³µí–ˆì„ ê²½ìš°
 				if (bAllInputCommandMatching)
 				{
 					bSuccessMatching = true;
 
-					// ¸ğµç Ä¿¸Çµå°¡ ¸ÅÄª ¼º°ø ÇßÀ¸¸ç, ÀÔ·Â ¼ö¿Í ½ºÆ®¶óÅ¸Áª Ä¿¸Çµå ¼ö°¡ °°À¸¸é
-					// ½ºÆ®¶óÅ¸ÁªÀ» ¹ßµ¿, ÀÔ·Â Ä¿¸Çµå ¹è¿­À» ºñ¿î´Ù.
+					// ëª¨ë“  ì»¤ë§¨ë“œê°€ ë§¤ì¹­ ì„±ê³µ í–ˆìœ¼ë©°, ì…ë ¥ ìˆ˜ì™€ ìŠ¤íŠ¸ë¼íƒ€ì ¬ ì»¤ë§¨ë“œ ìˆ˜ê°€ ê°™ìœ¼ë©´
+					// ìŠ¤íŠ¸ë¼íƒ€ì ¬ì„ ë°œë™, ì…ë ¥ ì»¤ë§¨ë“œ ë°°ì—´ì„ ë¹„ìš´ë‹¤.
 					int32 InputSequenceNum = InputSequence.Num();
 					int32 StrataCommandArrNum = StrataCommandArr.Num();
 
@@ -580,6 +580,8 @@ void ASSCharacterPlayer::ProcessCommandInput(const FInputActionValue& Value)
 
 void ASSCharacterPlayer::AttackHitCheck()
 {
+	Super::AttackHitCheck();
+
 	if (IsLocallyControlled() && MainWeapon)
 	{
 		FHitResult HitResult = MainWeapon->AttackHitCheck();
@@ -588,6 +590,16 @@ void ASSCharacterPlayer::AttackHitCheck()
 		{
 			ServerRpcNotifyFireHit(HitResult);
 		}
+	}
+}
+
+void ASSCharacterPlayer::ShowAttackEffect()
+{
+	Super::ShowAttackEffect();
+
+	if (MainWeapon)
+	{
+		MainWeapon->ShowAttackEffect();
 	}
 }
 

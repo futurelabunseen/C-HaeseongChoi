@@ -36,3 +36,7 @@ const FHitResult USSWeaponComponent::AttackHitCheck()
 {
 	return FHitResult();
 }
+
+void USSWeaponComponent::ShowAttackEffect()
+{
+}

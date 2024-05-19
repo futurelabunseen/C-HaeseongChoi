@@ -19,5 +19,6 @@ public:
 
 // Attack Section
 public:
-	virtual const FHitResult AttackHitCheck();
+	virtual const FHitResult AttackHitCheck() override;
+	virtual void ShowAttackEffect() override;
 };

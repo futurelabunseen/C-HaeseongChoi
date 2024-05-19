@@ -34,7 +34,7 @@ protected:
 
 // Camera Section
 protected:
-	// ÁöÁö´ë ¿ªÇÒÀ» ÇÏ´Â ½ºÇÁ¸µ¾Ï ÄÄÆ÷³ÍÆ®
+	// ì§€ì§€ëŒ€ ì—­í• ì„ í•˜ëŠ” ìŠ¤í”„ë§ì•” ì»´í¬ë„ŒíŠ¸
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class USpringArmComponent> CameraBoom;
 
@@ -143,6 +143,7 @@ protected:
 // Attack Hit Section
 protected:
 	virtual void AttackHitCheck() override;
+	virtual void ShowAttackEffect() override;
 
 // Throw Section
 public:

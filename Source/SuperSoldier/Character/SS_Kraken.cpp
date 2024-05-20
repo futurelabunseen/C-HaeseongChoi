@@ -58,9 +58,9 @@ ASS_Kraken::ASS_Kraken(const FObjectInitializer& ObjectInitializer)
 	AIControllerClass = ASSKrakenAIController::StaticClass();
 }
 
-void ASS_Kraken::AttackHitCheck()
+const FHitResult ASS_Kraken::AttackHitCheck()
 {
-	Super::AttackHitCheck();
+	FHitResult HitResult = Super::AttackHitCheck();
 
 	if (HasAuthority())
 	{
@@ -101,6 +101,8 @@ void ASS_Kraken::AttackHitCheck()
 			}
 		}
 	}
+
+	return HitResult;
 }
 
 void ASS_Kraken::Tick(float DeltaSeconds)

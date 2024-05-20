@@ -31,14 +31,28 @@ protected:
 // Attack Section
 public:
 	virtual const FHitResult AttackHitCheck();
-	virtual void ShowAttackEffect();
+// VFX Section
+public:
+	virtual void ShowAttackEffect(const FHitResult& HitResult);
 protected:
 	UPROPERTY()
 	FName MuzzleSocketName;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TObjectPtr<class UParticleSystem> MuzzleFlashParticleEffect;
+	FName ShellEjectSocketName;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<class UParticleSystem> HitParticleEffect;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<class UNiagaraSystem> MuzzleFlashFX;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<class UNiagaraSystem> ShellEjectFX;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<class UStaticMesh> ShellEjectMesh;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<class UNiagaraSystem> TracerFX;
 };

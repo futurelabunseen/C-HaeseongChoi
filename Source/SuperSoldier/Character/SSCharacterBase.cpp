@@ -97,11 +97,12 @@ void ASSCharacterBase::SetupCharacterWidget(USSUserPlayWidget* InUserWidget)
 	}
 }
 
-void ASSCharacterBase::AttackHitCheck()
+const FHitResult ASSCharacterBase::AttackHitCheck()
 {
+	return FHitResult();
 }
 
-void ASSCharacterBase::ShowAttackEffect()
+void ASSCharacterBase::ShowAttackEffect(const FHitResult& HitResult)
 {
 }
 

@@ -18,7 +18,7 @@ public:
 protected:
 	const float MeshScale = 0.4f;
 protected:
-	virtual void AttackHitCheck() override;
+	virtual const FHitResult AttackHitCheck() override;
 	virtual void Tick(float DeltaSeconds) override;
 
 // TurnInPlace Section

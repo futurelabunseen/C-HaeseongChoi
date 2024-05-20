@@ -14,8 +14,8 @@ void UAnimNotify_ProcessAttack::Notify(USkeletalMeshComponent* MeshComp, UAnimSe
 
 		if (AttackPawn)
 		{
-			AttackPawn->AttackHitCheck();
-			AttackPawn->ShowAttackEffect();
+			FHitResult HitResult = AttackPawn->AttackHitCheck();
+			AttackPawn->ShowAttackEffect(HitResult);
 		}
 	}
 }

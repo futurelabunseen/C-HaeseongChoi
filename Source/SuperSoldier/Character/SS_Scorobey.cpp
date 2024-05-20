@@ -50,9 +50,9 @@ ASS_Scorobey::ASS_Scorobey(const FObjectInitializer& ObjectInitializer)
 	AIControllerClass = ASSScorobeyAIController::StaticClass();
 }
 
-void ASS_Scorobey::AttackHitCheck()
+const FHitResult ASS_Scorobey::AttackHitCheck()
 {
-	Super::AttackHitCheck();
+	FHitResult HitResult = Super::AttackHitCheck();
 
 	if (HasAuthority())
 	{
@@ -91,4 +91,6 @@ void ASS_Scorobey::AttackHitCheck()
 			}
 		}
 	}
+
+	return HitResult;
 }

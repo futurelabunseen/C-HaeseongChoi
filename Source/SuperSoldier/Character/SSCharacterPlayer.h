@@ -142,8 +142,8 @@ protected:
 
 // Attack Hit Section
 protected:
-	virtual void AttackHitCheck() override;
-	virtual void ShowAttackEffect() override;
+	virtual const FHitResult AttackHitCheck() override;
+	virtual void ShowAttackEffect(const FHitResult& HitResult) override;
 
 // Throw Section
 public:

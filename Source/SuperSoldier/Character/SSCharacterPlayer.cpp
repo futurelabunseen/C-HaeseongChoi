@@ -578,28 +578,30 @@ void ASSCharacterPlayer::ProcessCommandInput(const FInputActionValue& Value)
 	}
 }
 
-void ASSCharacterPlayer::AttackHitCheck()
+const FHitResult ASSCharacterPlayer::AttackHitCheck()
 {
-	Super::AttackHitCheck();
+	FHitResult Result = Super::AttackHitCheck();
 
 	if (IsLocallyControlled() && MainWeapon)
 	{
-		FHitResult HitResult = MainWeapon->AttackHitCheck();
-		
-		if (HitResult.bBlockingHit)
+		Result = MainWeapon->AttackHitCheck();
+
+		if (Result.bBlockingHit)
 		{
-			ServerRpcNotifyFireHit(HitResult);
+			ServerRpcNotifyFireHit(Result);
 		}
 	}
+
+	return Result;
 }
 
-void ASSCharacterPlayer::ShowAttackEffect()
+void ASSCharacterPlayer::ShowAttackEffect(const FHitResult& HitResult)
 {
-	Super::ShowAttackEffect();
+	Super::ShowAttackEffect(HitResult);
 
 	if (MainWeapon)
 	{
-		MainWeapon->ShowAttackEffect();
+		MainWeapon->ShowAttackEffect(HitResult);
 	}
 }
 

@@ -16,5 +16,5 @@ class SUPERSOLDIER_API ASS_Creepster : public ASSCharacterNonPlayer
 public:
 	ASS_Creepster(const FObjectInitializer& ObjectInitializer);
 protected:
-	virtual void AttackHitCheck() override;
+	virtual const FHitResult AttackHitCheck() override;
 };

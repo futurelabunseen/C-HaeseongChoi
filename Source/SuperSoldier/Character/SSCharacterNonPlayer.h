@@ -29,7 +29,7 @@ protected:
 // Attack Section
 public:
 	void Attack();
-	virtual void AttackHitCheck() override;
+	virtual const FHitResult AttackHitCheck() override;
 
 	void NotifyActionEnd(UAnimMontage* TargetMontage, bool IsProperlyEnded);
 	virtual void SetAIActionDelegate(const FAICharacterActionFinished& InOnActionFinished) override;

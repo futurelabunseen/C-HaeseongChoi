@@ -20,5 +20,9 @@ public:
 // Attack Section
 public:
 	virtual const FHitResult AttackHitCheck() override;
+
 	virtual void ShowAttackEffect(const FHitResult& HitResult) override;
+
+	UFUNCTION(NetMulticast, Unreliable)
+	void NetMulticastShowVFX(const FHitResult& HitResult);
 };

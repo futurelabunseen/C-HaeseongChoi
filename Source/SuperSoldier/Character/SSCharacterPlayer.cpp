@@ -20,6 +20,7 @@
 #include "Strata/SSStratagemManager.h"
 #include "Strata/SSStrataIndicator.h"
 #include "UI/SSUserPlayWidget.h"
+#include "TimerManager.h"
 
 ASSCharacterPlayer::ASSCharacterPlayer(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer.SetDefaultSubobjectClass<USSCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
@@ -578,30 +579,18 @@ void ASSCharacterPlayer::ProcessCommandInput(const FInputActionValue& Value)
 	}
 }
 
-const FHitResult ASSCharacterPlayer::AttackHitCheck()
+void ASSCharacterPlayer::AttackHitCheck()
 {
-	FHitResult Result = Super::AttackHitCheck();
-
-	if (IsLocallyControlled() && MainWeapon)
+	if (HasAuthority() && MainWeapon)
 	{
-		Result = MainWeapon->AttackHitCheck();
+		FHitResult HitResult = MainWeapon->AttackHitCheck();
 
-		if (Result.bBlockingHit)
+		if (HitResult.bBlockingHit)
 		{
-			ServerRpcNotifyFireHit(Result);
+			FDamageEvent DamageEvent;
+			const float AttackDamage = 30.0f;
+			HitResult.GetActor()->TakeDamage(AttackDamage, DamageEvent, GetController(), this);
 		}
-	}
-
-	return Result;
-}
-
-void ASSCharacterPlayer::ShowAttackEffect(const FHitResult& HitResult)
-{
-	Super::ShowAttackEffect(HitResult);
-
-	if (MainWeapon)
-	{
-		MainWeapon->ShowAttackEffect(HitResult);
 	}
 }
 
@@ -727,6 +716,9 @@ bool ASSCharacterPlayer::ServerRpcFire_Validate()
 
 void ASSCharacterPlayer::ServerRpcFire_Implementation()
 {
+	FTimerHandle HitCheckTimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(HitCheckTimerHandle, this, &ASSCharacterPlayer::AttackHitCheck, 0.07f, false);
+
 	RpcPlayAnimation(FireMontage);
 }
 

@@ -50,9 +50,9 @@ ASS_LandBug::ASS_LandBug(const FObjectInitializer& ObjectInitializer)
 	AIControllerClass = ASSLandBugAIController::StaticClass();
 }
 
-const FHitResult ASS_LandBug::AttackHitCheck()
+void ASS_LandBug::AttackHitCheck()
 {
-	FHitResult HitResult = Super::AttackHitCheck();
+	Super::AttackHitCheck();
 
 	if (HasAuthority())
 	{
@@ -91,6 +91,4 @@ const FHitResult ASS_LandBug::AttackHitCheck()
 			}
 		}
 	}
-
-	return HitResult;
 }

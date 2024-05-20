@@ -16,5 +16,5 @@ class SUPERSOLDIER_API ASS_Scorobey : public ASSCharacterNonPlayer
 public:
 	ASS_Scorobey(const FObjectInitializer& ObjectInitializer);
 protected:
-	virtual const FHitResult AttackHitCheck() override;
+	virtual void AttackHitCheck() override;
 };

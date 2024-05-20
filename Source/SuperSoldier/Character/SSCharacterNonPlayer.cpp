@@ -68,9 +68,8 @@ void ASSCharacterNonPlayer::Attack()
 	AnimInstance->Montage_SetEndDelegate(EndDelegate, AttackMontage);
 }
 
-const FHitResult ASSCharacterNonPlayer::AttackHitCheck()
+void ASSCharacterNonPlayer::AttackHitCheck()
 {
-	return FHitResult();
 }
 
 void ASSCharacterNonPlayer::NotifyActionEnd(UAnimMontage* TargetMontage, bool IsProperlyEnded)

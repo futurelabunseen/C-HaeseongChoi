@@ -39,8 +39,8 @@ public:
 
 // Attack Hit Section
 protected:
-	virtual const FHitResult AttackHitCheck() override;
-	virtual void ShowAttackEffect(const FHitResult& HitResult) override;
+	virtual void AttackHitCheck() override;
+	virtual void ShowAttackEffect();
 
 public:
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;

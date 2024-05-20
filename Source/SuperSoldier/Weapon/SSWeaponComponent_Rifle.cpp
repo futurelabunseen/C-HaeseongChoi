@@ -65,30 +65,39 @@ const FHitResult USSWeaponComponent_Rifle::AttackHitCheck()
 	{
 		AController* PlayerController = PlayerCharacter->GetController();
 
-		FVector CameraLocation;
-		FRotator CameraRotation;
+		if (PlayerController)
+		{
+			FVector CameraLocation;
+			FRotator CameraRotation;
 
-		PlayerController->GetPlayerViewPoint(CameraLocation, CameraRotation);
+			PlayerController->GetPlayerViewPoint(CameraLocation, CameraRotation);
 
-		FVector TraceStart = CameraLocation;
-		FVector TraceEnd = TraceStart + CameraRotation.Vector() * 5000.0f;
+			FVector TraceStart = CameraLocation;
+			FVector TraceEnd = TraceStart + CameraRotation.Vector() * 5000.0f;
 
-		FHitResult HitResult;
-		FCollisionQueryParams TraceParams(FName(TEXT("Attack")), false, PlayerCharacter);
+			FHitResult HitResult;
+			FCollisionQueryParams TraceParams(FName(TEXT("Attack")), false, PlayerCharacter);
 
-		GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, CCHANNEL_SSACTION, TraceParams);
+			GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, CCHANNEL_SSACTION, TraceParams);
 
+			ShowAttackEffect(HitResult);
 #if ENABLE_DRAW_DEBUG
-		FColor DrawColor = HitResult.bBlockingHit ? FColor::Green : FColor::Red;
-		DrawDebugLine(GetWorld(), TraceStart, TraceEnd, DrawColor, false, 5.0f);
+			FColor DrawColor = HitResult.bBlockingHit ? FColor::Green : FColor::Red;
+			DrawDebugLine(GetWorld(), TraceStart, TraceEnd, DrawColor, false, 5.0f);
 #endif
-		return HitResult;
+			return HitResult;
+		}
 	}
 
 	return FHitResult();
 }
 
 void USSWeaponComponent_Rifle::ShowAttackEffect(const FHitResult& HitResult)
+{
+	NetMulticastShowVFX(HitResult);
+}
+
+void USSWeaponComponent_Rifle::NetMulticastShowVFX_Implementation(const FHitResult& HitResult)
 {
 	if (!IsValid(WeaponMesh))
 	{
@@ -152,7 +161,8 @@ void USSWeaponComponent_Rifle::ShowAttackEffect(const FHitResult& HitResult)
 		if (IsValid(Tracer))
 		{
 			TArray<FVector> ImpactLocations;
-			ImpactLocations.Add(HitResult.ImpactPoint);
+
+			HitResult.bBlockingHit ? ImpactLocations.Add(HitResult.ImpactPoint) : ImpactLocations.Add(HitResult.TraceEnd);
 
 			UNiagaraDataInterfaceArrayFunctionLibrary::SetNiagaraArrayVector(
 				Tracer,

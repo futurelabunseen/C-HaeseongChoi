@@ -50,9 +50,9 @@ ASS_Creepster::ASS_Creepster(const FObjectInitializer& ObjectInitializer)
 	AIControllerClass = ASSCreepsterAIController::StaticClass();
 }
 
-const FHitResult ASS_Creepster::AttackHitCheck()
+void ASS_Creepster::AttackHitCheck()
 {
-	FHitResult HitResult = Super::AttackHitCheck();
+	Super::AttackHitCheck();
 
 	if (HasAuthority())
 	{
@@ -91,7 +91,5 @@ const FHitResult ASS_Creepster::AttackHitCheck()
 			}
 		}
 	}
-
-	return HitResult;
 }
 

@@ -3,6 +3,7 @@
 
 #include "Character/SSCharacterMovementComponent.h"
 #include "GameFramework/Character.h"
+#include "Character/SSCharacterBase.h"
 
 USSCharacterMovementComponent::USSCharacterMovementComponent()
 {
@@ -26,6 +27,15 @@ void USSCharacterMovementComponent::Sprint()
 {
 	if (CharacterOwner)
 	{
+		ASSCharacterBase* CharacterBase = Cast<ASSCharacterBase>(CharacterOwner);
+		if (IsValid(CharacterBase))
+		{
+			if (CharacterBase->bDead)
+			{
+				return;
+			}
+		}
+
 		if (bSprint)
 		{
 			MaxWalkSpeed = SprintSpeed;

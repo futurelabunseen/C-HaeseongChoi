@@ -97,12 +97,11 @@ void ASSCharacterBase::SetupCharacterWidget(USSUserPlayWidget* InUserWidget)
 	}
 }
 
-const FHitResult ASSCharacterBase::AttackHitCheck()
+void ASSCharacterBase::AttackHitCheck()
 {
-	return FHitResult();
 }
 
-void ASSCharacterBase::ShowAttackEffect(const FHitResult& HitResult)
+void ASSCharacterBase::ShowAttackEffect()
 {
 }
 
@@ -138,7 +137,7 @@ void ASSCharacterBase::OnDead()
 		AnimInstance->StopAllMontages(false);
 	}
 
-	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+	GetCharacterMovement()->DisableMovement();
 	SetActorEnableCollision(false);
 }
 
@@ -160,11 +159,7 @@ void ASSCharacterBase::OnRep_ServerCharacterbDead()
 	if (bDead)
 	{
 		OnDead();
-
-		if (IsLocallyControlled())
-		{
-			bUseControllerRotationYaw = false;
-		}
+		bUseControllerRotationYaw = false;
 	}
 }
 

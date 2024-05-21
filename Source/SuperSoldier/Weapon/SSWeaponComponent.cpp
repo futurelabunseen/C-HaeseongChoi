@@ -40,3 +40,7 @@ const FHitResult USSWeaponComponent::AttackHitCheck()
 void USSWeaponComponent::ShowAttackEffect(const FHitResult& HitResult)
 {
 }
+
+void USSWeaponComponent::PlaySoundEffect()
+{
+}

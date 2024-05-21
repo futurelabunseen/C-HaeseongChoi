@@ -143,6 +143,7 @@ protected:
 // Attack Hit Section
 protected:
 	virtual void AttackHitCheck() override;
+	virtual void PlaySoundEffect() override;
 
 // Throw Section
 public:

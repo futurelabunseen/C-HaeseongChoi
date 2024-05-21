@@ -15,6 +15,7 @@ void UAnimNotify_ProcessAttack::Notify(USkeletalMeshComponent* MeshComp, UAnimSe
 		if (AttackPawn)
 		{
 			AttackPawn->AttackHitCheck();
+			AttackPawn->PlaySoundEffect();
 		}
 	}
 }

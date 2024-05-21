@@ -21,8 +21,13 @@ public:
 public:
 	virtual const FHitResult AttackHitCheck() override;
 
+// VFX Section
 	virtual void ShowAttackEffect(const FHitResult& HitResult) override;
 
 	UFUNCTION(NetMulticast, Unreliable)
 	void NetMulticastShowVFX(const FHitResult& HitResult);
+
+// SFX Section
+public:
+	virtual void PlaySoundEffect() override;
 };

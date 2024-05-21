@@ -327,7 +327,7 @@ void ASSCharacterPlayer::SetAimingToMovementComponent(bool bNewAiming)
 
 void ASSCharacterPlayer::Fire(const FInputActionValue& Value)
 {
-	if (bReadyForThrowingStrata)
+	if (!GetAnyMontagePlaying(StrataReadyMontage) && bReadyForThrowingStrata)
 	{
 		const float AnimationSpeedRate = 1.0f;
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
@@ -581,17 +581,27 @@ void ASSCharacterPlayer::ProcessCommandInput(const FInputActionValue& Value)
 
 void ASSCharacterPlayer::AttackHitCheck()
 {
-	if (HasAuthority() && MainWeapon)
+	if (MainWeapon)
 	{
 		FHitResult HitResult = MainWeapon->AttackHitCheck();
 
-		if (HitResult.bBlockingHit)
+		if (IsLocallyControlled())
+		{
+			MainWeapon->ShowAttackEffect(HitResult);
+		}
+
+		if (HasAuthority() && HitResult.bBlockingHit)
 		{
 			FDamageEvent DamageEvent;
 			const float AttackDamage = 30.0f;
 			HitResult.GetActor()->TakeDamage(AttackDamage, DamageEvent, GetController(), this);
 		}
 	}
+}
+
+void ASSCharacterPlayer::PlaySoundEffect()
+{
+	MainWeapon->PlaySoundEffect();
 }
 
 void ASSCharacterPlayer::ReleaseThrowable()

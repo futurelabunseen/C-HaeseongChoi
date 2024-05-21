@@ -57,6 +57,12 @@ USSWeaponComponent_Rifle::USSWeaponComponent_Rifle()
 	{
 		TracerFX = TracerFXRef.Object;
 	}
+
+	static ConstructorHelpers::FObjectFinder<USoundBase> ShootSoundRef(TEXT("/Game/SFX_OF_WEAPON/Fire/AudioCue/Weapon_Fire_01_Cue.Weapon_Fire_01_Cue"));
+	if (ShootSoundRef.Object)
+	{
+		ShootSound = ShootSoundRef.Object;
+	}
 }
 
 const FHitResult USSWeaponComponent_Rifle::AttackHitCheck()
@@ -80,11 +86,11 @@ const FHitResult USSWeaponComponent_Rifle::AttackHitCheck()
 
 			GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, CCHANNEL_SSACTION, TraceParams);
 
-			ShowAttackEffect(HitResult);
-#if ENABLE_DRAW_DEBUG
-			FColor DrawColor = HitResult.bBlockingHit ? FColor::Green : FColor::Red;
-			DrawDebugLine(GetWorld(), TraceStart, TraceEnd, DrawColor, false, 5.0f);
-#endif
+			NetMulticastShowVFX(HitResult);
+//#if ENABLE_DRAW_DEBUG
+//			FColor DrawColor = HitResult.bBlockingHit ? FColor::Green : FColor::Red;
+//			DrawDebugLine(GetWorld(), TraceStart, TraceEnd, DrawColor, false, 5.0f);
+//#endif
 			return HitResult;
 		}
 	}
@@ -93,11 +99,6 @@ const FHitResult USSWeaponComponent_Rifle::AttackHitCheck()
 }
 
 void USSWeaponComponent_Rifle::ShowAttackEffect(const FHitResult& HitResult)
-{
-	NetMulticastShowVFX(HitResult);
-}
-
-void USSWeaponComponent_Rifle::NetMulticastShowVFX_Implementation(const FHitResult& HitResult)
 {
 	if (!IsValid(WeaponMesh))
 	{
@@ -184,5 +185,27 @@ void USSWeaponComponent_Rifle::NetMulticastShowVFX_Implementation(const FHitResu
 			Rotation.Yaw -= 90.0f;
 			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitParticleEffect, Location, Rotation);
 		}
+	}
+}
+
+void USSWeaponComponent_Rifle::PlaySoundEffect()
+{
+	if (WeaponMesh->DoesSocketExist(MuzzleSocketName))
+	{
+		FTransform MuzzleSocketTransform = WeaponMesh->GetSocketTransform(MuzzleSocketName);
+		UGameplayStatics::SpawnSoundAtLocation(
+			GetWorld(),
+			ShootSound,
+			MuzzleSocketTransform.GetLocation());
+	}
+}
+
+void USSWeaponComponent_Rifle::NetMulticastShowVFX_Implementation(const FHitResult& HitResult)
+{
+	ACharacter* PlayerCharacter = Cast<ACharacter>(GetOwner());
+
+	if (!PlayerCharacter->IsLocallyControlled())
+	{
+		ShowAttackEffect(HitResult);
 	}
 }

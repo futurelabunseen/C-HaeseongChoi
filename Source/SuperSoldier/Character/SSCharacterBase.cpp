@@ -101,6 +101,10 @@ void ASSCharacterBase::AttackHitCheck()
 {
 }
 
+void ASSCharacterBase::PlaySoundEffect()
+{
+}
+
 void ASSCharacterBase::ShowAttackEffect()
 {
 }

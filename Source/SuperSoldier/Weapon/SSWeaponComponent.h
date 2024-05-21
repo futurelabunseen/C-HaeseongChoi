@@ -30,6 +30,7 @@ protected:
 // Attack Section
 public:
 	virtual const FHitResult AttackHitCheck();
+
 // VFX Section
 public:
 	virtual void ShowAttackEffect(const FHitResult& HitResult);
@@ -54,4 +55,11 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<class UNiagaraSystem> TracerFX;
+
+// SFX Section
+public:
+	virtual void PlaySoundEffect();
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<class USoundBase> ShootSound;
 };

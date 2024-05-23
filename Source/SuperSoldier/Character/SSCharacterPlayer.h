@@ -9,6 +9,7 @@
 #include "SSCharacterPlayer.generated.h"
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnAimingDelegate, bool);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnCallingDelegate, bool);
 
 /**
  * 
@@ -110,6 +111,8 @@ protected:
 
 // Strata Section
 protected:
+	FOnCallingDelegate OnCalling;
+
 	bool bCalling;
 	bool bReadyForThrowingStrata;
 	bool bChangeMontageForThrowingStrata;

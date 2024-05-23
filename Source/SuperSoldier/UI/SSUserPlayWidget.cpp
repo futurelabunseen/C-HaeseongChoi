@@ -43,3 +43,15 @@ void USSUserPlayWidget::UpdateCrossHair(bool bAiming)
 		CrossHairImage->SetVisibility(ESlateVisibility::Hidden);
 	}
 }
+
+void USSUserPlayWidget::ShowStratagemList(bool bCalling)
+{
+	if (bCalling)
+	{
+		PlayAnimation(AnimShowStrataList);
+	}
+	else
+	{
+		PlayAnimation(AnimShowStrataList, 0.0f, 1, EUMGSequencePlayMode::Reverse);
+	}
+}

@@ -28,6 +28,9 @@ public:
 	UFUNCTION()
 	void UpdateCrossHair(bool bAiming);
 
+	UFUNCTION()
+	void ShowStratagemList(bool bCalling);
+
 protected:
 	UPROPERTY()
 	TObjectPtr<class UImage> CrossHairImage;
@@ -37,4 +40,7 @@ protected:
 	
 	UPROPERTY()
 	float MaxHP;
+
+	UPROPERTY(BlueprintReadWrite)
+	TObjectPtr<class UWidgetAnimation> AnimShowStrataList;
 };

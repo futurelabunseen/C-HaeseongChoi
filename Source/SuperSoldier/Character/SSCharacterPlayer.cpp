@@ -379,6 +379,7 @@ void ASSCharacterPlayer::Call(const FInputActionValue& Value)
 	if (!GetAnyMontagePlaying(CallMontage))
 	{
 		bCalling = Value.Get<bool>();
+		OnCalling.Broadcast(bCalling);
 
 		if (bCalling)
 		{
@@ -648,6 +649,7 @@ void ASSCharacterPlayer::SetupCharacterWidget(USSUserPlayWidget* InUserWidget)
 	if (InUserWidget)
 	{
 		OnAiming.AddUObject(InUserWidget, &USSUserPlayWidget::UpdateCrossHair);
+		OnCalling.AddUObject(InUserWidget, &USSUserPlayWidget::ShowStratagemList);
 	}
 }
 

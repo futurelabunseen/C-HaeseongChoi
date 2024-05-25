@@ -9,6 +9,7 @@
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraDataInterfaceArrayFunctionLibrary.h"
+#include "SuperSoldier.h"
 
 USSWeaponComponent_Rifle::USSWeaponComponent_Rifle()
 {
@@ -186,6 +187,8 @@ void USSWeaponComponent_Rifle::ShowAttackEffect(const FHitResult& HitResult)
 			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitParticleEffect, Location, Rotation);
 		}
 	}
+
+	SS_SUBLOG(LogSSNetwork, Log, TEXT("ShowVFX"));
 }
 
 void USSWeaponComponent_Rifle::PlaySoundEffect()
@@ -203,8 +206,7 @@ void USSWeaponComponent_Rifle::PlaySoundEffect()
 void USSWeaponComponent_Rifle::NetMulticastShowVFX_Implementation(const FHitResult& HitResult)
 {
 	ACharacter* PlayerCharacter = Cast<ACharacter>(GetOwner());
-
-	if (!PlayerCharacter->IsLocallyControlled())
+	if (PlayerCharacter->GetLocalRole() == ROLE_SimulatedProxy)
 	{
 		ShowAttackEffect(HitResult);
 	}

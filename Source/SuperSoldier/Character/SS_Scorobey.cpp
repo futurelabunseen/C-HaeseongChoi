@@ -48,6 +48,13 @@ ASS_Scorobey::ASS_Scorobey(const FObjectInitializer& ObjectInitializer)
 	// AI
 	AttackRange = 140.0f;
 	AIControllerClass = ASSScorobeyAIController::StaticClass();
+
+	// SFX
+	static ConstructorHelpers::FObjectFinder<USoundBase> AttackSoundRef(TEXT("/Game/Small_Monster_SFX_1/Cues/Mala_Attack_01_Cue.Mala_Attack_01_Cue"));
+	if (AttackSoundRef.Object)
+	{
+		AttackSound = AttackSoundRef.Object;
+	}
 }
 
 void ASS_Scorobey::AttackHitCheck()

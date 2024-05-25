@@ -9,6 +9,7 @@
 #include "SuperSoldier.h"
 #include "Engine/DamageEvents.h"
 #include "Character/SSCharacterBase.h"
+#include "Kismet/GameplayStatics.h"
 
 ASSStrataRocket::ASSStrataRocket()
 {
@@ -111,6 +112,16 @@ void ASSStrataRocket::NetMulticastRpcPlayEffect_Implementation(FVector_NetQuanti
             Rotation,
             FVector(10.0f, 4.0f, 4.0f));
     }
+
+	if (ExplodeSound)
+	{
+		UGameplayStatics::SpawnSoundAtLocation(
+			GetWorld(),
+			ExplodeSound,
+			Location,
+			FRotator::ZeroRotator,
+			1.25f);
+	}
 }
 
 

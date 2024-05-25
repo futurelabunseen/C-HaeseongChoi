@@ -7,6 +7,7 @@
 #include "AI/SSAIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "SuperSoldier.h"
+#include "Kismet/GameplayStatics.h"
 
 ASSCharacterNonPlayer::ASSCharacterNonPlayer(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -89,4 +90,15 @@ void ASSCharacterNonPlayer::TurnInPlace(bool bTurnRight)
 float ASSCharacterNonPlayer::GetAttackRange()
 {
 	return AttackRange;
+}
+
+void ASSCharacterNonPlayer::PlaySoundEffect()
+{
+	if (AttackSound)
+	{
+		UGameplayStatics::SpawnSoundAtLocation(
+			GetWorld(),
+			AttackSound,
+			GetActorLocation());
+	}
 }

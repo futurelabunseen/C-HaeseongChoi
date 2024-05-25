@@ -36,6 +36,9 @@ protected:
     UPROPERTY(EditAnywhere, BlueprintReadOnly)
     TObjectPtr<class UNiagaraSystem> SmokeSystem;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<class USoundBase> ExplodeSound;
+
     UPROPERTY(EditAnywhere, BlueprintReadOnly)
     float Speed;
 public:

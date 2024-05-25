@@ -51,4 +51,11 @@ public:
 	virtual float GetAttackRange() override;
 protected:
 	float AttackRange;
+
+// SFX Section
+public:
+	virtual void PlaySoundEffect() override;
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<class USoundBase> AttackSound;
 };

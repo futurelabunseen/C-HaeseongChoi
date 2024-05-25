@@ -585,7 +585,6 @@ void ASSCharacterPlayer::AttackHitCheck()
 	if (MainWeapon)
 	{
 		FHitResult HitResult = MainWeapon->AttackHitCheck();
-
 		if (IsLocallyControlled())
 		{
 			MainWeapon->ShowAttackEffect(HitResult);

@@ -48,6 +48,13 @@ ASS_LandBug::ASS_LandBug(const FObjectInitializer& ObjectInitializer)
 	// AI
 	AttackRange = 140.0f;
 	AIControllerClass = ASSLandBugAIController::StaticClass();
+
+	// SFX
+	static ConstructorHelpers::FObjectFinder<USoundBase> AttackSoundRef(TEXT("/Game/Small_Monster_SFX_1/Cues/Mala_Attack_02_Cue.Mala_Attack_02_Cue"));
+	if (AttackSoundRef.Object)
+	{
+		AttackSound = AttackSoundRef.Object;
+	}
 }
 
 void ASS_LandBug::AttackHitCheck()
@@ -57,7 +64,7 @@ void ASS_LandBug::AttackHitCheck()
 	if (HasAuthority())
 	{
 		FVector CollisionCenter = GetActorLocation() + GetActorForwardVector() * 150.0f;
-		float CollisionRadius = 60.0f;
+		float CollisionRadius = 75.0f;
 
 		FCollisionQueryParams CollisionParams;
 		CollisionParams.AddIgnoredActor(this);

@@ -48,6 +48,13 @@ ASS_Creepster::ASS_Creepster(const FObjectInitializer& ObjectInitializer)
 	// AI
 	AttackRange = 140.0f;
 	AIControllerClass = ASSCreepsterAIController::StaticClass();
+
+	// SFX
+	static ConstructorHelpers::FObjectFinder<USoundBase> AttackSoundRef(TEXT("/Game/Small_Monster_SFX_1/Cues/Mala_Attack_03_Cue.Mala_Attack_03_Cue"));
+	if (AttackSoundRef.Object)
+	{
+		AttackSound = AttackSoundRef.Object;
+	}
 }
 
 void ASS_Creepster::AttackHitCheck()

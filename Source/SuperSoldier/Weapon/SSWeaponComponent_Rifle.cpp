@@ -187,8 +187,6 @@ void USSWeaponComponent_Rifle::ShowAttackEffect(const FHitResult& HitResult)
 			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitParticleEffect, Location, Rotation);
 		}
 	}
-
-	SS_SUBLOG(LogSSNetwork, Log, TEXT("ShowVFX"));
 }
 
 void USSWeaponComponent_Rifle::PlaySoundEffect()

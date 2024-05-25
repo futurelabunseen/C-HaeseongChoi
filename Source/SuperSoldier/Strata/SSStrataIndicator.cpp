@@ -94,8 +94,11 @@ void ASSStrataIndicator::ActivateStrataAndDestroy()
 
 void ASSStrataIndicator::NetMulticastRpcShowStrataBeam_Implementation(FVector_NetQuantize BeamEnd)
 {
-	SetToShowStrataBeam(BeamEnd);
-
 	StrataIndicatorMesh->SetSimulatePhysics(false);
 	StrataIndicatorMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	if (!HasAuthority())
+	{
+		SetToShowStrataBeam(BeamEnd);
+	}
 }

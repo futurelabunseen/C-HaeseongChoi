@@ -93,6 +93,8 @@ void ASSStrataRocket::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActo
 
 void ASSStrataRocket::NetMulticastRpcPlayEffect_Implementation(FVector_NetQuantize Location, FRotator Rotation)
 {
+	if (HasAuthority()) return;
+
     if (ExplosionSystem)
     {
         UNiagaraFunctionLibrary::SpawnSystemAtLocation(

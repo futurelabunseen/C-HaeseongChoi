@@ -131,13 +131,13 @@ void ASSCharacterBase::SetDead()
 	bDead = true;
 	OnRep_ServerCharacterbDead();
 
-	FTimerHandle RespawnTimerHandle;
+	/*FTimerHandle RespawnTimerHandle;
 	GetGameInstance()->GetTimerManager().SetTimer(RespawnTimerHandle, FTimerDelegate::CreateLambda([&]() {
 		UE_LOG(LogTemp, Log, TEXT("Revive"));
 		bDead = false;
 		Stat->Initialize();
 		OnRep_ServerCharacterbDead();
-	}), 10.0f, false);
+	}), 10.0f, false);*/
 }
 
 void ASSCharacterBase::Dissolve()

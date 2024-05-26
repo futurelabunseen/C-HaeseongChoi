@@ -15,7 +15,7 @@ void USSCharacterStatComponent::BeginPlay()
 	Super::BeginPlay();
 
 	SetIsReplicated(true);
-	SetHP(MaxHP);
+	Initialize();
 }
 
 void USSCharacterStatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -44,6 +44,11 @@ void USSCharacterStatComponent::OnRep_CurrentHP()
 	{
 		OnHpZero.Broadcast();
 	}
+}
+
+void USSCharacterStatComponent::Initialize()
+{
+	SetHP(MaxHP);
 }
 
 float USSCharacterStatComponent::ApplyDamage(float InDamage)

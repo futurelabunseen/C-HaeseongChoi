@@ -27,7 +27,6 @@ ASSCharacterBase::ASSCharacterBase(const FObjectInitializer& ObjectInitializer)
 
 	// Stat
 	Stat = CreateDefaultSubobject<USSCharacterStatComponent>(TEXT("Stat"));
-	Stat->OnHpZero.AddUObject(this, &ASSCharacterBase::SetDead);
 
 	// DissolveCurve
 	static ConstructorHelpers::FObjectFinder<UCurveFloat> DissolveCurveFloatRef(
@@ -45,6 +44,11 @@ void ASSCharacterBase::BeginPlay()
 	Super::BeginPlay();
 
 	SetActorTickEnabled(false);
+
+	if (HasAuthority())
+	{
+		Stat->OnHpZero.AddUObject(this, &ASSCharacterBase::SetDead);
+	}
 
 	USkeletalMeshComponent* SkeletalMeshComponent = GetMesh();
 
@@ -126,6 +130,14 @@ void ASSCharacterBase::SetDead()
 {
 	bDead = true;
 	OnRep_ServerCharacterbDead();
+
+	FTimerHandle RespawnTimerHandle;
+	GetGameInstance()->GetTimerManager().SetTimer(RespawnTimerHandle, FTimerDelegate::CreateLambda([&]() {
+		UE_LOG(LogTemp, Log, TEXT("Revive"));
+		bDead = false;
+		Stat->Initialize();
+		OnRep_ServerCharacterbDead();
+	}), 10.0f, false);
 }
 
 void ASSCharacterBase::Dissolve()
@@ -136,13 +148,25 @@ void ASSCharacterBase::Dissolve()
 
 void ASSCharacterBase::OnDead()
 {
-	if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
+	if (bDead)
 	{
-		AnimInstance->StopAllMontages(false);
-	}
+		bUseControllerRotationYaw = false;
 
-	GetCharacterMovement()->DisableMovement();
-	SetActorEnableCollision(false);
+		if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
+		{
+			AnimInstance->StopAllMontages(false);
+		}
+
+		GetCharacterMovement()->SetMovementMode(MOVE_None);
+		SetActorEnableCollision(false);
+	}
+	else
+	{
+		bUseControllerRotationYaw = true;
+
+		GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+		SetActorEnableCollision(true);
+	}
 }
 
 void ASSCharacterBase::UpdateDissolveProgress(const float Value)
@@ -160,11 +184,7 @@ void ASSCharacterBase::UpdateDissolveProgress(const float Value)
 
 void ASSCharacterBase::OnRep_ServerCharacterbDead()
 {
-	if (bDead)
-	{
-		OnDead();
-		bUseControllerRotationYaw = false;
-	}
+	OnDead();
 }
 
 

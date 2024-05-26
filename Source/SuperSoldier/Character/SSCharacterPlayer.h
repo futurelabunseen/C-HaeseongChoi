@@ -165,6 +165,10 @@ public:
 public:
 	virtual void SetupCharacterWidget(class USSUserPlayWidget* InUserWidget);
 
+// Respawn Section
+public:
+	virtual void Respawn();
+
 // RPC Section
 protected:
 	void RpcPlayAnimation(UAnimMontage* MontageToPlay);

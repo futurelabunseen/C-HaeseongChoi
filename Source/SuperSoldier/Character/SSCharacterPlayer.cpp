@@ -302,6 +302,8 @@ void ASSCharacterPlayer::Sprint(const FInputActionValue& Value)
 
 void ASSCharacterPlayer::Aim(const FInputActionValue& Value)
 {
+	if (bDead) return;
+
 	bAiming = Value.Get<bool>();
 	OnAiming.Broadcast(bAiming);
 	SetAimingToMovementComponent(bAiming);
@@ -327,6 +329,8 @@ void ASSCharacterPlayer::SetAimingToMovementComponent(bool bNewAiming)
 
 void ASSCharacterPlayer::Fire(const FInputActionValue& Value)
 {
+	if (bDead) return;
+
 	if (!GetAnyMontagePlaying(StrataReadyMontage) && bReadyForThrowingStrata)
 	{
 		const float AnimationSpeedRate = 1.0f;
@@ -358,6 +362,8 @@ void ASSCharacterPlayer::Fire(const FInputActionValue& Value)
 
 void ASSCharacterPlayer::Throw(const FInputActionValue& Value)
 {
+	if (bDead) return;
+
 	if (!GetAnyMontagePlaying())
 	{
 		SetSprintToMovementComponent(false);
@@ -376,6 +382,8 @@ void ASSCharacterPlayer::Throw(const FInputActionValue& Value)
 
 void ASSCharacterPlayer::Call(const FInputActionValue& Value)
 {
+	if (bDead) return;
+
 	if (!GetAnyMontagePlaying(CallMontage))
 	{
 		bCalling = Value.Get<bool>();
@@ -650,6 +658,11 @@ void ASSCharacterPlayer::SetupCharacterWidget(USSUserPlayWidget* InUserWidget)
 		OnAiming.AddUObject(InUserWidget, &USSUserPlayWidget::UpdateCrossHair);
 		OnCalling.AddUObject(InUserWidget, &USSUserPlayWidget::ShowStratagemList);
 	}
+}
+
+void ASSCharacterPlayer::Respawn()
+{
+	SS_LOG(LogTemp, Log, TEXT("Respawn"));
 }
 
 void ASSCharacterPlayer::RpcPlayAnimation(UAnimMontage* MontageToPlay)

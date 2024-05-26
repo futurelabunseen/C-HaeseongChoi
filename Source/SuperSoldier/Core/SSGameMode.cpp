@@ -28,11 +28,12 @@ ASSGameMode::ASSGameMode()
 
 	// Set GameState
 	GameStateClass = ASSGameState::StaticClass();
+	CurPlayerNum = 0;
 }
 
 void ASSGameMode::StartPlay()
 {
-	// °ÔÀÓÀÇ ½ÃÀÛÀ» Áö½ÃÇÑ´Ù.
+	// ê²Œì„ì˜ ì‹œì‘ì„ ì§€ì‹œí•œë‹¤.
 	SS_LOG(LogSSNetwork, Log, TEXT("%s"), TEXT("Begin"));
 	Super::StartPlay();
 	SS_LOG(LogSSNetwork, Log, TEXT("%s"), TEXT("End"));
@@ -40,16 +41,25 @@ void ASSGameMode::StartPlay()
 
 void ASSGameMode::PreLogin(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage)
 {
-	// Å¬¶óÀÌ¾ğÆ®ÀÇ Á¢¼Ó ¿äÃ»À» Ã³¸®ÇÑ´Ù.
+	// í´ë¼ì´ì–¸íŠ¸ì˜ ì ‘ì† ìš”ì²­ì„ ì²˜ë¦¬í•œë‹¤.
 	SS_LOG(LogSSNetwork, Log, TEXT("%s"), TEXT("====================================================================="));
 	SS_LOG(LogSSNetwork, Log, TEXT("%s"), TEXT("Begin"));
-	Super::PreLogin(Options, Address, UniqueId, ErrorMessage);
+	if (CurPlayerNum < MaxPlayerNum)
+	{
+		++CurPlayerNum;
+		Super::PreLogin(Options, Address, UniqueId, ErrorMessage);
+	}
+	else
+	{
+		ErrorMessage = TEXT("[PreLogin Failed] Session already FullPlayer");
+		FGameModeEvents::GameModePreLoginEvent.Broadcast(this, UniqueId, ErrorMessage);
+	}
 	SS_LOG(LogSSNetwork, Log, TEXT("%s"), TEXT("End"));
 }
 
 APlayerController* ASSGameMode::Login(UPlayer* NewPlayer, ENetRole InRemoteRole, const FString& Portal, const FString& Options, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage)
 {
-	// Á¢¼ÓÀ» Çã¿ëÇÑ Å¬¶óÀÌ¾ğÆ®¿¡ ´ëÀÀÇÏ´Â ÇÃ·¹ÀÌ¾î ÄÁÆ®·Ñ·¯¸¦ ¸¸µç´Ù.
+	// ì ‘ì†ì„ í—ˆìš©í•œ í´ë¼ì´ì–¸íŠ¸ì— ëŒ€ì‘í•˜ëŠ” í”Œë ˆì´ì–´ ì»¨íŠ¸ë¡¤ëŸ¬ë¥¼ ë§Œë“ ë‹¤.
 	SS_LOG(LogSSNetwork, Log, TEXT("%s"), TEXT("Begin"));
 	APlayerController* NewPlayerController = Super::Login(NewPlayer, InRemoteRole, Portal, Options, UniqueId, ErrorMessage);
 	SS_LOG(LogSSNetwork, Log, TEXT("%s"), TEXT("End"));
@@ -59,7 +69,7 @@ APlayerController* ASSGameMode::Login(UPlayer* NewPlayer, ENetRole InRemoteRole,
 
 void ASSGameMode::PostLogin(APlayerController* NewPlayer)
 {
-	// ÇÃ·¹ÀÌ¾î ÀÔÀåÀ» À§ÇØ ÇÃ·¹ÀÌ¾î¿¡ ÇÊ¿äÇÑ ±âº» ¼³Á¤À» ¸ğµÎ ¸¶¹«¸® ÇÑ´Ù.
+	// í”Œë ˆì´ì–´ ì…ì¥ì„ ìœ„í•´ í”Œë ˆì´ì–´ì— í•„ìš”í•œ ê¸°ë³¸ ì„¤ì •ì„ ëª¨ë‘ ë§ˆë¬´ë¦¬ í•œë‹¤.
 	SS_LOG(LogSSNetwork, Log, TEXT("%s"), TEXT("Begin"));
 	Super::PostLogin(NewPlayer);
 	SS_LOG(LogSSNetwork, Log, TEXT("%s"), TEXT("End"));

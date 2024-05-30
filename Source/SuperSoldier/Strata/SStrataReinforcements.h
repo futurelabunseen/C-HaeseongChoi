@@ -4,17 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "Strata/SSStratagem.h"
-#include "SSStratPrecisionStrike.generated.h"
+#include "SStrataReinforcements.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class SUPERSOLDIER_API USSStratPrecisionStrike : public USSStratagem
+class SUPERSOLDIER_API USStrataReinforcements : public USSStratagem
 {
 	GENERATED_BODY()
 public:
-	USSStratPrecisionStrike();
+	USStrataReinforcements();
 protected:
 	virtual void ActivateStratagem(UWorld* const CurWorld, const FVector& TargetLocation);
 };

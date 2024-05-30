@@ -1,8 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Strata/SSStratPrecisionStrike.h"
-USSStratPrecisionStrike::USSStratPrecisionStrike()
+#include "Strata/SSStrataPrecisionStrike.h"
+USSStrataPrecisionStrike::USSStrataPrecisionStrike()
 {
 	DelayTime = 5.0f;
 	CoolTime = 20.0f;
@@ -10,9 +10,9 @@ USSStratPrecisionStrike::USSStratPrecisionStrike()
 	CommandArray = TArray<EStrataCommand>{ EStrataCommand::RIGHT, EStrataCommand::RIGHT, EStrataCommand::UP };
 }
 
-void USSStratPrecisionStrike::ActivateStratagem(UWorld* const CurWorld, const FVector& TargetLocation)
+void USSStrataPrecisionStrike::ActivateStratagem(UWorld* const CurWorld, const FVector& TargetLocation)
 {
-	// πÃªÁ¿œ Ω∫∆˘
+	// ÎØ∏ÏÇ¨Ïùº Ïä§Ìè∞
 	FString PrecisionStrikePath = TEXT("/Game/SuperSoldier/Props/BP_PrecisionStrike.BP_PrecisionStrike_C");
 	UClass* PrecisionStrikeClass = StaticLoadClass(UObject::StaticClass(), nullptr, *PrecisionStrikePath);
 	if (PrecisionStrikeClass)

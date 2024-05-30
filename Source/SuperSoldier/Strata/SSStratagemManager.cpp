@@ -3,7 +3,8 @@
 
 #include "SSStratagemManager.h"
 #include "Strata/SSStratagem.h"
-#include "Strata/SSStratPrecisionStrike.h"
+#include "Strata/SSStrataPrecisionStrike.h"
+#include "Strata/SStrataReinforcements.h"
 
 USSStratagemManager::USSStratagemManager()
 {
@@ -11,17 +12,23 @@ USSStratagemManager::USSStratagemManager()
 
 void USSStratagemManager::InitializeStratagem()
 {
-	// ½ºÆ®¶óÅ¸Áª ÀüÃ¼ ¸ñ·Ï ÃÊ±âÈ­
-	USSStratPrecisionStrike* Stratagem = NewObject<USSStratPrecisionStrike>();
-	if (Stratagem)
+	// ìŠ¤íŠ¸ë¼íƒ€ì ¬ ì „ì²´ ëª©ë¡ ì´ˆê¸°í™”
+	USSStrataPrecisionStrike* PrecisionStrike = NewObject<USSStrataPrecisionStrike>();
+	if (PrecisionStrike)
 	{
-		StratagemMap.Add(FName(TEXT("PrecisionStrike")), Stratagem);
+		StratagemMap.Add(FName(TEXT("PrecisionStrike")), PrecisionStrike);
+	}
+
+	USStrataReinforcements* Reinforcements = NewObject<USStrataReinforcements>();
+	if (Reinforcements)
+	{
+		StratagemMap.Add(FName(TEXT("Reinforcements")), Reinforcements);
 	}
 }
 
 USSStratagem* USSStratagemManager::GetStratagem(const FName& StratagemName)
 {
-	// ¸ñ·Ï¿¡ ÀÖ´Â Æ¯Á¤ ½ºÆ®¶óÅ¸ÁªÀ» °¡Á®¿Í ¸®ÅÏ
+	// ëª©ë¡ì— ìˆëŠ” íŠ¹ì • ìŠ¤íŠ¸ë¼íƒ€ì ¬ì„ ê°€ì ¸ì™€ ë¦¬í„´
 	USSStratagem* RetStratagem = *StratagemMap.Find(StratagemName);
 	return RetStratagem;
 }

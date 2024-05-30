@@ -168,6 +168,12 @@ void ASSCharacterPlayer::BeginPlay()
 		AvailableStratagems.Add(std::make_pair(FName(TEXT("PrecisionStrike")), DefaultStratagem));
 	}
 
+	DefaultStratagem = StratagemManager->GetStratagem(FName(TEXT("Reinforcements")));
+	if (DefaultStratagem)
+	{
+		AvailableStratagems.Add(std::make_pair(FName(TEXT("Reinforcements")), DefaultStratagem));
+	}
+
 	// If Locally Controlled
 	if (IsLocallyControlled())
 	{

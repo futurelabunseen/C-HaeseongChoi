@@ -6,6 +6,7 @@ USSStrataPrecisionStrike::USSStrataPrecisionStrike()
 {
 	DelayTime = 5.0f;
 	CoolTime = 20.0f;
+	StrataType = EStrataType::OFFENSE;
 
 	CommandArray = TArray<EStrataCommand>{ EStrataCommand::RIGHT, EStrataCommand::RIGHT, EStrataCommand::UP };
 }

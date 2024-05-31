@@ -15,6 +15,15 @@ enum class EStrataCommand : uint32
 	LEFT UMETA(DisplayName = "Command Left"),
 	RIGHT UMETA(DisplayName = "Command Right"),
 };
+
+UENUM()
+enum class EStrataType : int32
+{
+	NONE,
+	SUPPORT,
+	OFFENSE
+};
+
 /**
  * 
  */
@@ -28,9 +37,12 @@ public:
 	virtual const float& GetDelayTime() const { return DelayTime; }
 	virtual const TArray<EStrataCommand>& GetCommandSequence() const;
 	virtual void ActivateStratagem(UWorld* const CurWorld, const FVector& TargetLocation);
+
+	FORCEINLINE const EStrataType& GetStarataType() const { return StrataType; }
 protected:
 	float DelayTime;
 	float CoolTime;
 
+	EStrataType StrataType;
 	TArray<EStrataCommand> CommandArray;
 };

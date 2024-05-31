@@ -66,18 +66,37 @@ void ASSStrataIndicator::Throw(FVector Direction)
 
 void ASSStrataIndicator::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
+	if (!IsValid(CurStratagem)) return;
+
 	// Delay And Activate
 	FTimerHandle StrataActiveTimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(StrataActiveTimerHandle, this, &ASSStrataIndicator::ActivateStrataAndDestroy, CurStratagem->GetDelayTime(), false);
 
 	FVector StrataIndicatorBeamEnd = GetActorLocation();
+	EStrataType CurStrataType = CurStratagem->GetStarataType();
+	FLinearColor StrataBeamColor = { 0.0f, 0.0f, 0.0f, 1.0f };
+
 	StrataIndicatorBeamEnd.Z += 8000.0f;
-	NetMulticastRpcShowStrataBeam(StrataIndicatorBeamEnd);
+
+	switch (CurStrataType)
+	{
+	case EStrataType::SUPPORT:
+		StrataBeamColor = { 0.0f, 0.0f, 10.0f, 1.0f };
+		break;
+	case EStrataType::OFFENSE:
+		StrataBeamColor = { 10.0f, 0.0f, 0.0f, 1.0f };
+		break;
+	default:
+		break;
+	}
+
+	NetMulticastRpcShowStrataBeam(StrataBeamColor, StrataIndicatorBeamEnd);
 }
 
-void ASSStrataIndicator::SetToShowStrataBeam(FVector BeamEnd)
+void ASSStrataIndicator::SetToShowStrataBeam(FLinearColor BeamColor, FVector BeamEnd)
 {
 	StrataIndicatorBeam->SetVectorParameter(TEXT("User.Beam End"), BeamEnd);
+	StrataIndicatorBeam->SetColorParameter(TEXT("User.Color"), BeamColor);
 	StrataIndicatorBeam->Activate();
 }
 
@@ -92,13 +111,13 @@ void ASSStrataIndicator::ActivateStrataAndDestroy()
 	Destroy();
 }
 
-void ASSStrataIndicator::NetMulticastRpcShowStrataBeam_Implementation(FVector_NetQuantize BeamEnd)
+void ASSStrataIndicator::NetMulticastRpcShowStrataBeam_Implementation(FLinearColor BeamColor, FVector_NetQuantize BeamEnd)
 {
 	StrataIndicatorMesh->SetSimulatePhysics(false);
 	StrataIndicatorMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	if (!HasAuthority())
 	{
-		SetToShowStrataBeam(BeamEnd);
+		SetToShowStrataBeam(BeamColor, BeamEnd);
 	}
 }

@@ -7,6 +7,7 @@ USStrataReinforcements::USStrataReinforcements()
 {
 	DelayTime = 5.0f;
 	CoolTime = 20.0f;
+	StrataType = EStrataType::SUPPORT;
 
 	CommandArray = TArray<EStrataCommand>{ 
 		EStrataCommand::UP, 

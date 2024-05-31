@@ -21,6 +21,7 @@
 #include "Strata/SSStrataIndicator.h"
 #include "UI/SSUserPlayWidget.h"
 #include "TimerManager.h"
+#include "Character/CharacterStat/SSCharacterStatComponent.h"
 
 ASSCharacterPlayer::ASSCharacterPlayer(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer.SetDefaultSubobjectClass<USSCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
@@ -666,9 +667,14 @@ void ASSCharacterPlayer::SetupCharacterWidget(USSUserPlayWidget* InUserWidget)
 	}
 }
 
-void ASSCharacterPlayer::Respawn()
+void ASSCharacterPlayer::Respawn(const FVector& TargetLocation)
 {
-	SS_LOG(LogTemp, Log, TEXT("Respawn"));
+	SS_LOG(LogTemp, Log, TEXT("Respawn %s"), *TargetLocation.ToString());
+
+	bDead = false;
+	SetActorLocation(TargetLocation);
+	Stat->Initialize();
+	OnRep_ServerCharacterbDead();
 }
 
 void ASSCharacterPlayer::RpcPlayAnimation(UAnimMontage* MontageToPlay)

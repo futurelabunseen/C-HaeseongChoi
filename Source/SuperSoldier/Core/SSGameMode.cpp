@@ -42,8 +42,6 @@ void ASSGameMode::StartPlay()
 void ASSGameMode::PreLogin(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage)
 {
 	// 클라이언트의 접속 요청을 처리한다.
-	SS_LOG(LogSSNetwork, Log, TEXT("%s"), TEXT("====================================================================="));
-	SS_LOG(LogSSNetwork, Log, TEXT("%s"), TEXT("Begin"));
 	if (CurPlayerNum < MaxPlayerNum)
 	{
 		++CurPlayerNum;
@@ -54,7 +52,6 @@ void ASSGameMode::PreLogin(const FString& Options, const FString& Address, const
 		ErrorMessage = TEXT("[PreLogin Failed] Session already FullPlayer");
 		FGameModeEvents::GameModePreLoginEvent.Broadcast(this, UniqueId, ErrorMessage);
 	}
-	SS_LOG(LogSSNetwork, Log, TEXT("%s"), TEXT("End"));
 }
 
 APlayerController* ASSGameMode::Login(UPlayer* NewPlayer, ENetRole InRemoteRole, const FString& Portal, const FString& Options, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage)

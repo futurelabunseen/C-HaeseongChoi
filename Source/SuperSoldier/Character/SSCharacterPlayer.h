@@ -167,7 +167,7 @@ public:
 
 // Respawn Section
 public:
-	virtual void Respawn();
+	virtual void Respawn(const FVector& TargetLocation);
 
 // RPC Section
 protected:

@@ -2,6 +2,7 @@
 
 
 #include "Strata/SStrataReinforcements.h"
+#include "Character/SSCharacterPlayer.h"
 
 USStrataReinforcements::USStrataReinforcements()
 {
@@ -20,5 +21,17 @@ USStrataReinforcements::USStrataReinforcements()
 void USStrataReinforcements::ActivateStratagem(UWorld* const CurWorld, const FVector& TargetLocation)
 {
 	// Revive All Dead Player
-	UE_LOG(LogTemp, Log, TEXT("USStrataReinforcements - Revive All Dead Player"));
+	if (!IsValid(CurWorld)) return;
+
+	for (FConstPlayerControllerIterator It = CurWorld->GetPlayerControllerIterator(); It; ++It)
+	{
+		APlayerController* PlayerController = It->Get();
+		ASSCharacterPlayer* PlayerCharacter = Cast<ASSCharacterPlayer>(PlayerController->GetCharacter());
+		check(PlayerCharacter);
+
+		if (PlayerCharacter->bDead)
+		{
+			PlayerCharacter->Respawn(TargetLocation);
+		}
+	}
 }

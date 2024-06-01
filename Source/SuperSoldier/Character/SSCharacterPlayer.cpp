@@ -449,7 +449,7 @@ void ASSCharacterPlayer::EndCalling(UAnimMontage* TargetMontage, bool IsProperly
 	}
 	else
 	{
-		if (!bAiming && bSprintKeyPressing && GetAnyMontagePlaying(TargetMontage) == false)
+		if (!bAiming && !bCalling && bSprintKeyPressing && GetAnyMontagePlaying(TargetMontage) == false)
 		{
 			SetSprintToMovementComponent(true);
 		}

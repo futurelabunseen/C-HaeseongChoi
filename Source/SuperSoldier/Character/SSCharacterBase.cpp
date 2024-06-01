@@ -150,14 +150,14 @@ void ASSCharacterBase::OnDead()
 		}
 
 		GetCharacterMovement()->SetMovementMode(MOVE_None);
-		SetActorEnableCollision(false);
+		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 	else
 	{
 		bUseControllerRotationYaw = true;
 
 		GetCharacterMovement()->SetMovementMode(MOVE_Walking);
-		SetActorEnableCollision(true);
+		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	}
 }
 

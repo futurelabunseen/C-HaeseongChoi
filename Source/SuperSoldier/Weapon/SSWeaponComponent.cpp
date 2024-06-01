@@ -19,6 +19,7 @@ void USSWeaponComponent::BeginPlay()
 	if (WeaponMesh)
 	{
 		WeaponMesh->RegisterComponent();
+		WeaponMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 }
 

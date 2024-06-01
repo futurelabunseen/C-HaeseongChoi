@@ -24,6 +24,6 @@ public:
 	virtual void PostLogin(APlayerController* NewPlayer) override;
 
 protected:
-	const uint32 MaxPlayerNum = 2;
+	const uint32 MaxPlayerNum = 3;
 	uint32 CurPlayerNum;
 };

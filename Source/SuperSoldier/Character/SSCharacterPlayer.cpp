@@ -674,6 +674,8 @@ void ASSCharacterPlayer::Respawn(const FVector& TargetLocation)
 	bDead = false;
 	SetActorLocation(TargetLocation);
 	Stat->Initialize();
+	ClientRpcPlayAnimation(this, RespawnMontage);
+	RpcPlayAnimation(RespawnMontage);
 	OnRep_ServerCharacterbDead();
 }
 

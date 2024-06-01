@@ -167,6 +167,9 @@ public:
 
 // Respawn Section
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
+	TObjectPtr<class UAnimMontage> RespawnMontage;
+
 	virtual void Respawn(const FVector& TargetLocation);
 
 // RPC Section

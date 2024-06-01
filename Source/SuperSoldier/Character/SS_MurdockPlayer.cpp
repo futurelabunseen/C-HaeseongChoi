@@ -63,11 +63,20 @@ ASS_MurdockPlayer::ASS_MurdockPlayer(const FObjectInitializer& ObjectInitializer
 		StrataThrowMontage = StrataThrowMontageRef.Object;
 	}
 
+	// HitReact Montage
 	static ConstructorHelpers::FObjectFinder<UAnimMontage> HitReactMontageRef(
 		TEXT("/Game/SuperSoldier/Characters/Murdock/Animations/AM_HitReact.AM_HitReact"));
 	if (HitReactMontageRef.Object)
 	{
 		HitReactMontage = HitReactMontageRef.Object;
+	}
+
+	// Respawn Montage
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> RespawnMontageRef(
+		TEXT("/Game/SuperSoldier/Characters/Murdock/Animations/AM_Respawn.AM_Respawn"));
+	if (RespawnMontageRef.Object)
+	{
+		RespawnMontage = RespawnMontageRef.Object;
 	}
 }
 

@@ -48,6 +48,9 @@ ASSCharacterPlayer::ASSCharacterPlayer(const FObjectInitializer& ObjectInitializ
 	CameraBoom->SocketOffset = FVector(0.0f, 50.0f, 0.0f);
 	CameraBoom->bUsePawnControlRotation = true;
 
+	CameraBoom->bEnableCameraLag = true;
+	CameraBoom->CameraLagMaxDistance = 10000.0f;
+
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	FollowCamera->bUsePawnControlRotation = false;
@@ -215,7 +218,7 @@ bool ASSCharacterPlayer::GetAnyMontagePlaying(UAnimMontage* FilterMontage)
 
 void ASSCharacterPlayer::AttemptSprintEndDelegate(UAnimMontage* TargetMontage, bool IsProperlyEnded)
 {
-	if (!bAiming && bSprintKeyPressing && GetAnyMontagePlaying(TargetMontage) == false)
+	if (!bAiming && !bCalling && bSprintKeyPressing && GetAnyMontagePlaying(TargetMontage) == false)
 	{
 		SetSprintToMovementComponent(true);
 	}
@@ -670,6 +673,8 @@ void ASSCharacterPlayer::SetupCharacterWidget(USSUserPlayWidget* InUserWidget)
 void ASSCharacterPlayer::Respawn(const FVector& TargetLocation)
 {
 	SS_LOG(LogTemp, Log, TEXT("Respawn %s"), *TargetLocation.ToString());
+
+	FVector NewRelativeLocation = TargetLocation - GetActorLocation();
 
 	bDead = false;
 	SetActorLocation(TargetLocation);

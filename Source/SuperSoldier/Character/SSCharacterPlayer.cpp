@@ -55,6 +55,12 @@ ASSCharacterPlayer::ASSCharacterPlayer(const FObjectInitializer& ObjectInitializ
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	FollowCamera->bUsePawnControlRotation = false;
 
+	RespawnCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("RespawnCamera"));
+	RespawnCamera->SetupAttachment(RootComponent);
+	RespawnCamera->bUsePawnControlRotation = false;
+	RespawnCamera->SetRelativeLocation(FVector(-300.0f, 0.0f, 300.0f));
+	RespawnCamera->SetRelativeRotation(FRotator(-40.0f, 0.0f, 0.0f).Quaternion());
+
 	bAiming = false;
 	bSprintKeyPressing = false;
 	bReadyForThrowingStrata = false;
@@ -192,6 +198,9 @@ void ASSCharacterPlayer::BeginPlay()
 		{
 			Subsystem->AddMappingContext(NormalInputMappingContext, 0);
 		}
+
+		FollowCamera->SetActive(true);
+		RespawnCamera->SetActive(false);
 	}
 }
 
@@ -670,18 +679,47 @@ void ASSCharacterPlayer::SetupCharacterWidget(USSUserPlayWidget* InUserWidget)
 	}
 }
 
+void ASSCharacterPlayer::OnDead()
+{
+	Super::OnDead();
+
+	if (bDead == false)
+	{
+		if (IsLocallyControlled())
+		{
+			FollowCamera->SetActive(false);
+			RespawnCamera->SetActive(true);
+		}
+
+		GetCharacterMovement()->AirControl = 10.0f;
+	}
+}
+
 void ASSCharacterPlayer::Respawn(const FVector& TargetLocation)
 {
-	SS_LOG(LogTemp, Log, TEXT("Respawn %s"), *TargetLocation.ToString());
-
-	FVector NewRelativeLocation = TargetLocation - GetActorLocation();
-
 	bDead = false;
-	SetActorLocation(TargetLocation);
 	Stat->Initialize();
-	ClientRpcPlayAnimation(this, RespawnMontage);
-	RpcPlayAnimation(RespawnMontage);
+
+	SetActorLocation(TargetLocation);
+
 	OnRep_ServerCharacterbDead();
+}
+
+void ASSCharacterPlayer::Landed(const FHitResult& Hit)
+{
+	if (bDead == false)
+	{
+		if (IsLocallyControlled())
+		{
+			FollowCamera->SetActive(true);
+			RespawnCamera->SetActive(false);
+		}
+
+		ClientRpcPlayAnimation(this, RespawnMontage);
+		RpcPlayAnimation(RespawnMontage);
+
+		GetCharacterMovement()->AirControl = 0.05f;
+	}
 }
 
 void ASSCharacterPlayer::RpcPlayAnimation(UAnimMontage* MontageToPlay)

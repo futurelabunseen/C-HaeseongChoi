@@ -167,11 +167,15 @@ public:
 
 // Respawn Section
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Respawn)
 	TObjectPtr<class UAnimMontage> RespawnMontage;
 
-	virtual void Respawn(const FVector& TargetLocation);
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Respawn, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UCameraComponent> RespawnCamera;
 
+	virtual void OnDead() override;
+	virtual void Respawn(const FVector& TargetLocation);
+	virtual void Landed(const FHitResult& Hit) override;
 // RPC Section
 protected:
 	void RpcPlayAnimation(UAnimMontage* MontageToPlay);

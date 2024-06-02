@@ -31,7 +31,9 @@ void USStrataReinforcements::ActivateStratagem(UWorld* const CurWorld, const FVe
 
 		if (PlayerCharacter->bDead)
 		{
-			PlayerCharacter->Respawn(TargetLocation);
+			FVector RespawnLocation = TargetLocation;
+			RespawnLocation.Z += 5000.0f;
+			PlayerCharacter->Respawn(RespawnLocation);
 		}
 	}
 }

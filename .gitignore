@@ -75,6 +75,8 @@ DerivedDataCache/*
 
 # Oversized files
 Package/*
+Content/__ExternalActors__
+Content/__ExternalObjects__
 Content/Agora
 Content/AnimStarterPack
 Content/FPS_HUD
@@ -82,6 +84,7 @@ Content/Kraken
 Content/LyraAssets
 Content/Megascans
 Content/MoabDesert
+Content/ModularSciFi
 Content/ParagonWraith
 Content/ParagonMurdock
 Content/ParagonNarbash

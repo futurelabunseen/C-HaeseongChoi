@@ -4,11 +4,30 @@
 #include "Character/SSCharacterPlayer.h"
 #include "SuperSoldier.h"
 #include "EngineUtils.h"
+#include "InputMappingContext.h"
+#include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
 #include "Character/CharacterStat/SSCharacterStatComponent.h"
 
 ASSCharacterPlayer::ASSCharacterPlayer(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
+	// Input Action & Input Mapping Context
+	{
+		static ConstructorHelpers::FObjectFinder<UInputMappingContext> InputMappingContextRef(
+			TEXT("/Game/SuperSoldier/Input/IMC_Normal.IMC_Normal"));
+		if (InputMappingContextRef.Object)
+		{
+			NormalInputMappingContext = InputMappingContextRef.Object;
+		}
+
+		static ConstructorHelpers::FObjectFinder<UInputAction> InputActionMoveRef(
+			TEXT("/Game/SuperSoldier/Input/Actions/IA_Move.IA_Move"));
+		if (InputActionMoveRef.Object)
+		{
+			MoveAction = InputActionMoveRef.Object;
+		}
+	}
 }
 
 bool ASSCharacterPlayer::GetAnyMontagePlaying(UAnimMontage* FilterMontage)
@@ -32,6 +51,28 @@ bool ASSCharacterPlayer::GetAnyMontagePlaying(UAnimMontage* FilterMontage)
 	return bRet;
 }
 
+void ASSCharacterPlayer::Move(const FInputActionValue& Value)
+{
+	FVector2D MovementVector = Value.Get<FVector2D>();
+
+	const FRotator Rotation = Controller->GetControlRotation();
+	const FRotator YawRotation(0, Rotation.Yaw, 0);
+
+	const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+	const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+
+	AddMovementInput(ForwardDirection, MovementVector.Y);
+	AddMovementInput(RightDirection, MovementVector.X);
+}
+
+void ASSCharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent);
+	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ASSCharacterPlayer::Move);
+}
+
 void ASSCharacterPlayer::Respawn(const FVector& TargetLocation)
 {
 	bDead = false;
@@ -40,6 +81,23 @@ void ASSCharacterPlayer::Respawn(const FVector& TargetLocation)
 	SetActorLocation(TargetLocation);
 
 	OnRep_ServerCharacterbDead();
+}
+
+void ASSCharacterPlayer::BeginPlay()
+{
+	Super::BeginPlay();
+
+	// If Locally Controlled
+	if (IsLocallyControlled())
+	{
+		APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
+
+		if (UEnhancedInputLocalPlayerSubsystem* Subsystem =
+			ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+		{
+			Subsystem->AddMappingContext(NormalInputMappingContext, 0);
+		}
+	}
 }
 
 void ASSCharacterPlayer::RpcPlayAnimation(UAnimMontage* MontageToPlay)

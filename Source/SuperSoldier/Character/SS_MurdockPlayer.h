@@ -19,7 +19,6 @@ class SUPERSOLDIER_API ASS_MurdockPlayer : public ASSCharacterPlayer
 public:
 	ASS_MurdockPlayer(const FObjectInitializer& ObjectInitializer);
 
-	virtual void PostInitializeComponents() override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 protected:
 	virtual void BeginPlay() override;
@@ -35,20 +34,11 @@ protected:
 	void InitializeStratagem();
 	void InitializeWeapon();
 
-// IMC Section
+// Look Section
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UInputMappingContext> NormalInputMappingContext;
-
-// Move & Look Section
-protected:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UInputAction> MoveAction;
-
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> LookAction;
 
-	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 
 // Sprint Section

@@ -19,9 +19,24 @@ class SUPERSOLDIER_API ASSCharacterPlayer : public ASSCharacterBase
 public:
 	ASSCharacterPlayer(const FObjectInitializer& ObjectInitializer);
 
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void Respawn(const FVector& TargetLocation);
 protected:
+	virtual void BeginPlay() override;
+protected:
 	bool GetAnyMontagePlaying(UAnimMontage* FilterMontage = NULL);
+
+// IMC Section
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputMappingContext> NormalInputMappingContext;
+
+// Move Section
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction> MoveAction;
+
+	void Move(const FInputActionValue& Value);
 
 // Camera Section
 protected:

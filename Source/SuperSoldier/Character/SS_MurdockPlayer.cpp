@@ -9,7 +9,6 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "InputMappingContext.h"
 #include "EnhancedInputComponent.h"
-#include "EnhancedInputSubsystems.h"
 #include "Camera/CameraComponent.h"
 #include "Strata/SSStratagemManager.h"
 #include "Strata/SSStrataIndicator.h"
@@ -57,22 +56,8 @@ ASS_MurdockPlayer::ASS_MurdockPlayer(const FObjectInitializer& ObjectInitializer
 		FollowCamera->bUsePawnControlRotation = false;
 	}
 
-	// Input Action & Input Mapping Context
+	// Look Section
 	{
-		static ConstructorHelpers::FObjectFinder<UInputMappingContext> InputMappingContextRef(
-			TEXT("/Game/SuperSoldier/Input/IMC_Normal.IMC_Normal"));
-		if (InputMappingContextRef.Object)
-		{
-			NormalInputMappingContext = InputMappingContextRef.Object;
-		}
-
-		static ConstructorHelpers::FObjectFinder<UInputAction> InputActionMoveRef(
-			TEXT("/Game/SuperSoldier/Input/Actions/IA_Move.IA_Move"));
-		if (InputActionMoveRef.Object)
-		{
-			MoveAction = InputActionMoveRef.Object;
-		}
-
 		static ConstructorHelpers::FObjectFinder<UInputAction> InputActionLookRef(
 			TEXT("/Game/SuperSoldier/Input/Actions/IA_Look.IA_Look"));
 		if (InputActionLookRef.Object)
@@ -83,8 +68,6 @@ ASS_MurdockPlayer::ASS_MurdockPlayer(const FObjectInitializer& ObjectInitializer
 
 	// Mesh & AnimInstance
 	{
-		GetMesh()->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -100.0f), FRotator(0.0f, -90.0f, 0.0f));
-
 		static ConstructorHelpers::FObjectFinder<USkeletalMesh> CharacterMeshRef(
 			TEXT("/Game/ParagonMurdock/Characters/Heroes/Murdock/Skins/A_Executioner/Mesh/Murdock_Executioner.Murdock_Executioner"));
 		if (CharacterMeshRef.Object)
@@ -98,6 +81,8 @@ ASS_MurdockPlayer::ASS_MurdockPlayer(const FObjectInitializer& ObjectInitializer
 		{
 			GetMesh()->SetAnimInstanceClass(AnimInstanceClassRef.Class);
 		}
+
+		GetMesh()->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -100.0f), FRotator(0.0f, -90.0f, 0.0f));
 	}
 
 	// Fire Section
@@ -247,20 +232,11 @@ ASS_MurdockPlayer::ASS_MurdockPlayer(const FObjectInitializer& ObjectInitializer
 	}
 }
 
-void ASS_MurdockPlayer::PostInitializeComponents()
-{
-	Super::PostInitializeComponents();
-
-	InitializeStratagem();
-	InitializeWeapon();
-}
-
 void ASS_MurdockPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent);
-	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ASS_MurdockPlayer::Move);
 	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ASS_MurdockPlayer::Look);
 	EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Triggered, this, &ASS_MurdockPlayer::Sprint);
 	EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Triggered, this, &ASS_MurdockPlayer::Aim);
@@ -274,6 +250,9 @@ void ASS_MurdockPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 
+	InitializeStratagem();
+	InitializeWeapon();
+
 	// Remove Gun Mesh
 	GetMesh()->HideBoneByName(TEXT("gun"), EPhysBodyOp::PBO_None);
 	GetMesh()->HideBoneByName(TEXT("trap_handle"), EPhysBodyOp::PBO_None);
@@ -285,12 +264,6 @@ void ASS_MurdockPlayer::BeginPlay()
 		if (PlayerController)
 		{
 			EnableInput(PlayerController);
-		}
-
-		if (UEnhancedInputLocalPlayerSubsystem* Subsystem =
-			ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
-		{
-			Subsystem->AddMappingContext(NormalInputMappingContext, 0);
 		}
 	}
 }
@@ -329,20 +302,6 @@ void ASS_MurdockPlayer::InitializeWeapon()
 		MainWeapon->GetTargetSocketName());
 
 	MainWeapon->RegisterComponent();
-}
-
-void ASS_MurdockPlayer::Move(const FInputActionValue& Value)
-{
-	FVector2D MovementVector = Value.Get<FVector2D>();
-
-	const FRotator Rotation = Controller->GetControlRotation();
-	const FRotator YawRotation(0, Rotation.Yaw, 0);
-
-	const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-	const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-
-	AddMovementInput(ForwardDirection, MovementVector.Y);
-	AddMovementInput(RightDirection, MovementVector.X);
 }
 
 void ASS_MurdockPlayer::Look(const FInputActionValue& Value)

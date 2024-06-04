@@ -19,4 +19,10 @@ public:
 	virtual void Landed(const FHitResult& Hit) override;
 protected:
 	virtual void BeginPlay() override;
+
+public:
+	void SetRespawnMurdockCharacter(ACharacter* NewRespawnMurdockCharacter);
+protected:
+	UPROPERTY()
+	TObjectPtr<ACharacter> RespawnMurdockCharacter;
 };

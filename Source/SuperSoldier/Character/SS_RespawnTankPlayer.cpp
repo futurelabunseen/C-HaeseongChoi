@@ -85,3 +85,16 @@ void ASS_RespawnTankPlayer::BeginPlay()
 		}
 	}
 }
+
+void ASS_RespawnTankPlayer::SetRespawnMurdockCharacter(ACharacter* NewRespawnMurdockCharacter)
+{
+	check(NewRespawnMurdockCharacter)
+
+	RespawnMurdockCharacter = NewRespawnMurdockCharacter;
+
+	FName SocketName = TEXT("Socket_MurdockCharacter");
+	NewRespawnMurdockCharacter->AttachToComponent(
+		GetMesh(),
+		FAttachmentTransformRules::SnapToTargetNotIncludingScale,
+		SocketName);
+}

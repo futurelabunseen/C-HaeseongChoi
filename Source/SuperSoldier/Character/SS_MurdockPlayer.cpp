@@ -16,6 +16,7 @@
 #include "Character/SSCharacterControlData.h"
 #include "Engine/DamageEvents.h"
 #include "UI/SSUserPlayWidget.h"
+#include "Character/SS_RespawnTankPlayer.h"
 
 ASS_MurdockPlayer::ASS_MurdockPlayer(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer.SetDefaultSubobjectClass<USSCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
@@ -707,6 +708,15 @@ void ASS_MurdockPlayer::SetupCharacterWidget(USSUserPlayWidget* InUserWidget)
 void ASS_MurdockPlayer::Respawn(const FVector& TargetLocation)
 {
 	Super::Respawn(TargetLocation);
+
+	ASS_RespawnTankPlayer* RespawnTank = GetWorld()->SpawnActor<ASS_RespawnTankPlayer>(ASS_RespawnTankPlayer::StaticClass());
+	RespawnTank->SetActorLocation(TargetLocation);
+	RespawnTank->SetRespawnMurdockCharacter(this);
+
+	Controller->SetControlRotation(FRotator::ZeroRotator);
+	Controller->Possess(RespawnTank);
+
+	OnRep_ServerCharacterbDead();
 }
 
 bool ASS_MurdockPlayer::ServerRpcFire_Validate()

@@ -77,10 +77,6 @@ void ASSCharacterPlayer::Respawn(const FVector& TargetLocation)
 {
 	bDead = false;
 	Stat->Initialize();
-
-	SetActorLocation(TargetLocation);
-
-	OnRep_ServerCharacterbDead();
 }
 
 void ASSCharacterPlayer::BeginPlay()

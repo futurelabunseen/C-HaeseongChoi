@@ -63,11 +63,11 @@ void ASS_RespawnTankPlayer::Landed(const FHitResult& Hit)
 
 	if (IsLocallyControlled())
 	{
-		APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
+		/*APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
 		if (PlayerController)
 		{
 			DisableInput(PlayerController);
-		}
+		}*/
 	}
 }
 
@@ -84,6 +84,12 @@ void ASS_RespawnTankPlayer::BeginPlay()
 			EnableInput(PlayerController);
 		}
 	}
+}
+
+void ASS_RespawnTankPlayer::OnRep_Controller()
+{
+	Super::OnRep_Controller();
+	Controller->SetControlRotation(FRotator::ZeroRotator);
 }
 
 void ASS_RespawnTankPlayer::SetRespawnMurdockCharacter(ACharacter* NewRespawnMurdockCharacter)

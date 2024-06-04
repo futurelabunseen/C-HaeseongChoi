@@ -713,7 +713,6 @@ void ASS_MurdockPlayer::Respawn(const FVector& TargetLocation)
 	RespawnTank->SetActorLocation(TargetLocation);
 	RespawnTank->SetRespawnMurdockCharacter(this);
 
-	Controller->SetControlRotation(FRotator::ZeroRotator);
 	Controller->Possess(RespawnTank);
 
 	OnRep_ServerCharacterbDead();

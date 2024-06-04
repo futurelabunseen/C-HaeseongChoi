@@ -19,6 +19,7 @@ public:
 	virtual void Landed(const FHitResult& Hit) override;
 protected:
 	virtual void BeginPlay() override;
+	virtual void OnRep_Controller() override;
 
 public:
 	void SetRespawnMurdockCharacter(ACharacter* NewRespawnMurdockCharacter);

@@ -150,14 +150,15 @@ void ASSCharacterBase::OnDead()
 		}
 
 		GetCharacterMovement()->SetMovementMode(MOVE_None);
+		GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 	else
 	{
 		bUseControllerRotationYaw = true;
 
-		GetCharacterMovement()->SetMovementMode(MOVE_Walking);
-		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		// GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+		// GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	}
 }
 

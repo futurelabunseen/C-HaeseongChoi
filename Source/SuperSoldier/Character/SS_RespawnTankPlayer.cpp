@@ -159,9 +159,12 @@ void ASS_RespawnTankPlayer::RespawnMurdockCharacter()
 	FVector FinalLocDist = FinalLocation - MurdockCurLocation;
 	if (FinalLocDist.IsNearlyZero(1.0f))
 	{
-		MurdockCharacter->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
-		MurdockCharacter->GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-		MurdockCharacter->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		ASSCharacterPlayer* PlayerCharacter = Cast<ASSCharacterPlayer>(MurdockCharacter);
+		check(PlayerCharacter)
+		if (PlayerCharacter)
+		{
+			PlayerCharacter->Respawn(MurdockCurLocation);
+		}
 		Controller->Possess(MurdockCharacter);
 	}
 	else

@@ -3,6 +3,7 @@
 
 #include "Strata/SStrataReinforcements.h"
 #include "Character/SSCharacterPlayer.h"
+#include "Character/SS_RespawnTankPlayer.h"
 
 USStrataReinforcements::USStrataReinforcements()
 {
@@ -33,7 +34,12 @@ void USStrataReinforcements::ActivateStratagem(UWorld* const CurWorld, const FVe
 		{
 			FVector RespawnLocation = TargetLocation;
 			RespawnLocation.Z += 5000.0f;
-			PlayerCharacter->Respawn(RespawnLocation);
+
+			ASS_RespawnTankPlayer* RespawnTank = CurWorld->SpawnActor<ASS_RespawnTankPlayer>(ASS_RespawnTankPlayer::StaticClass());
+			RespawnTank->SetActorLocation(RespawnLocation);
+			RespawnTank->SetRespawnMurdockCharacter(PlayerCharacter);
+
+			PlayerController->Possess(RespawnTank);
 		}
 	}
 }

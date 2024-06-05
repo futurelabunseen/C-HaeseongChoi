@@ -8,10 +8,14 @@
 #include "Camera/CameraComponent.h"
 #include "InputMappingContext.h"
 #include "EnhancedInputComponent.h"
+#include "SuperSoldier.h"
 
 ASS_RespawnTankPlayer::ASS_RespawnTankPlayer(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
 {
+	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bStartWithTickEnabled = true;
+
 	// Pawn
 	{
 		bUseControllerRotationPitch = false;
@@ -22,6 +26,7 @@ ASS_RespawnTankPlayer::ASS_RespawnTankPlayer(const FObjectInitializer& ObjectIni
 	// Capsule
 	{
 		GetCapsuleComponent()->InitCapsuleSize(100.0f, 100.0f);
+		GetCapsuleComponent()->SetCollisionProfileName(TEXT("SSRespawnTankCapsule"));
 	}
 
 	// Movement
@@ -61,19 +66,41 @@ void ASS_RespawnTankPlayer::Landed(const FHitResult& Hit)
 {
 	Super::Landed(Hit);
 
+	GetCharacterMovement()->SetMovementMode(MOVE_None);
+
+	if (HasAuthority())
+	{
+		// SetActorTickEnabled(true);
+
+		GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+		MurdockCharacter->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+
+		GetWorld()->GetTimerManager().SetTimer(RespawnTimerHandle, this, &ASS_RespawnTankPlayer::RespawnMurdockCharacter, 0.016f, false);
+	}
+
 	if (IsLocallyControlled())
 	{
-		/*APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
+		APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
 		if (PlayerController)
 		{
 			DisableInput(PlayerController);
-		}*/
+		}
 	}
 }
 
 void ASS_RespawnTankPlayer::BeginPlay()
 {
 	Super::BeginPlay();
+
+	SetActorTickEnabled(false);
+
+	if (!HasAuthority())
+	{
+		GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
 
 	// If Locally Controlled
 	if (IsLocallyControlled())
@@ -89,18 +116,56 @@ void ASS_RespawnTankPlayer::BeginPlay()
 void ASS_RespawnTankPlayer::OnRep_Controller()
 {
 	Super::OnRep_Controller();
-	Controller->SetControlRotation(FRotator::ZeroRotator);
+
+	if (Controller)
+	{
+		Controller->SetControlRotation(FRotator::ZeroRotator);
+	}
 }
 
 void ASS_RespawnTankPlayer::SetRespawnMurdockCharacter(ACharacter* NewRespawnMurdockCharacter)
 {
 	check(NewRespawnMurdockCharacter)
 
-	RespawnMurdockCharacter = NewRespawnMurdockCharacter;
+	MurdockCharacter = NewRespawnMurdockCharacter;
 
 	FName SocketName = TEXT("Socket_MurdockCharacter");
-	NewRespawnMurdockCharacter->AttachToComponent(
+	MurdockCharacter->AttachToComponent(
 		GetMesh(),
 		FAttachmentTransformRules::SnapToTargetNotIncludingScale,
 		SocketName);
+}
+
+void ASS_RespawnTankPlayer::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+}
+
+void ASS_RespawnTankPlayer::RespawnMurdockCharacter()
+{
+	FName RespawnStartLocationSocketName = TEXT("Socket_MurdockCharacter");
+	FName RespawnEndLocationSocketName = TEXT("Socket_RespawnComplete");
+
+	FVector RespawnStartLocation = GetMesh()->GetSocketTransform(RespawnStartLocationSocketName).GetLocation();
+	FVector RespawnEndLocation = GetMesh()->GetSocketTransform(RespawnEndLocationSocketName).GetLocation();
+	FVector LocationDist = RespawnEndLocation - RespawnStartLocation;
+	RespawnEndLocation += LocationDist * 0.5f;
+
+	FVector MurdockCurLocation = MurdockCharacter->GetActorLocation();
+
+	FVector FinalLocation = FMath::Lerp(MurdockCurLocation, RespawnEndLocation, 0.1f);
+	MurdockCharacter->SetActorLocation(FinalLocation);
+
+	FVector FinalLocDist = FinalLocation - MurdockCurLocation;
+	if (FinalLocDist.IsNearlyZero(1.0f))
+	{
+		MurdockCharacter->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+		MurdockCharacter->GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		MurdockCharacter->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		Controller->Possess(MurdockCharacter);
+	}
+	else
+	{
+		GetWorld()->GetTimerManager().SetTimer(RespawnTimerHandle, this, &ASS_RespawnTankPlayer::RespawnMurdockCharacter, 0.016f, false);
+	}
 }

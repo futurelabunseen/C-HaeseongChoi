@@ -24,6 +24,13 @@ protected:
 public:
 	void SetRespawnMurdockCharacter(ACharacter* NewRespawnMurdockCharacter);
 protected:
+	FTimerHandle RespawnTimerHandle;
+
 	UPROPERTY()
-	TObjectPtr<ACharacter> RespawnMurdockCharacter;
+	TObjectPtr<ACharacter> MurdockCharacter;
+public:
+	virtual void Tick(float DeltaSeconds) override;
+
+	UFUNCTION()
+	void RespawnMurdockCharacter();
 };

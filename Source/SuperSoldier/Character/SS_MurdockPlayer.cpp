@@ -17,6 +17,7 @@
 #include "Engine/DamageEvents.h"
 #include "UI/SSUserPlayWidget.h"
 #include "Character/SS_RespawnTankPlayer.h"
+#include "SuperSoldier.h"
 
 ASS_MurdockPlayer::ASS_MurdockPlayer(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer.SetDefaultSubobjectClass<USSCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
@@ -702,6 +703,17 @@ void ASS_MurdockPlayer::SetupCharacterWidget(USSUserPlayWidget* InUserWidget)
 	{
 		OnAiming.AddUObject(InUserWidget, &USSUserPlayWidget::UpdateCrossHair);
 		OnCalling.AddUObject(InUserWidget, &USSUserPlayWidget::ShowStratagemList);
+	}
+}
+
+void ASS_MurdockPlayer::SetMovementMode(bool bCanMove)
+{
+	if (bCanMove)
+	{
+	}
+	else
+	{
+
 	}
 }
 

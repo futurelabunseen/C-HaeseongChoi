@@ -147,7 +147,6 @@ public:
 	TObjectPtr<class UAnimMontage> RespawnMontage;
 
 	virtual void Respawn(const FVector& TargetLocation) override;
-
 // Rpc Section
 protected:
 	UFUNCTION(Server, Reliable, WithValidation)

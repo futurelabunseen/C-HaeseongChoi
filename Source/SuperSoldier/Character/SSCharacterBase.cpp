@@ -156,8 +156,8 @@ void ASSCharacterBase::OnDead()
 	else
 	{
 		bUseControllerRotationYaw = true;
-
 		// GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+		// GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 		// GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	}
 }

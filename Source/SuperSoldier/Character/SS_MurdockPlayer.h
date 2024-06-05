@@ -9,6 +9,12 @@
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnAimingDelegate, bool);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnCallingDelegate, bool);
 
+enum class ECharacterControlType : uint8
+{
+	Normal,
+	Aiming
+};
+
 /**
  * 
  */
@@ -139,7 +145,7 @@ protected:
 
 // Widget Section
 public:
-	virtual void SetupCharacterWidget(class USSUserPlayWidget* InUserWidget);
+	virtual void SetupCharacterWidget(class USSUserPlayWidget* InUserWidget) override;
 
 // Respawn Section
 public:
@@ -147,6 +153,7 @@ public:
 	TObjectPtr<class UAnimMontage> RespawnMontage;
 
 	virtual void Respawn(const FVector& TargetLocation) override;
+
 // Rpc Section
 protected:
 	UFUNCTION(Server, Reliable, WithValidation)

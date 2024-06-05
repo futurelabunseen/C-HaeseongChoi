@@ -37,8 +37,6 @@ void USStrataReinforcements::ActivateStratagem(UWorld* const CurWorld, const FVe
 
 			ASS_RespawnTankPlayer* RespawnTank = CurWorld->SpawnActor<ASS_RespawnTankPlayer>(ASS_RespawnTankPlayer::StaticClass());
 			RespawnTank->SetActorLocation(RespawnLocation);
-			RespawnTank->SetRespawnMurdockCharacter(PlayerCharacter);
-
 			PlayerController->Possess(RespawnTank);
 		}
 	}

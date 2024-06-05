@@ -9,7 +9,6 @@
 #include "Net/UnrealNetwork.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Character/CharacterStat/SSCharacterStatComponent.h"
-#include "UI/SSUserPlayWidget.h"
 
 // Sets default values
 ASSCharacterBase::ASSCharacterBase(const FObjectInitializer& ObjectInitializer)
@@ -37,6 +36,7 @@ ASSCharacterBase::ASSCharacterBase(const FObjectInitializer& ObjectInitializer)
 	}
 
 	bDead = false;
+	CharacterCollisionType = ECharacterCollisionType::Normal;
 }
 
 void ASSCharacterBase::BeginPlay()
@@ -89,16 +89,7 @@ void ASSCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(ASSCharacterBase, bDead);
-}
-
-void ASSCharacterBase::SetupCharacterWidget(USSUserPlayWidget* InUserWidget)
-{
-	if (InUserWidget)
-	{
-		Stat->OnHpChanged.AddUObject(InUserWidget, &USSUserPlayWidget::UpdateHPBar);
-		InUserWidget->SetMaxHP(Stat->GetMaxHP());
-		InUserWidget->UpdateHPBar(Stat->GetCurrentHP());
-	}
+	DOREPLIFETIME(ASSCharacterBase, CharacterCollisionType);
 }
 
 void ASSCharacterBase::AttackHitCheck()
@@ -129,37 +120,15 @@ void ASSCharacterBase::ReleaseThrowable()
 void ASSCharacterBase::SetDead()
 {
 	bDead = true;
+	CharacterCollisionType = ECharacterCollisionType::NoCollision;
 	OnRep_ServerCharacterbDead();
+	OnRep_ServerCharacterCollisionType();
 }
 
 void ASSCharacterBase::Dissolve()
 {
 	SetActorTickEnabled(true);
 	DissolveTimeline.PlayFromStart();
-}
-
-void ASSCharacterBase::OnDead()
-{
-	if (bDead)
-	{
-		bUseControllerRotationYaw = false;
-
-		if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
-		{
-			AnimInstance->StopAllMontages(false);
-		}
-
-		GetCharacterMovement()->SetMovementMode(MOVE_None);
-		GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	}
-	else
-	{
-		bUseControllerRotationYaw = true;
-		GetCharacterMovement()->SetMovementMode(MOVE_Walking);
-		GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	}
 }
 
 void ASSCharacterBase::UpdateDissolveProgress(const float Value)
@@ -177,7 +146,45 @@ void ASSCharacterBase::UpdateDissolveProgress(const float Value)
 
 void ASSCharacterBase::OnRep_ServerCharacterbDead()
 {
-	OnDead();
+	if (bDead)
+	{
+		bUseControllerRotationYaw = false;
+
+		if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
+		{
+			AnimInstance->StopAllMontages(false);
+		}
+	}
+	else
+	{
+		bUseControllerRotationYaw = true;
+	}
+}
+
+void ASSCharacterBase::SetCharacterCollisionType(ECharacterCollisionType NewCharacterCollisionType)
+{
+	CharacterCollisionType = NewCharacterCollisionType;
+	OnRep_ServerCharacterCollisionType();
+}
+
+void ASSCharacterBase::Respawn(const FVector& TargetLocation)
+{
+}
+
+void ASSCharacterBase::OnRep_ServerCharacterCollisionType()
+{
+	if (CharacterCollisionType == ECharacterCollisionType::Normal)
+	{
+		GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+		GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	}
+	else if (CharacterCollisionType == ECharacterCollisionType::NoCollision)
+	{
+		GetCharacterMovement()->SetMovementMode(MOVE_None);
+		GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
 }
 
 

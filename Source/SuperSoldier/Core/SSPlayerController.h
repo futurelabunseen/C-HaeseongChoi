@@ -21,6 +21,8 @@ protected:
 	virtual void PostInitializeComponents() override;
 	virtual void PostNetInit() override;
 
+	virtual void AcknowledgePossession(class APawn* P) override;
+
 // UI Widget Section
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = UI, Meta = (AllowPrivateAccess = "true"))

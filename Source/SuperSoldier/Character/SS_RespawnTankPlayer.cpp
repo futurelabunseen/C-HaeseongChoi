@@ -8,6 +8,7 @@
 #include "Camera/CameraComponent.h"
 #include "InputMappingContext.h"
 #include "EnhancedInputComponent.h"
+#include "Character/SS_MurdockPlayer.h"
 #include "SuperSoldier.h"
 
 ASS_RespawnTankPlayer::ASS_RespawnTankPlayer(const FObjectInitializer& ObjectInitializer) :
@@ -70,12 +71,13 @@ void ASS_RespawnTankPlayer::Landed(const FHitResult& Hit)
 
 	if (HasAuthority())
 	{
-		// SetActorTickEnabled(true);
-
 		GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
-		MurdockCharacter->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+		ASSCharacterPlayer* PlayerCharacter = Cast<ASSCharacterPlayer>(MurdockCharacter);
+		check(PlayerCharacter);
+		PlayerCharacter->SetActorHiddenInGame(false);
+		PlayerCharacter->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 
 		GetWorld()->GetTimerManager().SetTimer(RespawnTimerHandle, this, &ASS_RespawnTankPlayer::RespawnMurdockCharacter, 0.016f, false);
 	}
@@ -96,7 +98,20 @@ void ASS_RespawnTankPlayer::BeginPlay()
 
 	SetActorTickEnabled(false);
 
-	if (!HasAuthority())
+	if (HasAuthority())
+	{
+		MurdockCharacter = GetWorld()->SpawnActor<ASS_MurdockPlayer>(ASS_MurdockPlayer::StaticClass());
+
+		FName SocketName = TEXT("Socket_MurdockCharacter");
+		MurdockCharacter->AttachToComponent(
+			GetMesh(),
+			FAttachmentTransformRules::SnapToTargetNotIncludingScale,
+			SocketName);
+
+		MurdockCharacter->SetActorHiddenInGame(true);
+		MurdockCharacter->SetCharacterCollisionType(ECharacterCollisionType::NoCollision);
+	}
+	else
 	{
 		GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -123,19 +138,6 @@ void ASS_RespawnTankPlayer::OnRep_Controller()
 	}
 }
 
-void ASS_RespawnTankPlayer::SetRespawnMurdockCharacter(ACharacter* NewRespawnMurdockCharacter)
-{
-	check(NewRespawnMurdockCharacter)
-
-	MurdockCharacter = NewRespawnMurdockCharacter;
-
-	FName SocketName = TEXT("Socket_MurdockCharacter");
-	MurdockCharacter->AttachToComponent(
-		GetMesh(),
-		FAttachmentTransformRules::SnapToTargetNotIncludingScale,
-		SocketName);
-}
-
 void ASS_RespawnTankPlayer::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
@@ -143,6 +145,8 @@ void ASS_RespawnTankPlayer::Tick(float DeltaSeconds)
 
 void ASS_RespawnTankPlayer::RespawnMurdockCharacter()
 {
+	check(MurdockCharacter);
+
 	FName RespawnStartLocationSocketName = TEXT("Socket_MurdockCharacter");
 	FName RespawnEndLocationSocketName = TEXT("Socket_RespawnComplete");
 
@@ -159,12 +163,8 @@ void ASS_RespawnTankPlayer::RespawnMurdockCharacter()
 	FVector FinalLocDist = FinalLocation - MurdockCurLocation;
 	if (FinalLocDist.IsNearlyZero(1.0f))
 	{
-		ASSCharacterPlayer* PlayerCharacter = Cast<ASSCharacterPlayer>(MurdockCharacter);
-		check(PlayerCharacter)
-		if (PlayerCharacter)
-		{
-			PlayerCharacter->Respawn(MurdockCurLocation);
-		}
+		MurdockCharacter->Respawn(MurdockCurLocation);
+		MurdockCharacter->SetCharacterCollisionType(ECharacterCollisionType::Normal);
 		Controller->Possess(MurdockCharacter);
 	}
 	else

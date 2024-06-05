@@ -8,6 +8,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Character/CharacterStat/SSCharacterStatComponent.h"
+#include "UI/SSUserPlayWidget.h"
 
 ASSCharacterPlayer::ASSCharacterPlayer(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -51,6 +52,16 @@ bool ASSCharacterPlayer::GetAnyMontagePlaying(UAnimMontage* FilterMontage)
 	return bRet;
 }
 
+void ASSCharacterPlayer::SetupCharacterWidget(USSUserPlayWidget* InUserWidget)
+{
+	if (InUserWidget)
+	{
+		Stat->OnHpChanged.AddUObject(InUserWidget, &USSUserPlayWidget::UpdateHPBar);
+		InUserWidget->SetMaxHP(Stat->GetMaxHP());
+		InUserWidget->UpdateHPBar(Stat->GetCurrentHP());
+	}
+}
+
 void ASSCharacterPlayer::Move(const FInputActionValue& Value)
 {
 	FVector2D MovementVector = Value.Get<FVector2D>();
@@ -73,28 +84,9 @@ void ASSCharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ASSCharacterPlayer::Move);
 }
 
-void ASSCharacterPlayer::Respawn(const FVector& TargetLocation)
-{
-	bDead = false;
-	Stat->Initialize();
-	OnRep_ServerCharacterbDead();
-}
-
 void ASSCharacterPlayer::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// If Locally Controlled
-	if (IsLocallyControlled())
-	{
-		APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
-
-		if (UEnhancedInputLocalPlayerSubsystem* Subsystem =
-			ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
-		{
-			Subsystem->AddMappingContext(NormalInputMappingContext, 0);
-		}
-	}
 }
 
 void ASSCharacterPlayer::RpcPlayAnimation(UAnimMontage* MontageToPlay)

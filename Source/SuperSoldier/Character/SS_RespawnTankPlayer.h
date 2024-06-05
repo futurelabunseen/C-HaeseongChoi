@@ -20,14 +20,11 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	virtual void OnRep_Controller() override;
-
-public:
-	void SetRespawnMurdockCharacter(ACharacter* NewRespawnMurdockCharacter);
 protected:
 	FTimerHandle RespawnTimerHandle;
 
 	UPROPERTY()
-	TObjectPtr<ACharacter> MurdockCharacter;
+	TObjectPtr<class ASSCharacterBase> MurdockCharacter;
 public:
 	virtual void Tick(float DeltaSeconds) override;
 

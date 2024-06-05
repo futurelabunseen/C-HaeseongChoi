@@ -254,19 +254,13 @@ void ASS_MurdockPlayer::BeginPlay()
 	InitializeStratagem();
 	InitializeWeapon();
 
+	GetCharacterMovement()->SetMovementMode(MOVE_None);
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
 	// Remove Gun Mesh
 	GetMesh()->HideBoneByName(TEXT("gun"), EPhysBodyOp::PBO_None);
 	GetMesh()->HideBoneByName(TEXT("trap_handle"), EPhysBodyOp::PBO_None);
-
-	// If Locally Controlled
-	if (IsLocallyControlled())
-	{
-		APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
-		if (PlayerController)
-		{
-			EnableInput(PlayerController);
-		}
-	}
 }
 
 void ASS_MurdockPlayer::SetCharacterControlData(const USSCharacterControlData* CharacterControlData)

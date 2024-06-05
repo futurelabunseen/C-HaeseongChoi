@@ -9,10 +9,10 @@
 #include "SSCharacterBase.generated.h"
 
 UENUM()
-enum class ECharacterControlType : uint8
+enum class ECharacterCollisionType : uint8
 {
 	Normal,
-	Aiming
+	NoCollision
 };
 
 UCLASS()
@@ -33,10 +33,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Stat, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class USSCharacterStatComponent> Stat;
 
-// Widget Section
-public:
-	virtual void SetupCharacterWidget(class USSUserPlayWidget* InUserWidget);
-
 // Attack Hit Section
 protected:
 	virtual void AttackHitCheck() override;
@@ -54,9 +50,6 @@ public:
 protected:
 	void SetDead();
 	void Dissolve();
-
-	UFUNCTION()
-	virtual void OnDead();
 
 	UFUNCTION()
 	void UpdateDissolveProgress(const float Value);
@@ -77,5 +70,17 @@ public:
 
 protected:
 	UFUNCTION()
-	void OnRep_ServerCharacterbDead();
+	virtual void OnRep_ServerCharacterbDead();
+
+public:
+	void SetCharacterCollisionType(ECharacterCollisionType NewCharacterCollisionType);
+
+	UFUNCTION()
+	virtual void Respawn(const FVector& TargetLocation);
+protected:
+	UPROPERTY(ReplicatedUsing = OnRep_ServerCharacterCollisionType)
+	ECharacterCollisionType CharacterCollisionType;
+
+	UFUNCTION()
+	void OnRep_ServerCharacterCollisionType();
 };

@@ -4,7 +4,10 @@
 #include "Core/SSPlayerController.h"
 #include "SuperSoldier.h"
 #include "UI/SSUserPlayWidget.h"
-#include "Character/SSCharacterBase.h"
+#include "Character/SSCharacterPlayer.h"
+#include "InputMappingContext.h"
+#include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
 
 ASSPlayerController::ASSPlayerController()
 {
@@ -19,26 +22,16 @@ ASSPlayerController::ASSPlayerController()
 
 void ASSPlayerController::BeginPlay()
 {
-	SS_LOG(LogSSNetwork, Log, TEXT("%s"), TEXT("Begin"));
-
 	Super::BeginPlay();
-
-	SS_LOG(LogSSNetwork, Log, TEXT("%s"), TEXT("End"));
-
-	FInputModeGameOnly GameOnlyInputMode;
-	SetInputMode(GameOnlyInputMode);
 
 	if (IsLocalController())
 	{
+		FInputModeGameOnly GameOnlyInputMode;
+		SetInputMode(GameOnlyInputMode);
+
 		UserPlayWidget = CreateWidget<USSUserPlayWidget>(this, UserPlayWidgetClass);
 		UserPlayWidget->AddToViewport();
 		UserPlayWidget->SetVisibility(ESlateVisibility::Visible);
-
-		ASSCharacterBase* SSCharacter = Cast<ASSCharacterBase>(GetCharacter());
-		if (SSCharacter)
-		{
-			SSCharacter->SetupCharacterWidget(UserPlayWidget);
-		}
 	}
 }
 
@@ -54,4 +47,24 @@ void ASSPlayerController::PostNetInit()
 	SS_LOG(LogSSNetwork, Log, TEXT("%s"), TEXT("Begin"));
 	Super::PostNetInit();
 	SS_LOG(LogSSNetwork, Log, TEXT("%s"), TEXT("End"));
+}
+
+void ASSPlayerController::AcknowledgePossession(APawn* P)
+{
+	Super::AcknowledgePossession(P);
+
+	ASSCharacterPlayer* SSCharacterPlayer = CastChecked<ASSCharacterPlayer>(P);
+	SSCharacterPlayer->SetupCharacterWidget(UserPlayWidget);
+
+	if (UEnhancedInputLocalPlayerSubsystem* Subsystem =
+		ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
+	{
+		Subsystem->ClearAllMappings();
+
+		UInputMappingContext* MappingContext = SSCharacterPlayer->GetIMC();
+		if (MappingContext)
+		{
+			Subsystem->AddMappingContext(SSCharacterPlayer->GetIMC(), 0);
+		}
+	}
 }

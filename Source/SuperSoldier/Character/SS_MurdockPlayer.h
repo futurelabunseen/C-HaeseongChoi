@@ -139,10 +139,6 @@ protected:
 public:
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
-protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
-	TObjectPtr<class UAnimMontage> HitReactMontage;
-
 // Widget Section
 public:
 	virtual void SetupCharacterWidget(class USSUserPlayWidget* InUserWidget) override;

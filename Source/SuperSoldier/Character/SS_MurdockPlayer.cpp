@@ -682,9 +682,6 @@ float ASS_MurdockPlayer::TakeDamage(float DamageAmount, FDamageEvent const& Dama
 {
 	float Result = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
-	ClientRpcPlayAnimation(this, HitReactMontage);
-	RpcPlayAnimation(HitReactMontage);
-
 	return Result;
 }
 

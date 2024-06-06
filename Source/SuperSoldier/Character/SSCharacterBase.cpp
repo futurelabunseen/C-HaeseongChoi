@@ -108,6 +108,7 @@ float ASSCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 {
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
+	NetMulticastRpcShowAnimationMontage(HitReactMontage, 1.0f);
 	Stat->ApplyDamage(DamageAmount);
 	
 	return DamageAmount;
@@ -187,4 +188,19 @@ void ASSCharacterBase::OnRep_ServerCharacterCollisionType()
 	}
 }
 
+void ASSCharacterBase::NetMulticastRpcShowAnimationMontage_Implementation(UAnimMontage* MontageToPlay, const float AnimationSpeedRate)
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	AnimInstance->Montage_Play(MontageToPlay, AnimationSpeedRate);
+}
 
+void ASSCharacterBase::NetMulticastRpcShowAnimationMontageWithSection_Implementation(UAnimMontage* MontageToPlay, FName SectionName, const float AnimationSpeedRate)
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	AnimInstance->Montage_Play(MontageToPlay, AnimationSpeedRate);
+
+	if (SectionName != TEXT(""))
+	{
+		AnimInstance->Montage_JumpToSection(SectionName, MontageToPlay);
+	}
+}

@@ -83,4 +83,17 @@ protected:
 
 	UFUNCTION()
 	void OnRep_ServerCharacterCollisionType();
+
+// HitReact Section
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
+	TObjectPtr<class UAnimMontage> HitReactMontage;
+
+	UFUNCTION(NetMulticast, Unreliable)
+	void NetMulticastRpcShowAnimationMontage(UAnimMontage* MontageToPlay, const float AnimationSpeedRate);
+
+	UFUNCTION(NetMulticast, Unreliable)
+	void NetMulticastRpcShowAnimationMontageWithSection(UAnimMontage* MontageToPlay, FName SectionName, const float AnimationSpeedRate);
 };
+
+

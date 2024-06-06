@@ -33,13 +33,21 @@ ASS_LandBug::ASS_LandBug(const FObjectInitializer& ObjectInitializer)
 		AttackMontage = AttackMontageRef.Object;
 	}
 
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> HitReactMontageRef(
+		TEXT("/Game/SuperSoldier/Characters/Monsters/LandBug/Animations/AM_LandBugHitReact.AM_LandBugHitReact"));
+	if (HitReactMontageRef.Object)
+	{
+		HitReactMontage = HitReactMontageRef.Object;
+	}
+
 	bTurnInPlace = false;
 
 	// Capsule
 	GetCapsuleComponent()->InitCapsuleSize(75.f, 75.0f);
 
 	// Movement
-	GetCharacterMovement()->MaxWalkSpeed = 250.0f;
+	DefaultWalkSpeed = 250.0f;
+	GetCharacterMovement()->MaxWalkSpeed = DefaultWalkSpeed;
 
 	// Mesh & AnimInstance
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -75.0f), FRotator(0.0f, -90.0f, 0.0f));

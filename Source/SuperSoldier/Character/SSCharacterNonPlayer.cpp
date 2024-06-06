@@ -12,6 +12,8 @@
 ASSCharacterNonPlayer::ASSCharacterNonPlayer(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
+	DefaultWalkSpeed = 0.0f;
+
 	// Movement
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 350.0f, 0.0f);
@@ -46,15 +48,20 @@ void ASSCharacterNonPlayer::OnRep_ServerCharacterbDead()
 	GetWorld()->GetTimerManager().SetTimer(DeadTimerHandle, this, &ASSCharacterNonPlayer::Dissolve, DissolveDelayTime, false);
 }
 
-void ASSCharacterNonPlayer::NetMulticastRpcShowAnimationMontage_Implementation(UAnimMontage* MontageToPlay, FName SectionName, const float AnimationSpeedRate)
+float ASSCharacterNonPlayer::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	AnimInstance->Montage_Play(MontageToPlay, AnimationSpeedRate);
+	float Result = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
-	if (SectionName != TEXT(""))
+	if (GetCharacterMovement())
 	{
-		AnimInstance->Montage_JumpToSection(SectionName, MontageToPlay);
+		FTimerHandle SpeedRestoreTimerHandle;
+		GetCharacterMovement()->MaxWalkSpeed = DefaultWalkSpeed * SpeedReductionFactor;
+		GetWorldTimerManager().SetTimer(SpeedRestoreTimerHandle, FTimerDelegate::CreateLambda([&] {
+			GetCharacterMovement()->MaxWalkSpeed = DefaultWalkSpeed;
+		}), 1.25f, false);
 	}
+
+	return Result;
 }
 
 void ASSCharacterNonPlayer::Attack()
@@ -62,7 +69,7 @@ void ASSCharacterNonPlayer::Attack()
 	const float AnimationSpeedRate = 1.5f;
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 
-	NetMulticastRpcShowAnimationMontage(AttackMontage, TEXT(""), AnimationSpeedRate);
+	NetMulticastRpcShowAnimationMontage(AttackMontage, AnimationSpeedRate);
 
 	FOnMontageEnded EndDelegate;
 	EndDelegate.BindUObject(this, &ASSCharacterNonPlayer::NotifyActionEnd);

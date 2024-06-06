@@ -41,13 +41,21 @@ ASS_Kraken::ASS_Kraken(const FObjectInitializer& ObjectInitializer)
 		TurnInPlaceMontage = TurnInPlaceMontageRef.Object;
 	}
 
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> HitReactMontageRef(
+		TEXT("/Game/SuperSoldier/Characters/Monsters/Kraken/Animations/AM_KrakenHit.AM_KrakenHit"));
+	if (HitReactMontageRef.Object)
+	{
+		HitReactMontage = HitReactMontageRef.Object;
+	}
+
 	bTurnInPlace = false;
 
 	// Capsule
 	GetCapsuleComponent()->InitCapsuleSize(200.f, 200.0f);
 
 	// Movement
-	GetCharacterMovement()->MaxWalkSpeed = 400.0f;
+	DefaultWalkSpeed = 400.0f;
+	GetCharacterMovement()->MaxWalkSpeed = DefaultWalkSpeed;
 
 	// Mesh & AnimInstance
 	GetMesh()->SetRelativeLocationAndRotation(FVector(-10.0f, 0.0f, -199.0f), FRotator(0.0f, -90.0f, 0.0f));
@@ -149,11 +157,11 @@ void ASS_Kraken::TurnInPlace(bool bTurnRight)
 
 	if (bTurnRight)
 	{
-		NetMulticastRpcShowAnimationMontage(TurnInPlaceMontage, TEXT("TurnRight"), AnimationSpeedRate);
+		NetMulticastRpcShowAnimationMontageWithSection(TurnInPlaceMontage, TEXT("TurnRight"), AnimationSpeedRate);
 	}
 
 	else
 	{
-		NetMulticastRpcShowAnimationMontage(TurnInPlaceMontage, TEXT(""), AnimationSpeedRate);
+		NetMulticastRpcShowAnimationMontage(TurnInPlaceMontage, AnimationSpeedRate);
 	}
 }

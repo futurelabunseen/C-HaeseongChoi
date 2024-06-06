@@ -20,11 +20,13 @@ protected:
 	virtual void Tick(float DeltaSeconds) override;
 protected:
 	virtual void OnRep_ServerCharacterbDead() override;
+public:
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 protected:
 	FAICharacterActionFinished OnActionFinished;
 
-	UFUNCTION(NetMulticast, Unreliable)
-	void NetMulticastRpcShowAnimationMontage(UAnimMontage* MontageToPlay, FName SectionName, const float AnimationSpeedRate);
+	float DefaultWalkSpeed;
+	const float SpeedReductionFactor = 0.1f;
 
 // Attack Section
 public:

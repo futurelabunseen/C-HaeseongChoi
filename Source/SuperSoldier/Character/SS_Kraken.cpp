@@ -48,6 +48,18 @@ ASS_Kraken::ASS_Kraken(const FObjectInitializer& ObjectInitializer)
 		HitReactMontage = HitReactMontageRef.Object;
 	}
 
+	static ConstructorHelpers::FObjectFinder<USoundBase> MoanSoundRef(TEXT("/Game/SuperSoldier/Characters/Monsters/Kraken/Sounds/SC_KrakenHitMoan.SC_KrakenHitMoan"));
+	if (MoanSoundRef.Object)
+	{
+		MoanSound = MoanSoundRef.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<USoundBase> DeadSoundRef(TEXT("/Game/SuperSoldier/Characters/Monsters/Kraken/Sounds/SC_KrakenDead.SC_KrakenDead"));
+	if (DeadSoundRef.Object)
+	{
+		DeadSound = DeadSoundRef.Object;
+	}
+
 	bTurnInPlace = false;
 
 	// Capsule

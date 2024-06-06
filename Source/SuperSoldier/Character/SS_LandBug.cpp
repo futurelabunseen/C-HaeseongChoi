@@ -63,6 +63,18 @@ ASS_LandBug::ASS_LandBug(const FObjectInitializer& ObjectInitializer)
 	{
 		AttackSound = AttackSoundRef.Object;
 	}
+
+	static ConstructorHelpers::FObjectFinder<USoundBase> MoanSoundRef(TEXT("/Game/SuperSoldier/Characters/Monsters/LandBug/Sounds/SC_LandBugHitMoan.SC_LandBugHitMoan"));
+	if (MoanSoundRef.Object)
+	{
+		MoanSound = MoanSoundRef.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<USoundBase> DeadSoundRef(TEXT("/Game/SuperSoldier/Characters/Monsters/LandBug/Sounds/SC_LandBugDead.SC_LandBugDead"));
+	if (DeadSoundRef.Object)
+	{
+		DeadSound = DeadSoundRef.Object;
+	}
 }
 
 void ASS_LandBug::AttackHitCheck()

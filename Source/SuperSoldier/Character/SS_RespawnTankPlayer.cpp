@@ -103,7 +103,11 @@ void ASS_RespawnTankPlayer::BeginPlay()
 
 	if (HasAuthority())
 	{
-		MurdockCharacter = GetWorld()->SpawnActor<ASS_MurdockPlayer>(ASS_MurdockPlayer::StaticClass());
+		FActorSpawnParameters ActorSpawnParameters;
+		ActorSpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		MurdockCharacter = GetWorld()->SpawnActor<ASS_MurdockPlayer>(ASS_MurdockPlayer::StaticClass(), ActorSpawnParameters);
+
+		check(MurdockCharacter);
 
 		FName SocketName = TEXT("Socket_MurdockCharacter");
 		MurdockCharacter->AttachToComponent(

@@ -9,6 +9,7 @@
 #include "Net/UnrealNetwork.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Character/CharacterStat/SSCharacterStatComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 ASSCharacterBase::ASSCharacterBase(const FObjectInitializer& ObjectInitializer)
@@ -100,6 +101,10 @@ void ASSCharacterBase::PlaySoundEffect()
 {
 }
 
+void ASSCharacterBase::PlayMoanSound()
+{
+}
+
 void ASSCharacterBase::ShowAttackEffect()
 {
 }
@@ -143,6 +148,10 @@ void ASSCharacterBase::UpdateDissolveProgress(const float Value)
 	{
 		Destroy();
 	}
+}
+
+void ASSCharacterBase::PlayDeadSound()
+{
 }
 
 void ASSCharacterBase::OnRep_ServerCharacterbDead()

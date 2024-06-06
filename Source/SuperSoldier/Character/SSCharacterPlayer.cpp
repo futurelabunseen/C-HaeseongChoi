@@ -10,6 +10,7 @@
 #include "Camera/CameraComponent.h"
 #include "Character/CharacterStat/SSCharacterStatComponent.h"
 #include "UI/SSUserPlayWidget.h"
+#include "Kismet/GameplayStatics.h"
 
 ASSCharacterPlayer::ASSCharacterPlayer(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -32,6 +33,15 @@ ASSCharacterPlayer::ASSCharacterPlayer(const FObjectInitializer& ObjectInitializ
 	}
 }
 
+void ASSCharacterPlayer::OnRep_ServerCharacterbDead()
+{
+	Super::OnRep_ServerCharacterbDead();
+	if(IsLocallyControlled())
+	{
+		PlayDeadSound();
+	}
+}
+
 bool ASSCharacterPlayer::GetAnyMontagePlaying(UAnimMontage* FilterMontage)
 {
 	bool bRet = false;
@@ -51,6 +61,32 @@ bool ASSCharacterPlayer::GetAnyMontagePlaying(UAnimMontage* FilterMontage)
 			CurMontageClass != FilterMontageClass;
 	}
 	return bRet;
+}
+
+void ASSCharacterPlayer::PlayMoanSound()
+{
+	Super::PlayMoanSound();
+
+	if (IsLocallyControlled())
+	{
+		UGameplayStatics::SpawnSoundAtLocation(
+			GetWorld(),
+			MoanSound,
+			GetActorLocation());
+	}
+}
+
+void ASSCharacterPlayer::PlayDeadSound()
+{
+	Super::PlayDeadSound();
+
+	if (IsLocallyControlled())
+	{
+		UGameplayStatics::SpawnSoundAtLocation(
+			GetWorld(),
+			DeadSound,
+			GetActorLocation());
+	}
 }
 
 void ASSCharacterPlayer::SetupCharacterWidget(USSUserPlayWidget* InUserWidget)

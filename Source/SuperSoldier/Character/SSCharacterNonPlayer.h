@@ -57,6 +57,8 @@ protected:
 // SFX Section
 public:
 	virtual void PlaySoundEffect() override;
+	virtual void PlayMoanSound() override;
+	virtual void PlayDeadSound() override;
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<class USoundBase> AttackSound;

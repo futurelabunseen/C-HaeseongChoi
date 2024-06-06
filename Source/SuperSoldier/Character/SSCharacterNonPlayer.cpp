@@ -44,8 +44,12 @@ void ASSCharacterNonPlayer::OnRep_ServerCharacterbDead()
 		AIController->StopAI();
 	}
 
-	FTimerHandle DeadTimerHandle;
-	GetWorld()->GetTimerManager().SetTimer(DeadTimerHandle, this, &ASSCharacterNonPlayer::Dissolve, DissolveDelayTime, false);
+	if (GetLocalRole() == ENetRole::ROLE_SimulatedProxy)
+	{
+		FTimerHandle DeadTimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(DeadTimerHandle, this, &ASSCharacterNonPlayer::Dissolve, DissolveDelayTime, false);
+		PlayDeadSound();
+	}
 }
 
 float ASSCharacterNonPlayer::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -108,4 +112,26 @@ void ASSCharacterNonPlayer::PlaySoundEffect()
 			AttackSound,
 			GetActorLocation());
 	}
+}
+
+void ASSCharacterNonPlayer::PlayMoanSound()
+{
+	Super::PlayMoanSound();
+
+	UGameplayStatics::SpawnSoundAtLocation(
+		GetWorld(),
+		MoanSound,
+		GetActorLocation());
+}
+
+void ASSCharacterNonPlayer::PlayDeadSound()
+{
+	Super::PlayDeadSound();
+
+	UGameplayStatics::SpawnSoundAtLocation(
+		GetWorld(),
+		DeadSound,
+		GetActorLocation(),
+		FRotator::ZeroRotator,
+		0.7f);
 }

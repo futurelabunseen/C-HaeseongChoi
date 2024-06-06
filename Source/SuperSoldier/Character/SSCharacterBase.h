@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "Components/TimelineComponent.h"
 #include "Interface/SSAnimationAttackInterface.h"
+#include "Interface/SSAnimationPlaySoundInterface.h"
 #include "SSCharacterBase.generated.h"
 
 UENUM()
@@ -16,7 +17,7 @@ enum class ECharacterCollisionType : uint8
 };
 
 UCLASS()
-class SUPERSOLDIER_API ASSCharacterBase : public ACharacter, public ISSAnimationAttackInterface
+class SUPERSOLDIER_API ASSCharacterBase : public ACharacter, public ISSAnimationAttackInterface, public ISSAnimationPlaySoundInterface
 {
 	GENERATED_BODY()
 
@@ -37,6 +38,7 @@ protected:
 protected:
 	virtual void AttackHitCheck() override;
 	virtual void PlaySoundEffect() override;
+	virtual void PlayMoanSound() override;
 
 	virtual void ShowAttackEffect();
 public:
@@ -53,6 +55,11 @@ protected:
 
 	UFUNCTION()
 	void UpdateDissolveProgress(const float Value);
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<class USoundBase> DeadSound;
+
+	virtual void PlayDeadSound();
 
 protected:
 	const float DissolveDelayTime = 5.0f;
@@ -88,6 +95,9 @@ protected:
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
 	TObjectPtr<class UAnimMontage> HitReactMontage;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<class USoundBase> MoanSound;
 
 	UFUNCTION(NetMulticast, Unreliable)
 	void NetMulticastRpcShowAnimationMontage(UAnimMontage* MontageToPlay, const float AnimationSpeedRate);

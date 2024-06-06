@@ -63,6 +63,18 @@ ASS_Scorobey::ASS_Scorobey(const FObjectInitializer& ObjectInitializer)
 	{
 		AttackSound = AttackSoundRef.Object;
 	}
+
+	static ConstructorHelpers::FObjectFinder<USoundBase> MoanSoundRef(TEXT("/Game/SuperSoldier/Characters/Monsters/Scorobey/Sounds/SC_ScorobeyHitMoan.SC_ScorobeyHitMoan"));
+	if (MoanSoundRef.Object)
+	{
+		MoanSound = MoanSoundRef.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<USoundBase> DeadSoundRef(TEXT("/Game/SuperSoldier/Characters/Monsters/Scorobey/Sounds/SC_ScorobeyDead.SC_ScorobeyDead"));
+	if (DeadSoundRef.Object)
+	{
+		DeadSound = DeadSoundRef.Object;
+	}
 }
 
 void ASS_Scorobey::AttackHitCheck()

@@ -40,6 +40,18 @@ ASS_Creepster::ASS_Creepster(const FObjectInitializer& ObjectInitializer)
 		HitReactMontage = HitReactMontageRef.Object;
 	}
 
+	static ConstructorHelpers::FObjectFinder<USoundBase> MoanSoundRef(TEXT("/Game/SuperSoldier/Characters/Monsters/Creepster/Sounds/SC_CreepsterHitMoan.SC_CreepsterHitMoan"));
+	if (MoanSoundRef.Object)
+	{
+		MoanSound = MoanSoundRef.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<USoundBase> DeadSoundRef(TEXT("/Game/SuperSoldier/Characters/Monsters/Creepster/Sounds/SC_CreepsterDead.SC_CreepsterDead"));
+	if (DeadSoundRef.Object)
+	{
+		DeadSound = DeadSoundRef.Object;
+	}
+
 	bTurnInPlace = false;
 
 	// Capsule

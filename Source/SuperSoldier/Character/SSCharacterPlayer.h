@@ -23,7 +23,13 @@ public:
 protected:
 	virtual void BeginPlay() override;
 protected:
+	virtual void OnRep_ServerCharacterbDead() override;
 	bool GetAnyMontagePlaying(UAnimMontage* FilterMontage = NULL);
+
+// SFX Section
+protected:
+	virtual void PlayMoanSound() override;
+	virtual void PlayDeadSound() override;
 
 // IMC Section
 public:

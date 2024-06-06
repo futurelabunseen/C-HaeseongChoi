@@ -172,7 +172,7 @@ ASS_MurdockPlayer::ASS_MurdockPlayer(const FObjectInitializer& ObjectInitializer
 		}
 	}
 
-	// HitReact Montage
+	// HitReact Montage & Sound
 	{
 		static ConstructorHelpers::FObjectFinder<UAnimMontage> HitReactMontageRef(
 			TEXT("/Game/SuperSoldier/Characters/Murdock/Animations/AM_HitReact.AM_HitReact"));
@@ -180,6 +180,19 @@ ASS_MurdockPlayer::ASS_MurdockPlayer(const FObjectInitializer& ObjectInitializer
 		{
 			HitReactMontage = HitReactMontageRef.Object;
 		}
+
+		static ConstructorHelpers::FObjectFinder<USoundBase> MoanSoundRef(TEXT("/Game/ParagonMurdock/Characters/Heroes/Murdock/Sounds/SoundCues/Murdock_Effort_Pain_03_Dialogue_Cue.Murdock_Effort_Pain_03_Dialogue_Cue"));
+		if (MoanSoundRef.Object)
+		{
+			MoanSound = MoanSoundRef.Object;
+		}
+
+		static ConstructorHelpers::FObjectFinder<USoundBase> DeadSoundRef(TEXT("/Game/ParagonMurdock/Characters/Heroes/Murdock/Sounds/SoundCues/Murdock_Effort_Death_02_Dialogue_Cue.Murdock_Effort_Death_02_Dialogue_Cue"));
+		if (DeadSoundRef.Object)
+		{
+			DeadSound = DeadSoundRef.Object;
+		}
+
 	}
 
 	// Respawn Montage

@@ -61,6 +61,8 @@ ASS_RespawnTankPlayer::ASS_RespawnTankPlayer(const FObjectInitializer& ObjectIni
 		GetMesh()->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -300.0f), FRotator(0.0f, 0.0f, 0.0f));
 		GetMesh()->SetRelativeScale3D(FVector(0.5f));
 	}
+
+	bStartLerpCamera = false;
 }
 
 void ASS_RespawnTankPlayer::Landed(const FHitResult& Hit)
@@ -78,6 +80,7 @@ void ASS_RespawnTankPlayer::Landed(const FHitResult& Hit)
 		check(PlayerCharacter);
 		PlayerCharacter->SetActorHiddenInGame(false);
 		PlayerCharacter->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+		ClientRpcLerpCamera(PlayerCharacter);
 
 		GetWorld()->GetTimerManager().SetTimer(RespawnTimerHandle, this, &ASS_RespawnTankPlayer::RespawnMurdockCharacter, 0.016f, false);
 	}
@@ -141,9 +144,21 @@ void ASS_RespawnTankPlayer::OnRep_Controller()
 void ASS_RespawnTankPlayer::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
+
+	if (bStartLerpCamera)
+	{
+		LerpCamera(DeltaSeconds);
+	}
 }
 
 void ASS_RespawnTankPlayer::RespawnMurdockCharacter()
+{
+	check(MurdockCharacter);
+
+	SetRespawnMurdockLocation();
+}
+
+void ASS_RespawnTankPlayer::SetRespawnMurdockLocation()
 {
 	check(MurdockCharacter);
 
@@ -156,19 +171,47 @@ void ASS_RespawnTankPlayer::RespawnMurdockCharacter()
 	RespawnEndLocation += LocationDist * 0.5f;
 
 	FVector MurdockCurLocation = MurdockCharacter->GetActorLocation();
-
 	FVector FinalLocation = FMath::Lerp(MurdockCurLocation, RespawnEndLocation, 0.1f);
 	MurdockCharacter->SetActorLocation(FinalLocation);
 
-	FVector FinalLocDist = FinalLocation - MurdockCurLocation;
+	FVector FinalLocDist = RespawnEndLocation - MurdockCharacter->GetActorLocation();
 	if (FinalLocDist.IsNearlyZero(1.0f))
 	{
-		MurdockCharacter->Respawn(MurdockCurLocation);
-		MurdockCharacter->SetCharacterCollisionType(ECharacterCollisionType::Normal);
 		Controller->Possess(MurdockCharacter);
+		MurdockCharacter->Respawn(MurdockCharacter->GetActorLocation());
+		MurdockCharacter->SetCharacterCollisionType(ECharacterCollisionType::Normal);
+		SetLifeSpan(2.0f);
 	}
 	else
 	{
 		GetWorld()->GetTimerManager().SetTimer(RespawnTimerHandle, this, &ASS_RespawnTankPlayer::RespawnMurdockCharacter, 0.016f, false);
 	}
+}
+
+void ASS_RespawnTankPlayer::LerpCamera(float DeltaSeconds)
+{
+	LerpAlpha = FMath::Clamp(LerpAlpha + DeltaSeconds * 1.5f, 0.0f, 1.0f);
+	FVector StartCameraLocation = CameraLerpStartTransform.GetLocation();
+	FRotator StartCameraRotation = CameraLerpStartTransform.GetRotation().Rotator();
+
+	const UCameraComponent* MurdockCamera = MurdockCharacter->GetFollowCamera();
+	FVector EndCameraLocation = MurdockCamera->GetComponentLocation();
+	FRotator EndCameraRotation = MurdockCamera->GetComponentRotation();
+
+	FVector NewCurCameraLocation = FMath::Lerp(StartCameraLocation, EndCameraLocation, LerpAlpha);
+	FRotator NewCurCameraRotation = FMath::Lerp(StartCameraRotation, EndCameraRotation, LerpAlpha);
+
+	FollowCamera->SetWorldLocation(NewCurCameraLocation);
+	FollowCamera->SetWorldRotation(NewCurCameraRotation);
+}
+
+void ASS_RespawnTankPlayer::ClientRpcLerpCamera_Implementation(ASSCharacterPlayer* RespawnCharacter)
+{
+	check(RespawnCharacter);
+
+	SetActorTickEnabled(true);
+	bStartLerpCamera = true;
+	LerpAlpha = 0.0f;
+	MurdockCharacter = RespawnCharacter;
+	CameraLerpStartTransform = FollowCamera->GetComponentTransform();
 }

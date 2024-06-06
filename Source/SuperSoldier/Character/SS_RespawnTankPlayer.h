@@ -24,10 +24,27 @@ protected:
 	FTimerHandle RespawnTimerHandle;
 
 	UPROPERTY()
-	TObjectPtr<class ASSCharacterBase> MurdockCharacter;
+	TObjectPtr<class ASSCharacterPlayer> MurdockCharacter;
 public:
 	virtual void Tick(float DeltaSeconds) override;
 
+protected:
 	UFUNCTION()
 	void RespawnMurdockCharacter();
+
+	UFUNCTION()
+	void SetRespawnMurdockLocation();
+
+// Camera Lerp Section
+protected:
+	bool bStartLerpCamera;
+	FTimerHandle LerpCameraTimerHandle;
+	FTransform CameraLerpStartTransform;
+	float LerpAlpha;
+
+	UFUNCTION()
+	void LerpCamera(float DeltaSeconds);
+
+	UFUNCTION(Client, UnReliable)
+	void ClientRpcLerpCamera(ASSCharacterPlayer* RespawnCharacter);
 };

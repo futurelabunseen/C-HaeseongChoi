@@ -7,6 +7,7 @@
 #include "InputMappingContext.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Camera/CameraComponent.h"
 #include "Character/CharacterStat/SSCharacterStatComponent.h"
 #include "UI/SSUserPlayWidget.h"
 

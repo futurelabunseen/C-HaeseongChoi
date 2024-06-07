@@ -46,5 +46,5 @@ protected:
 	void LerpCamera(float DeltaSeconds);
 
 	UFUNCTION(Client, UnReliable)
-	void ClientRpcLerpCamera(ASSCharacterPlayer* RespawnCharacter);
+	void ClientRpcStartCameraEffect(ASSCharacterPlayer* RespawnCharacter);
 };

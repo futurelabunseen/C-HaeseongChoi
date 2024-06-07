@@ -9,6 +9,8 @@
 #include "InputMappingContext.h"
 #include "EnhancedInputComponent.h"
 #include "Character/SS_MurdockPlayer.h"
+#include "Kismet/GameplayStatics.h"
+#include "Camera/SSLandingCameraShake.h"
 #include "SuperSoldier.h"
 
 ASS_RespawnTankPlayer::ASS_RespawnTankPlayer(const FObjectInitializer& ObjectInitializer) :
@@ -80,7 +82,7 @@ void ASS_RespawnTankPlayer::Landed(const FHitResult& Hit)
 		check(PlayerCharacter);
 		PlayerCharacter->SetActorHiddenInGame(false);
 		PlayerCharacter->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-		ClientRpcLerpCamera(PlayerCharacter);
+		ClientRpcStartCameraEffect(PlayerCharacter);
 
 		GetWorld()->GetTimerManager().SetTimer(RespawnTimerHandle, this, &ASS_RespawnTankPlayer::RespawnMurdockCharacter, 0.016f, false);
 	}
@@ -209,7 +211,7 @@ void ASS_RespawnTankPlayer::LerpCamera(float DeltaSeconds)
 	FollowCamera->SetWorldRotation(NewCurCameraRotation);
 }
 
-void ASS_RespawnTankPlayer::ClientRpcLerpCamera_Implementation(ASSCharacterPlayer* RespawnCharacter)
+void ASS_RespawnTankPlayer::ClientRpcStartCameraEffect_Implementation(ASSCharacterPlayer* RespawnCharacter)
 {
 	check(RespawnCharacter);
 
@@ -218,4 +220,11 @@ void ASS_RespawnTankPlayer::ClientRpcLerpCamera_Implementation(ASSCharacterPlaye
 	LerpAlpha = 0.0f;
 	MurdockCharacter = RespawnCharacter;
 	CameraLerpStartTransform = FollowCamera->GetComponentTransform();
+
+	APlayerController* PlayerController = CastChecked<APlayerController>(Controller);
+	if (PlayerController)
+	{
+		// Play the camera shake
+		PlayerController->ClientStartCameraShake(USSLandingCameraShake::StaticClass());
+	}
 }

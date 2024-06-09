@@ -11,11 +11,11 @@ USSLandingCameraShake::USSLandingCameraShake()
 	RotOscillation.Pitch.Amplitude = 15.0f;
 	RotOscillation.Pitch.Frequency = 30.0f;
 
-	RotOscillation.Yaw.Amplitude = 15.0f;
-	RotOscillation.Yaw.Frequency = 30.0f;
+	RotOscillation.Yaw.Amplitude = 5.0f;
+	RotOscillation.Yaw.Frequency = 15.0f;
 
-	RotOscillation.Roll.Amplitude = 15.0f;
-	RotOscillation.Roll.Frequency = 30.0f;
+	RotOscillation.Roll.Amplitude = 5.0f;
+	RotOscillation.Roll.Frequency = 15.0f;
 
 	// Location oscillation
 	LocOscillation.Z.Amplitude = 10.0f;

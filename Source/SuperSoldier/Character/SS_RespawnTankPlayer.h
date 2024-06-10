@@ -45,4 +45,9 @@ protected:
 protected:
 	UFUNCTION(Client, UnReliable)
 	void ClientRpcStartCameraEffect(ASSCharacterPlayer* RespawnCharacter);
+
+// VFX Section
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<class UNiagaraComponent> TrailNiagara;
 };

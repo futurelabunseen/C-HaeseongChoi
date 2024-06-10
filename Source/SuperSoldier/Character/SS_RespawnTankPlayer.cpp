@@ -10,6 +10,8 @@
 #include "EnhancedInputComponent.h"
 #include "Character/SS_MurdockPlayer.h"
 #include "Kismet/GameplayStatics.h"
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 #include "SuperSoldier.h"
 
 ASS_RespawnTankPlayer::ASS_RespawnTankPlayer(const FObjectInitializer& ObjectInitializer) :
@@ -62,6 +64,19 @@ ASS_RespawnTankPlayer::ASS_RespawnTankPlayer(const FObjectInitializer& ObjectIni
 		GetMesh()->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -300.0f), FRotator(0.0f, 0.0f, 0.0f));
 		GetMesh()->SetRelativeScale3D(FVector(0.5f));
 	}
+
+	// Niagara
+	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> TrailNiagaraRef(TEXT("/Game/RocketAttackFX/FX/Vehicle/NS_RocketVehicle_Missile.NS_RocketVehicle_Missile"));
+	
+	TrailNiagara = CreateDefaultSubobject<UNiagaraComponent>(TEXT("TrailNiagara"));
+	TrailNiagara->SetupAttachment(RootComponent);
+	TrailNiagara->SetAsset(TrailNiagaraRef.Object);
+	TrailNiagara->SetFloatParameter(TEXT("User.Thrust_Radius"), 20.0f);
+	TrailNiagara->SetFloatParameter(TEXT("User.Thrust_Size"), 8.0f);
+	// TrailNiagara->SetRelativeLocation(FVector(0.0f, 0.0f, -310.0f));
+	TrailNiagara->SetRelativeLocation(FVector(0.0f, 0.0f, -90.0f));
+	TrailNiagara->SetRelativeRotation(FRotator(-90.0f, 0.0f, 0.0f));
+	TrailNiagara->bAutoActivate = false;
 }
 
 void ASS_RespawnTankPlayer::Landed(const FHitResult& Hit)
@@ -99,6 +114,7 @@ void ASS_RespawnTankPlayer::Landed(const FHitResult& Hit)
 
 			// Play the Camera Shake
 			PlayerController->ClientStartCameraShake(LandingCameraLocationShakeClass);
+			TrailNiagara->SetActive(false);
 		}
 	}
 }
@@ -135,6 +151,8 @@ void ASS_RespawnTankPlayer::BeginPlay()
 		{
 			EnableInput(PlayerController);
 		}
+
+		TrailNiagara->SetActive(true);
 	}
 }
 
@@ -186,7 +204,7 @@ void ASS_RespawnTankPlayer::SetRespawnMurdockLocation()
 	RespawnEndLocation += LocationDist * 0.5f;
 
 	FVector MurdockCurLocation = MurdockCharacter->GetActorLocation();
-	FVector FinalLocation = FMath::Lerp(MurdockCurLocation, RespawnEndLocation, 0.1f);
+	FVector FinalLocation = FMath::Lerp(MurdockCurLocation, RespawnEndLocation, 0.075f);
 	MurdockCharacter->SetActorLocation(FinalLocation);
 
 	FVector FinalLocDist = RespawnEndLocation - MurdockCharacter->GetActorLocation();
@@ -209,5 +227,5 @@ void ASS_RespawnTankPlayer::ClientRpcStartCameraEffect_Implementation(ASSCharact
 
 	APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
 	MurdockCharacter = RespawnCharacter;
-	PlayerController->SetViewTargetWithBlend(RespawnCharacter, 1.0f);
+	PlayerController->SetViewTargetWithBlend(RespawnCharacter, 0.8f, EViewTargetBlendFunction::VTBlend_Cubic);
 }

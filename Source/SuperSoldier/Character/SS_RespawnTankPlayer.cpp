@@ -206,4 +206,8 @@ void ASS_RespawnTankPlayer::SetRespawnMurdockLocation()
 void ASS_RespawnTankPlayer::ClientRpcStartCameraEffect_Implementation(ASSCharacterPlayer* RespawnCharacter)
 {
 	check(RespawnCharacter);
+
+	APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
+	MurdockCharacter = RespawnCharacter;
+	PlayerController->SetViewTargetWithBlend(RespawnCharacter, 1.0f);
 }

@@ -142,6 +142,8 @@ void ASS_RespawnTankPlayer::BeginPlay()
 
 void ASS_RespawnTankPlayer::PostInitializeComponents()
 {
+	Super::PostInitializeComponents();
+
 	// Camera Shake
 	FStringClassReference LandingCameraLocationShakePath(TEXT("/Game/SuperSoldier/Camera/BP_LandingCameraLocationShake.BP_LandingCameraLocationShake_C"));
 	UClass* LandingCameraLocationShakeRef = LandingCameraLocationShakePath.TryLoadClass<UCameraShakeBase>();

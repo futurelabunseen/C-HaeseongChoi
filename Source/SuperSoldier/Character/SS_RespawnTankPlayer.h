@@ -35,6 +35,11 @@ protected:
 	UFUNCTION()
 	void SetRespawnMurdockLocation();
 
+// Camera Shake Section
+protected:
+	UPROPERTY()
+	TSubclassOf<UCameraShakeBase> LandingCameraLocationShakeClass;
+
 // Camera Lerp Section
 protected:
 	bool bStartLerpCamera;

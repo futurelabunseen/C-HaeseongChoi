@@ -82,17 +82,26 @@ void ASS_RespawnTankPlayer::Landed(const FHitResult& Hit)
 		check(PlayerCharacter);
 		PlayerCharacter->SetActorHiddenInGame(false);
 		PlayerCharacter->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-		ClientRpcStartCameraEffect(PlayerCharacter);
 
-		GetWorld()->GetTimerManager().SetTimer(RespawnTimerHandle, this, &ASS_RespawnTankPlayer::RespawnMurdockCharacter, 0.016f, false);
+		FTimerHandle CallFuncTimer;
+		GetWorld()->GetTimerManager().SetTimer(CallFuncTimer, FTimerDelegate::CreateLambda([&]() {
+			ClientRpcStartCameraEffect(MurdockCharacter);
+			RespawnMurdockCharacter();
+		}), 0.5f, false);
 	}
 
 	if (IsLocallyControlled())
 	{
+		SS_LOG(LogSSNetwork, Log, TEXT("Client Landing"))
+
 		APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
 		if (PlayerController)
 		{
+			// Disable Input
 			DisableInput(PlayerController);
+
+			// Play the Camera Shake
+			PlayerController->ClientStartCameraShake(LandingCameraLocationShakeClass);
 		}
 	}
 }
@@ -100,6 +109,14 @@ void ASS_RespawnTankPlayer::Landed(const FHitResult& Hit)
 void ASS_RespawnTankPlayer::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// Camera Shake
+	FStringClassReference LandingCameraLocationShakePath(TEXT("/Game/SuperSoldier/Camera/BP_LandingCameraLocationShake.BP_LandingCameraLocationShake_C"));
+	UClass* LandingCameraLocationShakeRef = LandingCameraLocationShakePath.TryLoadClass<UCameraShakeBase>();
+	if (LandingCameraLocationShakeRef)
+	{
+		LandingCameraLocationShakeClass = LandingCameraLocationShakeRef;
+	}
 
 	SetActorTickEnabled(false);
 
@@ -119,11 +136,6 @@ void ASS_RespawnTankPlayer::BeginPlay()
 
 		MurdockCharacter->SetActorHiddenInGame(true);
 		MurdockCharacter->SetCharacterCollisionType(ECharacterCollisionType::NoCollision);
-	}
-	else
-	{
-		GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 
 	// If Locally Controlled
@@ -220,11 +232,4 @@ void ASS_RespawnTankPlayer::ClientRpcStartCameraEffect_Implementation(ASSCharact
 	LerpAlpha = 0.0f;
 	MurdockCharacter = RespawnCharacter;
 	CameraLerpStartTransform = FollowCamera->GetComponentTransform();
-
-	APlayerController* PlayerController = CastChecked<APlayerController>(Controller);
-	if (PlayerController)
-	{
-		// Play the camera shake
-		PlayerController->ClientStartCameraShake(USSLandingCameraShake::StaticClass());
-	}
 }

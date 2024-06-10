@@ -50,7 +50,7 @@ public:
 
 // Dead Section
 protected:
-	void SetDead();
+	virtual void SetDead();
 	void Dissolve();
 
 	UFUNCTION()

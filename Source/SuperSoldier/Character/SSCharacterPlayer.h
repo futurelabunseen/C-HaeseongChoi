@@ -23,6 +23,7 @@ public:
 protected:
 	virtual void BeginPlay() override;
 protected:
+	virtual void SetDead();
 	virtual void OnRep_ServerCharacterbDead() override;
 	bool GetAnyMontagePlaying(UAnimMontage* FilterMontage = NULL);
 

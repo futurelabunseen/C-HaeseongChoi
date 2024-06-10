@@ -25,5 +25,16 @@ public:
 
 protected:
 	const uint32 MaxPlayerNum = 3;
-	uint32 CurPlayerNum;
+	uint32 CurPlayerNum = 0;
+
+// Respawn Section
+public:
+	UFUNCTION()
+	void RespawnAllPlayer(FVector TargetLocation);
+
+	UFUNCTION()
+	void RespawnPlayers(FVector TargetLocation);
+
+protected:
+	bool IsAllPlayerDead();
 };

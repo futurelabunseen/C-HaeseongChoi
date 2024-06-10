@@ -5,6 +5,9 @@
 #include "Core/SSPlayerController.h"
 #include "Core/SSGameState.h"
 #include "GameFramework/HUD.h"
+#include "EngineUtils.h"
+#include "Character/SS_RespawnTankPlayer.h"
+#include "Strata/SStrataReinforcements.h"
 #include "SuperSoldier.h"
 
 
@@ -28,7 +31,6 @@ ASSGameMode::ASSGameMode()
 
 	// Set GameState
 	GameStateClass = ASSGameState::StaticClass();
-	CurPlayerNum = 0;
 }
 
 void ASSGameMode::StartPlay()
@@ -70,4 +72,56 @@ void ASSGameMode::PostLogin(APlayerController* NewPlayer)
 	SS_LOG(LogSSNetwork, Log, TEXT("%s"), TEXT("Begin"));
 	Super::PostLogin(NewPlayer);
 	SS_LOG(LogSSNetwork, Log, TEXT("%s"), TEXT("End"));
+}
+
+void ASSGameMode::RespawnAllPlayer(FVector TargetLocation)
+{
+	if (IsAllPlayerDead())
+	{
+		FTimerHandle RespawnTimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(
+			RespawnTimerHandle, 
+			FTimerDelegate::CreateLambda([&]() {
+				RespawnPlayers(TargetLocation);
+				}),
+			1.0f, 
+			false, 1.0f);
+	}
+}
+
+void ASSGameMode::RespawnPlayers(FVector TargetLocation)
+{
+	for (APlayerController* PlayerController : TActorRange<APlayerController>(GetWorld()))
+	{
+		ASSCharacterPlayer* PlayerCharacter = CastChecked<ASSCharacterPlayer>(PlayerController->GetCharacter());
+		ASSPlayerController* SSPlayerController = CastChecked<ASSPlayerController>(PlayerController);
+
+		if (PlayerCharacter->bDead)
+		{
+			FVector RespawnLocation = TargetLocation;
+			RespawnLocation.Z += 8000.0f;
+
+			ASS_RespawnTankPlayer* RespawnTank = GetWorld()->SpawnActor<ASS_RespawnTankPlayer>(ASS_RespawnTankPlayer::StaticClass());
+			RespawnTank->SetActorLocation(RespawnLocation);
+			PlayerController->Possess(RespawnTank);
+
+			PlayerCharacter->SetActorHiddenInGame(true);
+			PlayerCharacter->SetLifeSpan(2.0f);
+		}
+	}
+}
+
+bool ASSGameMode::IsAllPlayerDead()
+{
+	bool bAllPlayerDead = true;
+	for (APlayerController* PlayerController : TActorRange<APlayerController>(GetWorld()))
+	{
+		if (PlayerController)
+		{
+			ASSCharacterBase* CharacterPlayer = CastChecked<ASSCharacterBase>(PlayerController->GetCharacter());
+
+			if (!CharacterPlayer->bDead) break;
+		}
+	}
+	return bAllPlayerDead;
 }

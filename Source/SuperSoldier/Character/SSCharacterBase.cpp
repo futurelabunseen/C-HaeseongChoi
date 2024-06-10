@@ -125,8 +125,11 @@ void ASSCharacterBase::ReleaseThrowable()
 
 void ASSCharacterBase::SetDead()
 {
+	// Server Side Func
+
 	bDead = true;
 	CharacterCollisionType = ECharacterCollisionType::NoCollision;
+
 	OnRep_ServerCharacterbDead();
 	OnRep_ServerCharacterCollisionType();
 }

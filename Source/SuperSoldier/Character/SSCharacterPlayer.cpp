@@ -11,6 +11,7 @@
 #include "Character/CharacterStat/SSCharacterStatComponent.h"
 #include "UI/SSUserPlayWidget.h"
 #include "Kismet/GameplayStatics.h"
+#include "Core/SSGameMode.h"
 
 ASSCharacterPlayer::ASSCharacterPlayer(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -31,6 +32,14 @@ ASSCharacterPlayer::ASSCharacterPlayer(const FObjectInitializer& ObjectInitializ
 			MoveAction = InputActionMoveRef.Object;
 		}
 	}
+}
+
+void ASSCharacterPlayer::SetDead()
+{
+	Super::SetDead();
+
+	ASSGameMode* SuperSoldierGameMode = CastChecked<ASSGameMode>(GetWorld()->GetAuthGameMode());
+	SuperSoldierGameMode->RespawnAllPlayer(GetActorLocation());
 }
 
 void ASSCharacterPlayer::OnRep_ServerCharacterbDead()

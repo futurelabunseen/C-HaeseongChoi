@@ -68,3 +68,9 @@ void ASSPlayerController::AcknowledgePossession(APawn* P)
 		}
 	}
 }
+
+void ASSPlayerController::ClientRpcBlendViewTargetToNewPawn_Implementation(APawn* NewPawn)
+{
+	SS_LOG(LogSSNetwork, Log, TEXT("BlendViewTargetToNewPawn"));
+	SetViewTargetWithBlend(NewPawn, 0.8f);
+}

@@ -30,4 +30,9 @@ protected:
 
 	UPROPERTY()
 	TObjectPtr<class USSUserPlayWidget> UserPlayWidget;
+
+// Respawn Camera Lerp Section
+public:
+	UFUNCTION(Client, Unreliable)
+	void ClientRpcBlendViewTargetToNewPawn(APawn* NewPawn);
 };

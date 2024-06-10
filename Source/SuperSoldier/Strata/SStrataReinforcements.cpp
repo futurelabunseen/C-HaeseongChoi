@@ -4,6 +4,9 @@
 #include "Strata/SStrataReinforcements.h"
 #include "Character/SSCharacterPlayer.h"
 #include "Character/SS_RespawnTankPlayer.h"
+#include "Core/SSPlayerController.h"
+#include "EngineUtils.h"
+#include "Core/SSGameMode.h"
 
 USStrataReinforcements::USStrataReinforcements()
 {
@@ -24,23 +27,13 @@ void USStrataReinforcements::ActivateStratagem(UWorld* const CurWorld, const FVe
 	// Revive All Dead Player
 	if (!IsValid(CurWorld)) return;
 
-	for (FConstPlayerControllerIterator It = CurWorld->GetPlayerControllerIterator(); It; ++It)
+	for (APlayerController* PlayerController : TActorRange<APlayerController>(CurWorld))
 	{
-		APlayerController* PlayerController = It->Get();
-		ASSCharacterPlayer* PlayerCharacter = Cast<ASSCharacterPlayer>(PlayerController->GetCharacter());
-		check(PlayerCharacter);
-
+		ASSCharacterPlayer* PlayerCharacter = CastChecked<ASSCharacterPlayer>(PlayerController->GetCharacter());
 		if (PlayerCharacter->bDead)
 		{
-			FVector RespawnLocation = TargetLocation;
-			RespawnLocation.Z += 5000.0f;
-
-			ASS_RespawnTankPlayer* RespawnTank = CurWorld->SpawnActor<ASS_RespawnTankPlayer>(ASS_RespawnTankPlayer::StaticClass());
-			RespawnTank->SetActorLocation(RespawnLocation);
-			PlayerController->Possess(RespawnTank);
-
-			PlayerCharacter->SetActorHiddenInGame(true);
-			PlayerCharacter->SetLifeSpan(2.0f);
+			ASSGameMode* SSGameMode = CastChecked<ASSGameMode>(CurWorld->GetAuthGameMode());
+			SSGameMode->RespawnPlayers(TargetLocation);
 		}
 	}
 }

@@ -102,6 +102,7 @@ void ASS_RespawnTankPlayer::Landed(const FHitResult& Hit)
 
 			// Play the Camera Shake
 			PlayerController->ClientStartCameraShake(LandingCameraLocationShakeClass);
+			PlayerController->ClientStartCameraShake(USSLandingCameraShake::StaticClass());
 		}
 	}
 }
@@ -109,14 +110,6 @@ void ASS_RespawnTankPlayer::Landed(const FHitResult& Hit)
 void ASS_RespawnTankPlayer::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// Camera Shake
-	FStringClassReference LandingCameraLocationShakePath(TEXT("/Game/SuperSoldier/Camera/BP_LandingCameraLocationShake.BP_LandingCameraLocationShake_C"));
-	UClass* LandingCameraLocationShakeRef = LandingCameraLocationShakePath.TryLoadClass<UCameraShakeBase>();
-	if (LandingCameraLocationShakeRef)
-	{
-		LandingCameraLocationShakeClass = LandingCameraLocationShakeRef;
-	}
 
 	SetActorTickEnabled(false);
 
@@ -146,6 +139,17 @@ void ASS_RespawnTankPlayer::BeginPlay()
 		{
 			EnableInput(PlayerController);
 		}
+	}
+}
+
+void ASS_RespawnTankPlayer::PostInitializeComponents()
+{
+	// Camera Shake
+	FStringClassReference LandingCameraLocationShakePath(TEXT("/Game/SuperSoldier/Camera/BP_LandingCameraLocationShake.BP_LandingCameraLocationShake_C"));
+	UClass* LandingCameraLocationShakeRef = LandingCameraLocationShakePath.TryLoadClass<UCameraShakeBase>();
+	if (LandingCameraLocationShakeRef)
+	{
+		LandingCameraLocationShakeClass = LandingCameraLocationShakeRef;
 	}
 }
 

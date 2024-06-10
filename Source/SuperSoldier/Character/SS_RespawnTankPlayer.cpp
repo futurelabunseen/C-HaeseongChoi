@@ -10,7 +10,6 @@
 #include "EnhancedInputComponent.h"
 #include "Character/SS_MurdockPlayer.h"
 #include "Kismet/GameplayStatics.h"
-#include "Camera/SSLandingCameraShake.h"
 #include "SuperSoldier.h"
 
 ASS_RespawnTankPlayer::ASS_RespawnTankPlayer(const FObjectInitializer& ObjectInitializer) :
@@ -102,7 +101,6 @@ void ASS_RespawnTankPlayer::Landed(const FHitResult& Hit)
 
 			// Play the Camera Shake
 			PlayerController->ClientStartCameraShake(LandingCameraLocationShakeClass);
-			PlayerController->ClientStartCameraShake(USSLandingCameraShake::StaticClass());
 		}
 	}
 }

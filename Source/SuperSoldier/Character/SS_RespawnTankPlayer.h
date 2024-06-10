@@ -43,14 +43,6 @@ protected:
 
 // Camera Lerp Section
 protected:
-	bool bStartLerpCamera;
-	FTimerHandle LerpCameraTimerHandle;
-	FTransform CameraLerpStartTransform;
-	float LerpAlpha;
-
-	UFUNCTION()
-	void LerpCamera(float DeltaSeconds);
-
 	UFUNCTION(Client, UnReliable)
 	void ClientRpcStartCameraEffect(ASSCharacterPlayer* RespawnCharacter);
 };

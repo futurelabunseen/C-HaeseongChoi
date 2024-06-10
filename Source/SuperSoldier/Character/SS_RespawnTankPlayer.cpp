@@ -62,8 +62,6 @@ ASS_RespawnTankPlayer::ASS_RespawnTankPlayer(const FObjectInitializer& ObjectIni
 		GetMesh()->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -300.0f), FRotator(0.0f, 0.0f, 0.0f));
 		GetMesh()->SetRelativeScale3D(FVector(0.5f));
 	}
-
-	bStartLerpCamera = false;
 }
 
 void ASS_RespawnTankPlayer::Landed(const FHitResult& Hit)
@@ -86,7 +84,7 @@ void ASS_RespawnTankPlayer::Landed(const FHitResult& Hit)
 		GetWorld()->GetTimerManager().SetTimer(CallFuncTimer, FTimerDelegate::CreateLambda([&]() {
 			ClientRpcStartCameraEffect(MurdockCharacter);
 			RespawnMurdockCharacter();
-		}), 0.5f, false);
+		}), 0.8f, false);
 	}
 
 	if (IsLocallyControlled())
@@ -145,7 +143,7 @@ void ASS_RespawnTankPlayer::PostInitializeComponents()
 	Super::PostInitializeComponents();
 
 	// Camera Shake
-	FStringClassReference LandingCameraLocationShakePath(TEXT("/Game/SuperSoldier/Camera/BP_LandingCameraLocationShake.BP_LandingCameraLocationShake_C"));
+	FStringClassReference LandingCameraLocationShakePath(TEXT("/Game/SuperSoldier/Camera/BP_LandingCameraShake.BP_LandingCameraShake_C"));
 	UClass* LandingCameraLocationShakeRef = LandingCameraLocationShakePath.TryLoadClass<UCameraShakeBase>();
 	if (LandingCameraLocationShakeRef)
 	{
@@ -166,11 +164,6 @@ void ASS_RespawnTankPlayer::OnRep_Controller()
 void ASS_RespawnTankPlayer::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
-
-	if (bStartLerpCamera)
-	{
-		LerpCamera(DeltaSeconds);
-	}
 }
 
 void ASS_RespawnTankPlayer::RespawnMurdockCharacter()
@@ -210,30 +203,7 @@ void ASS_RespawnTankPlayer::SetRespawnMurdockLocation()
 	}
 }
 
-void ASS_RespawnTankPlayer::LerpCamera(float DeltaSeconds)
-{
-	LerpAlpha = FMath::Clamp(LerpAlpha + DeltaSeconds * 1.5f, 0.0f, 1.0f);
-	FVector StartCameraLocation = CameraLerpStartTransform.GetLocation();
-	FRotator StartCameraRotation = CameraLerpStartTransform.GetRotation().Rotator();
-
-	const UCameraComponent* MurdockCamera = MurdockCharacter->GetFollowCamera();
-	FVector EndCameraLocation = MurdockCamera->GetComponentLocation();
-	FRotator EndCameraRotation = MurdockCamera->GetComponentRotation();
-
-	FVector NewCurCameraLocation = FMath::Lerp(StartCameraLocation, EndCameraLocation, LerpAlpha);
-	FRotator NewCurCameraRotation = FMath::Lerp(StartCameraRotation, EndCameraRotation, LerpAlpha);
-
-	FollowCamera->SetWorldLocation(NewCurCameraLocation);
-	FollowCamera->SetWorldRotation(NewCurCameraRotation);
-}
-
 void ASS_RespawnTankPlayer::ClientRpcStartCameraEffect_Implementation(ASSCharacterPlayer* RespawnCharacter)
 {
 	check(RespawnCharacter);
-
-	SetActorTickEnabled(true);
-	bStartLerpCamera = true;
-	LerpAlpha = 0.0f;
-	MurdockCharacter = RespawnCharacter;
-	CameraLerpStartTransform = FollowCamera->GetComponentTransform();
 }

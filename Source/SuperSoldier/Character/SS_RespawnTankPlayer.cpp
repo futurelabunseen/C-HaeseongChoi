@@ -100,12 +100,12 @@ void ASS_RespawnTankPlayer::Landed(const FHitResult& Hit)
 			ClientRpcStartCameraEffect(MurdockCharacter);
 			RespawnMurdockCharacter();
 		}), 0.8f, false);
+
+		NetMulticastEndNiagaraEffect();
 	}
 
-	if (IsLocallyControlled())
+	else 
 	{
-		SS_LOG(LogSSNetwork, Log, TEXT("Client Landing"))
-
 		APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
 		if (PlayerController)
 		{
@@ -114,7 +114,6 @@ void ASS_RespawnTankPlayer::Landed(const FHitResult& Hit)
 
 			// Play the Camera Shake
 			PlayerController->ClientStartCameraShake(LandingCameraLocationShakeClass);
-			TrailNiagara->SetActive(false);
 		}
 	}
 }
@@ -143,19 +142,21 @@ void ASS_RespawnTankPlayer::BeginPlay()
 		MurdockCharacter->SetCharacterCollisionType(ECharacterCollisionType::NoCollision);
 	}
 
-	// If Locally Controlled
-	if (IsLocallyControlled())
+	else
 	{
-		APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
-		if (PlayerController)
-		{
-			EnableInput(PlayerController);
-		}
-
 		TrailNiagara->SetActive(true);
 
-		// Camera Lerp
-		
+		// If Locally Controlled
+		if (IsLocallyControlled())
+		{
+			APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
+			if (PlayerController)
+			{
+				EnableInput(PlayerController);
+			}
+
+			// Camera Lerp
+		}
 	}
 }
 
@@ -222,6 +223,11 @@ void ASS_RespawnTankPlayer::SetRespawnMurdockLocation()
 	{
 		GetWorld()->GetTimerManager().SetTimer(RespawnTimerHandle, this, &ASS_RespawnTankPlayer::RespawnMurdockCharacter, 0.016f, false);
 	}
+}
+
+void ASS_RespawnTankPlayer::NetMulticastEndNiagaraEffect_Implementation()
+{
+	TrailNiagara->SetActive(false);
 }
 
 void ASS_RespawnTankPlayer::ClientRpcStartCameraEffect_Implementation(ASSCharacterPlayer* RespawnCharacter)

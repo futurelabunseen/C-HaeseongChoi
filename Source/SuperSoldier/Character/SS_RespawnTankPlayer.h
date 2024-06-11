@@ -50,4 +50,7 @@ protected:
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<class UNiagaraComponent> TrailNiagara;
+
+	UFUNCTION(NetMulticast, UnReliable)
+	void NetMulticastEndNiagaraEffect();
 };

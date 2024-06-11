@@ -58,7 +58,7 @@ ASS_LandBug::ASS_LandBug(const FObjectInitializer& ObjectInitializer)
 	AIControllerClass = ASSLandBugAIController::StaticClass();
 
 	// SFX
-	static ConstructorHelpers::FObjectFinder<USoundBase> AttackSoundRef(TEXT("/Game/Small_Monster_SFX_1/Cues/Mala_Attack_02_Cue.Mala_Attack_02_Cue"));
+	static ConstructorHelpers::FObjectFinder<USoundBase> AttackSoundRef(TEXT("/Game/SuperSoldier/Characters/Monsters/LandBug/Sounds/SC_LandBugAttack.SC_LandBugAttack"));
 	if (AttackSoundRef.Object)
 	{
 		AttackSound = AttackSoundRef.Object;

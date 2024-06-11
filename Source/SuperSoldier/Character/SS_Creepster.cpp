@@ -70,7 +70,7 @@ ASS_Creepster::ASS_Creepster(const FObjectInitializer& ObjectInitializer)
 	AIControllerClass = ASSCreepsterAIController::StaticClass();
 
 	// SFX
-	static ConstructorHelpers::FObjectFinder<USoundBase> AttackSoundRef(TEXT("/Game/Small_Monster_SFX_1/Cues/Mala_Attack_03_Cue.Mala_Attack_03_Cue"));
+	static ConstructorHelpers::FObjectFinder<USoundBase> AttackSoundRef(TEXT("/Game/SuperSoldier/Characters/Monsters/Creepster/Sounds/SC_CreepsterAttack.SC_CreepsterAttack"));
 	if (AttackSoundRef.Object)
 	{
 		AttackSound = AttackSoundRef.Object;

@@ -53,7 +53,7 @@ protected:
 
 // Camera Section
 public:
-	FORCEINLINE const class UCameraComponent* const GetFollowCamera() { return FollowCamera; }
+	FORCEINLINE const FVector GetFollowCameraWorldLocation();
 protected:
 	// 지지대 역할을 하는 스프링암 컴포넌트
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, Meta = (AllowPrivateAccess = "true"))

@@ -106,8 +106,9 @@ void ASSGameMode::RespawnPlayers(FVector TargetLocation)
 
 			ASS_RespawnTankPlayer* RespawnTank = GetWorld()->SpawnActor<ASS_RespawnTankPlayer>(ASS_RespawnTankPlayer::StaticClass());
 			RespawnTank->SetActorLocation(RespawnLocation);
-			PlayerController->Possess(RespawnTank);
+			RespawnTank->SetRespawnStartCameraLocation(PlayerCharacter->GetFollowCameraWorldLocation());
 
+			PlayerController->Possess(RespawnTank);
 			PlayerCharacter->SetActorHiddenInGame(true);
 			PlayerCharacter->SetLifeSpan(2.0f);
 		}

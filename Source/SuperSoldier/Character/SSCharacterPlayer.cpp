@@ -119,6 +119,11 @@ void ASSCharacterPlayer::Move(const FInputActionValue& Value)
 	AddMovementInput(RightDirection, MovementVector.X);
 }
 
+const FVector ASSCharacterPlayer::GetFollowCameraWorldLocation()
+{
+	return FollowCamera->GetComponentLocation();
+}
+
 void ASSCharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);

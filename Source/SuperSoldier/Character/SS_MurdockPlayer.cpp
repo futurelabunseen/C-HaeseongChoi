@@ -49,8 +49,6 @@ ASS_MurdockPlayer::ASS_MurdockPlayer(const FObjectInitializer& ObjectInitializer
 		CameraBoom->TargetArmLength = 500.0f;
 		CameraBoom->SocketOffset = FVector(0.0f, 50.0f, 0.0f);
 		CameraBoom->bUsePawnControlRotation = true;
-		CameraBoom->bEnableCameraLag = true;
-		CameraBoom->CameraLagMaxDistance = 10000.0f;
 
 		FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 		FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);

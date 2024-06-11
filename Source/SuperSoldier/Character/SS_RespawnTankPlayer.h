@@ -42,7 +42,15 @@ protected:
 	TSubclassOf<UCameraShakeBase> LandingCameraLocationShakeClass;
 
 // Camera Lerp Section
+public:
+	void SetRespawnStartCameraLocation(const FVector_NetQuantize& NewLocation);
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 protected:
+	UPROPERTY(Replicated)
+	FVector_NetQuantize RespawnStartCameraRelativeLocation;
+	FVector RespawnEndCameraRelativeLocation;
+
 	UFUNCTION(Client, UnReliable)
 	void ClientRpcStartCameraEffect(ASSCharacterPlayer* RespawnCharacter);
 

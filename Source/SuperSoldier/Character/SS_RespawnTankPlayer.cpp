@@ -12,6 +12,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
+#include "Net/UnrealNetwork.h"
 #include "SuperSoldier.h"
 
 ASS_RespawnTankPlayer::ASS_RespawnTankPlayer(const FObjectInitializer& ObjectInitializer) :
@@ -48,8 +49,11 @@ ASS_RespawnTankPlayer::ASS_RespawnTankPlayer(const FObjectInitializer& ObjectIni
 		FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 		FollowCamera->SetupAttachment(RootComponent);
 		FollowCamera->SetRelativeLocation(FVector(150.0f, 0.0f, 800.0f));
-		FollowCamera->SetRelativeRotation(FRotator(-90.0f, 0.0f, 0.0f).Quaternion());
+		FollowCamera->SetRelativeRotation(FRotator(-90.0f, 0.0f, 0.0f));
 		FollowCamera->bUsePawnControlRotation = false;
+
+		RespawnEndCameraRelativeLocation = FollowCamera->GetRelativeLocation();
+		RespawnStartCameraRelativeLocation = RespawnEndCameraRelativeLocation;
 	}
 
 	// Mesh
@@ -73,7 +77,6 @@ ASS_RespawnTankPlayer::ASS_RespawnTankPlayer(const FObjectInitializer& ObjectIni
 	TrailNiagara->SetAsset(TrailNiagaraRef.Object);
 	TrailNiagara->SetFloatParameter(TEXT("User.Thrust_Radius"), 20.0f);
 	TrailNiagara->SetFloatParameter(TEXT("User.Thrust_Size"), 8.0f);
-	// TrailNiagara->SetRelativeLocation(FVector(0.0f, 0.0f, -310.0f));
 	TrailNiagara->SetRelativeLocation(FVector(0.0f, 0.0f, -90.0f));
 	TrailNiagara->SetRelativeRotation(FRotator(-90.0f, 0.0f, 0.0f));
 	TrailNiagara->bAutoActivate = false;
@@ -149,13 +152,15 @@ void ASS_RespawnTankPlayer::BeginPlay()
 		// If Locally Controlled
 		if (IsLocallyControlled())
 		{
+			SetActorTickEnabled(true);
+
 			APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
 			if (PlayerController)
 			{
 				EnableInput(PlayerController);
 			}
 
-			// Camera Lerp
+			FollowCamera->SetRelativeLocation(RespawnStartCameraRelativeLocation);
 		}
 	}
 }
@@ -186,6 +191,18 @@ void ASS_RespawnTankPlayer::OnRep_Controller()
 void ASS_RespawnTankPlayer::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
+
+	FVector NewLocation = FMath::Lerp(FollowCamera->GetRelativeLocation(), RespawnEndCameraRelativeLocation, 0.1f);
+
+	if (FollowCamera->GetRelativeLocation().Equals(NewLocation, 1.0f))
+	{
+		FollowCamera->SetRelativeLocation(RespawnEndCameraRelativeLocation);
+		SetActorTickEnabled(false);
+	}
+	else
+	{
+		FollowCamera->SetRelativeLocation(NewLocation);
+	}
 }
 
 void ASS_RespawnTankPlayer::RespawnMurdockCharacter()
@@ -225,6 +242,19 @@ void ASS_RespawnTankPlayer::SetRespawnMurdockLocation()
 	}
 }
 
+void ASS_RespawnTankPlayer::SetRespawnStartCameraLocation(const FVector_NetQuantize& NewLocation)
+{
+	// SetCameraRelative Location
+	FVector NewRelativeLocation = NewLocation - RootComponent->GetComponentLocation();
+	RespawnStartCameraRelativeLocation = NewRelativeLocation;
+}
+
+void ASS_RespawnTankPlayer::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ASS_RespawnTankPlayer, RespawnStartCameraRelativeLocation);
+}
+
 void ASS_RespawnTankPlayer::NetMulticastEndNiagaraEffect_Implementation()
 {
 	TrailNiagara->SetActive(false);
@@ -236,5 +266,6 @@ void ASS_RespawnTankPlayer::ClientRpcStartCameraEffect_Implementation(ASSCharact
 
 	APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
 	MurdockCharacter = RespawnCharacter;
-	PlayerController->SetViewTargetWithBlend(RespawnCharacter, 0.8f, EViewTargetBlendFunction::VTBlend_Cubic);
+
+	PlayerController->SetViewTargetWithBlend(RespawnCharacter, 0.8f);
 }

@@ -86,7 +86,7 @@ void ASSGameMode::RespawnAllPlayer(FVector TargetLocation)
 				}),
 			1.0f, 
 			false, 
-			1.0f);
+			5.0f);
 	}
 }
 
@@ -100,6 +100,8 @@ void ASSGameMode::RespawnPlayers(FVector TargetLocation)
 		if (PlayerCharacter->bDead)
 		{
 			FVector RespawnLocation = TargetLocation;
+			RespawnLocation.X += FMath::RandRange(-200.0f, 200.0f);
+			RespawnLocation.Y += FMath::RandRange(-200.0f, 200.0f);
 			RespawnLocation.Z += 8000.0f;
 
 			ASS_RespawnTankPlayer* RespawnTank = GetWorld()->SpawnActor<ASS_RespawnTankPlayer>(ASS_RespawnTankPlayer::StaticClass());

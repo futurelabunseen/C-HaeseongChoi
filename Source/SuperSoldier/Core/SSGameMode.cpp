@@ -121,7 +121,11 @@ bool ASSGameMode::IsAllPlayerDead()
 		{
 			ASSCharacterBase* CharacterPlayer = CastChecked<ASSCharacterBase>(PlayerController->GetCharacter());
 
-			if (!CharacterPlayer->bDead) break;
+			if (!CharacterPlayer->bDead)
+			{
+				bAllPlayerDead = false;
+				break;
+			}
 		}
 	}
 	return bAllPlayerDead;

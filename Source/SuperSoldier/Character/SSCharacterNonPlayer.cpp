@@ -34,15 +34,22 @@ void ASSCharacterNonPlayer::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 }
 
-void ASSCharacterNonPlayer::OnRep_ServerCharacterbDead()
+void ASSCharacterNonPlayer::SetDead()
 {
-	Super::OnRep_ServerCharacterbDead();
+	Super::SetDead();
+	
+	SetLifeSpan(15.0f);
 
 	ASSAIController* AIController = Cast<ASSAIController>(GetController());
 	if (AIController)
 	{
 		AIController->StopAI();
 	}
+}
+
+void ASSCharacterNonPlayer::OnRep_ServerCharacterbDead()
+{
+	Super::OnRep_ServerCharacterbDead();
 
 	if (GetLocalRole() == ENetRole::ROLE_SimulatedProxy)
 	{

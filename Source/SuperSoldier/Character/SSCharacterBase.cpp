@@ -126,7 +126,6 @@ void ASSCharacterBase::ReleaseThrowable()
 void ASSCharacterBase::SetDead()
 {
 	// Server Side Func
-
 	bDead = true;
 	CharacterCollisionType = ECharacterCollisionType::NoCollision;
 
@@ -149,7 +148,7 @@ void ASSCharacterBase::UpdateDissolveProgress(const float Value)
 	}
 	if (Value >= 1.f)
 	{
-		Destroy();
+		SetActorTickEnabled(false);
 	}
 }
 

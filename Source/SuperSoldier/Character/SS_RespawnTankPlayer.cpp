@@ -211,7 +211,7 @@ void ASS_RespawnTankPlayer::SetRespawnMurdockLocation()
 	MurdockCharacter->SetActorLocation(FinalLocation);
 
 	FVector FinalLocDist = RespawnEndLocation - MurdockCharacter->GetActorLocation();
-	if (FinalLocDist.IsNearlyZero(1.0f))
+	if (FinalLocDist.IsNearlyZero(3.0f))
 	{
 		Controller->Possess(MurdockCharacter);
 		MurdockCharacter->Respawn(MurdockCharacter->GetActorLocation());

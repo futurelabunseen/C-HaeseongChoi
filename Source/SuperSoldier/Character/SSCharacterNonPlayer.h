@@ -19,6 +19,7 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
 protected:
+	virtual void SetDead();
 	virtual void OnRep_ServerCharacterbDead() override;
 public:
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;

@@ -153,6 +153,9 @@ void ASS_RespawnTankPlayer::BeginPlay()
 		}
 
 		TrailNiagara->SetActive(true);
+
+		// Camera Lerp
+		
 	}
 }
 

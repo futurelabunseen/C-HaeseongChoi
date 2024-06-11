@@ -85,7 +85,8 @@ void ASSGameMode::RespawnAllPlayer(FVector TargetLocation)
 				RespawnPlayers(TargetLocation);
 				}),
 			1.0f, 
-			false, 1.0f);
+			false, 
+			1.0f);
 	}
 }
 

@@ -76,7 +76,7 @@ void ASSCharacterPlayer::PlayMoanSound()
 {
 	Super::PlayMoanSound();
 
-	if (IsLocallyControlled())
+	if (!HasAuthority())
 	{
 		UGameplayStatics::SpawnSoundAtLocation(
 			GetWorld(),
@@ -89,13 +89,10 @@ void ASSCharacterPlayer::PlayDeadSound()
 {
 	Super::PlayDeadSound();
 
-	if (IsLocallyControlled())
-	{
-		UGameplayStatics::SpawnSoundAtLocation(
-			GetWorld(),
-			DeadSound,
-			GetActorLocation());
-	}
+	UGameplayStatics::SpawnSoundAtLocation(
+		GetWorld(),
+		DeadSound,
+		GetActorLocation());
 }
 
 void ASSCharacterPlayer::SetupCharacterWidget(USSUserPlayWidget* InUserWidget)

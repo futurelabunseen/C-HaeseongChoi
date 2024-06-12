@@ -4,6 +4,7 @@
 #include "UI/SSUserPlayWidget.h"
 #include "Components/Image.h"
 #include "Components/ProgressBar.h"
+#include "Components/TextBlock.h"
 
 USSUserPlayWidget::USSUserPlayWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -20,6 +21,9 @@ void USSUserPlayWidget::NativeConstruct()
 	ensure(CrossHairImage);
 
 	CrossHairImage->SetVisibility(ESlateVisibility::Hidden);
+
+	TotalKillCountText = Cast<UTextBlock>(GetWidgetFromName(TEXT("TextTotalKillCount")));
+	ensure(CrossHairImage);
 }
 
 void USSUserPlayWidget::UpdateHPBar(float NewCurrentHP)
@@ -42,6 +46,11 @@ void USSUserPlayWidget::UpdateCrossHair(bool bAiming)
 	{
 		CrossHairImage->SetVisibility(ESlateVisibility::Hidden);
 	}
+}
+
+void USSUserPlayWidget::UpdateTotalKillCount(int32 TotalKilledMonsterCount)
+{
+	TotalKillCountText->SetText(FText::FromString(FString::FromInt(TotalKilledMonsterCount)));
 }
 
 void USSUserPlayWidget::ShowStratagemList(bool bCalling)

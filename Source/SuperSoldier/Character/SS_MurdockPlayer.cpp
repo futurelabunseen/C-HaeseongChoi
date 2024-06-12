@@ -700,6 +700,17 @@ void ASS_MurdockPlayer::ReleaseThrowable()
 	}
 }
 
+void ASS_MurdockPlayer::SetDead()
+{
+	if (CurStrataIndicator)
+	{
+		CurStrataIndicator->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+		CurStrataIndicator->SetActorRotation(FRotator(0.0f, 0.0f, 0.0f).Quaternion());
+		CurStrataIndicator->SetSimulateCollision();
+		CurStrataIndicator = nullptr;
+	}
+}
+
 float ASS_MurdockPlayer::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	float Result = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);

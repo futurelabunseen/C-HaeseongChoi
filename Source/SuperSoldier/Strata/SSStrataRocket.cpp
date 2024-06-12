@@ -36,7 +36,6 @@ ASSStrataRocket::ASSStrataRocket()
 
 ASSStrataRocket::~ASSStrataRocket()
 {
-    UE_LOG(LogTemp, Log, TEXT("Destroy"))
 }
 
 void ASSStrataRocket::BeginPlay()

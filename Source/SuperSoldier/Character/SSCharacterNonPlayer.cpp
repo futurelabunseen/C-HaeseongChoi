@@ -8,6 +8,7 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "SuperSoldier.h"
 #include "Kismet/GameplayStatics.h"
+#include "Core/SSGameState.h"
 
 ASSCharacterNonPlayer::ASSCharacterNonPlayer(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -45,6 +46,9 @@ void ASSCharacterNonPlayer::SetDead()
 	{
 		AIController->StopAI();
 	}
+
+	ASSGameState* SSGameState = CastChecked<ASSGameState>(GetWorld()->GetGameState());
+	SSGameState->AddKilledMonsterCount();
 }
 
 void ASSCharacterNonPlayer::OnRep_ServerCharacterbDead()

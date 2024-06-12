@@ -3,17 +3,26 @@
 
 #include "Core/SSGameState.h"
 #include "SuperSoldier.h"
+#include "Net/UnrealNetwork.h"
 
 void ASSGameState::HandleBeginPlay()
 {
-	SS_LOG(LogSSNetwork, Log, TEXT("%s"), TEXT("Begin"));
 	Super::HandleBeginPlay();
-	SS_LOG(LogSSNetwork, Log, TEXT("%s"), TEXT("End"));
 }
 
 void ASSGameState::OnRep_ReplicatedHasBegunPlay()
 {
-	SS_LOG(LogSSNetwork, Log, TEXT("%s"), TEXT("Begin"));
 	Super::OnRep_ReplicatedHasBegunPlay();
-	SS_LOG(LogSSNetwork, Log, TEXT("%s"), TEXT("End"));
+}
+
+void ASSGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ASSGameState, TotalKilledMonsterCount);
+}
+
+void ASSGameState::OnRep_TotalKilledMonsterCount()
+{
+	SS_LOG(LogSSNetwork, Log, TEXT("TotalKilledMonsterCount : %d"), TotalKilledMonsterCount);
+	OnTotalKilledMonsterCountChangedDelegate.Broadcast(TotalKilledMonsterCount);
 }

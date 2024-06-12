@@ -29,6 +29,9 @@ public:
 	void UpdateCrossHair(bool bAiming);
 
 	UFUNCTION()
+	void UpdateTotalKillCount(int32 TotalKilledMonsterCount);
+
+	UFUNCTION()
 	void ShowStratagemList(bool bCalling);
 
 protected:
@@ -43,4 +46,7 @@ protected:
 
 	UPROPERTY(BlueprintReadWrite)
 	TObjectPtr<class UWidgetAnimation> AnimShowStrataList;
+
+	UPROPERTY()
+	TObjectPtr<class UTextBlock> TotalKillCountText;
 };

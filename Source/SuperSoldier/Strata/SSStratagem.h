@@ -39,10 +39,14 @@ public:
 	virtual void ActivateStratagem(UWorld* const CurWorld, const FVector& TargetLocation);
 
 	FORCEINLINE const EStrataType& GetStarataType() const { return StrataType; }
+	FORCEINLINE void SetThrowedDirection(const FVector& NewThrowedDirection) { ThrowedDirection = NewThrowedDirection; }
+	
 protected:
 	float DelayTime;
 	float CoolTime;
 
 	EStrataType StrataType;
 	TArray<EStrataCommand> CommandArray;
+
+	FVector ThrowedDirection;
 };

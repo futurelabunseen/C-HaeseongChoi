@@ -60,6 +60,7 @@ void ASSStrataIndicator::Throw(FVector Direction)
 {
 	const float ThrowSpeed = 2000.0f;
 	StrataIndicatorMesh->SetPhysicsLinearVelocity(Direction * ThrowSpeed);
+	CurStratagem->SetThrowedDirection(Direction);
 }
 
 void ASSStrataIndicator::SetSimulateCollision()

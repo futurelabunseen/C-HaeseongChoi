@@ -292,16 +292,22 @@ void ASS_MurdockPlayer::InitializeStratagem()
 	// Register Stratagem
 	USSGameInstance* SSGameInstance = Cast<USSGameInstance>(GetGameInstance());
 	USSStratagemManager* StratagemManager = SSGameInstance->GetStratagemManager();
-	USSStratagem* DefaultStratagem = StratagemManager->GetStratagem(FName(TEXT("PrecisionStrike")));
+	USSStratagem* DefaultStratagem = StratagemManager->GetStratagem(FName(TEXT("Reinforcements")));
+	if (DefaultStratagem)
+	{
+		AvailableStratagems.Add(std::make_pair(FName(TEXT("Reinforcements")), DefaultStratagem));
+	}
+
+	DefaultStratagem = StratagemManager->GetStratagem(FName(TEXT("PrecisionStrike")));
 	if (DefaultStratagem)
 	{
 		AvailableStratagems.Add(std::make_pair(FName(TEXT("PrecisionStrike")), DefaultStratagem));
 	}
 
-	DefaultStratagem = StratagemManager->GetStratagem(FName(TEXT("Reinforcements")));
+	DefaultStratagem = StratagemManager->GetStratagem(FName(TEXT("AirStrike")));
 	if (DefaultStratagem)
 	{
-		AvailableStratagems.Add(std::make_pair(FName(TEXT("Reinforcements")), DefaultStratagem));
+		AvailableStratagems.Add(std::make_pair(FName(TEXT("AirStrike")), DefaultStratagem));
 	}
 }
 

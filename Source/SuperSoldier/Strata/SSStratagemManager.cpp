@@ -3,8 +3,9 @@
 
 #include "SSStratagemManager.h"
 #include "Strata/SSStratagem.h"
-#include "Strata/SSStrataPrecisionStrike.h"
 #include "Strata/SStrataReinforcements.h"
+#include "Strata/SSStrataPrecisionStrike.h"
+#include "Strata/SSStrataAirStrike.h"
 
 USSStratagemManager::USSStratagemManager()
 {
@@ -13,16 +14,22 @@ USSStratagemManager::USSStratagemManager()
 void USSStratagemManager::InitializeStratagem()
 {
 	// 스트라타젬 전체 목록 초기화
+	USStrataReinforcements* Reinforcements = NewObject<USStrataReinforcements>();
+	if (Reinforcements)
+	{
+		StratagemMap.Add(FName(TEXT("Reinforcements")), Reinforcements);
+	}
+
 	USSStrataPrecisionStrike* PrecisionStrike = NewObject<USSStrataPrecisionStrike>();
 	if (PrecisionStrike)
 	{
 		StratagemMap.Add(FName(TEXT("PrecisionStrike")), PrecisionStrike);
 	}
 
-	USStrataReinforcements* Reinforcements = NewObject<USStrataReinforcements>();
-	if (Reinforcements)
+	USSStrataAirStrike* AirStrike = NewObject<USSStrataAirStrike>();
+	if (AirStrike)
 	{
-		StratagemMap.Add(FName(TEXT("Reinforcements")), Reinforcements);
+		StratagemMap.Add(FName(TEXT("AirStrike")), AirStrike);
 	}
 }
 

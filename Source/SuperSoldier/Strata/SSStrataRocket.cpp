@@ -43,6 +43,7 @@ void ASSStrataRocket::BeginPlay()
 {
 	Super::BeginPlay();
     SetActorTickEnabled(false);
+	SetLifeSpan(20.0f);
 
     RocketStaticMesh->OnComponentHit.AddDynamic(this, &ASSStrataRocket::OnHit);
 }

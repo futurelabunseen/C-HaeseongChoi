@@ -59,9 +59,13 @@ void ASSStrataIndicator::BeginPlay()
 void ASSStrataIndicator::Throw(FVector Direction)
 {
 	const float ThrowSpeed = 2000.0f;
+	StrataIndicatorMesh->SetPhysicsLinearVelocity(Direction * ThrowSpeed);
+}
+
+void ASSStrataIndicator::SetSimulateCollision()
+{
 	StrataIndicatorMesh->SetSimulatePhysics(true);
 	StrataIndicatorMesh->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
-	StrataIndicatorMesh->SetPhysicsLinearVelocity(Direction * ThrowSpeed);
 }
 
 void ASSStrataIndicator::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)

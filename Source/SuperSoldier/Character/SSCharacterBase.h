@@ -100,7 +100,7 @@ protected:
 	TObjectPtr<class USoundBase> MoanSound;
 
 	UFUNCTION(NetMulticast, Unreliable)
-	void NetMulticastRpcShowAnimationMontage(UAnimMontage* MontageToPlay, const float AnimationSpeedRate);
+	virtual void NetMulticastRpcShowAnimationMontage(UAnimMontage* MontageToPlay, const float AnimationSpeedRate);
 
 	UFUNCTION(NetMulticast, Unreliable)
 	void NetMulticastRpcShowAnimationMontageWithSection(UAnimMontage* MontageToPlay, FName SectionName, const float AnimationSpeedRate);

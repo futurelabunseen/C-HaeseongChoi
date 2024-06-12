@@ -258,6 +258,13 @@ void ASS_MurdockPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	EnhancedInputComponent->BindAction(CommandAction, ETriggerEvent::Triggered, this, &ASS_MurdockPlayer::ProcessCommandInput);
 }
 
+void ASS_MurdockPlayer::ResetPlayerInputVariable()
+{
+	bCalling = false;
+	bReadyForThrowingStrata = false;
+	bChangeMontageForThrowingStrata = false;
+}
+
 void ASS_MurdockPlayer::BeginPlay()
 {
 	Super::BeginPlay();
@@ -672,28 +679,32 @@ void ASS_MurdockPlayer::ReleaseThrowable()
 		CurStrataIndicator->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 		CurStrataIndicator->SetActorRotation(FRotator(0.0f, 0.0f, 0.0f).Quaternion());
 
-		UClass* StrataIndicatorClass = CurStrataIndicator.GetClass();
-		UFunction* ThrowFunction = CurStrataIndicator->FindFunction(FName(TEXT("Throw")));
+		// Throw Camera Direction Vector
+		FVector CameraLocation;
+		FRotator CameraRotation;
+		GetController()->GetPlayerViewPoint(CameraLocation, CameraRotation);
 
-		if (ThrowFunction)
-		{
-			// Throw Camera Direction Vector
-			FVector CameraLocation;
-			FRotator CameraRotation;
-			GetController()->GetPlayerViewPoint(CameraLocation, CameraRotation);
+		FVector ThrowPos = CameraLocation + CameraRotation.Vector() * 2000.0f;
+		FVector ThrowDirection = ThrowPos - CurStrataIndicator->GetActorLocation();
+		ThrowDirection.Normalize();
 
-			FVector ThrowPos = CameraLocation + CameraRotation.Vector() * 2000.0f;
-			FVector ThrowDirection = ThrowPos - CurStrataIndicator->GetActorLocation();
-			ThrowDirection.Normalize();
-
-			CurStrataIndicator->ProcessEvent(ThrowFunction, &ThrowDirection);
-		}
+		CurStrataIndicator->SetSimulateCollision();
+		CurStrataIndicator->Throw(ThrowDirection);
+		CurStrataIndicator = nullptr;
 	}
 }
 
 float ASS_MurdockPlayer::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	float Result = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+	if (CurStrataIndicator)
+	{
+		CurStrataIndicator->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+		CurStrataIndicator->SetActorRotation(FRotator(0.0f, 0.0f, 0.0f).Quaternion());
+		CurStrataIndicator->SetSimulateCollision();
+		CurStrataIndicator = nullptr;
+	}
 
 	return Result;
 }
@@ -728,7 +739,7 @@ void ASS_MurdockPlayer::ServerRpcFire_Implementation()
 	GetWorld()->GetTimerManager().SetTimer(
 		HitCheckTimerHandle,
 		FTimerDelegate::CreateLambda([&]() {
-			AttackHitCheck(TEXT("None"));
+			AttackHitCheck(TEXT("Fire"));
 			}),
 		0.07f,
 		false);
@@ -844,4 +855,18 @@ void ASS_MurdockPlayer::ServerRpcStrataThrow_Implementation()
 	AnimInstance->Montage_Play(StrataThrowMontage, AnimationSpeedRate);
 
 	RpcPlayAnimation(StrataThrowMontage);
+}
+
+void ASS_MurdockPlayer::NetMulticastRpcShowAnimationMontage_Implementation(UAnimMontage* MontageToPlay, const float AnimationSpeedRate)
+{
+	Super::NetMulticastRpcShowAnimationMontage_Implementation(MontageToPlay, AnimationSpeedRate);
+
+	if (IsLocallyControlled())
+	{
+		if (MontageToPlay == HitReactMontage)
+		{
+			ResetPlayerInputVariable();
+			OnCalling.Broadcast(bCalling);
+		}
+	}
 }

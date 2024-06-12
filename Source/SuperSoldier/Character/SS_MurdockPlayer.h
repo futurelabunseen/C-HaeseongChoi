@@ -27,6 +27,7 @@ public:
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 protected:
+	void ResetPlayerInputVariable();
 	virtual void BeginPlay() override;
 
 // CharacterControl Section
@@ -172,4 +173,6 @@ protected:
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerRpcStrataThrow();
+
+	virtual void NetMulticastRpcShowAnimationMontage_Implementation(UAnimMontage* MontageToPlay, const float AnimationSpeedRate) override;
 };

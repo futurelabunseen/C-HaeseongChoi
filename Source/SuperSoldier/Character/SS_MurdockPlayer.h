@@ -85,7 +85,7 @@ protected:
 
 // Attack Hit Section
 protected:
-	virtual void AttackHitCheck() override;
+	virtual void AttackHitCheck(FName AttackId = TEXT("None")) override;
 	virtual void PlaySoundEffect() override;
 
 // Throw Section

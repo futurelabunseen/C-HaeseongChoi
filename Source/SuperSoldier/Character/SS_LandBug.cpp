@@ -75,11 +75,14 @@ ASS_LandBug::ASS_LandBug(const FObjectInitializer& ObjectInitializer)
 	{
 		DeadSound = DeadSoundRef.Object;
 	}
+
+	// Attack
+	AttackMontageSectionNames.Add(TEXT("RoundKickAttack"));
 }
 
-void ASS_LandBug::AttackHitCheck()
+void ASS_LandBug::AttackHitCheck(FName AttackId)
 {
-	Super::AttackHitCheck();
+	Super::AttackHitCheck(AttackId);
 
 	if (HasAuthority())
 	{

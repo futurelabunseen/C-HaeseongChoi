@@ -27,4 +27,5 @@ public:
 	virtual void TurnInPlace(bool bTurnRight) = 0;
 
 	virtual float GetAttackRange() = 0;
+	virtual const TArray<FName>& GetAttackMontageSectionNames() = 0;
 };

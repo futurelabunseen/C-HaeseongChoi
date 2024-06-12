@@ -22,6 +22,6 @@ class SUPERSOLDIER_API ISSAnimationAttackInterface
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-	virtual void AttackHitCheck() = 0;
+	virtual void AttackHitCheck(FName AttackId = TEXT("None")) = 0;
 	virtual void PlaySoundEffect() = 0;
 };

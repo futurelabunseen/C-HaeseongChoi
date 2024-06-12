@@ -93,7 +93,7 @@ void ASSCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME(ASSCharacterBase, CharacterCollisionType);
 }
 
-void ASSCharacterBase::AttackHitCheck()
+void ASSCharacterBase::AttackHitCheck(FName AttackId)
 {
 }
 

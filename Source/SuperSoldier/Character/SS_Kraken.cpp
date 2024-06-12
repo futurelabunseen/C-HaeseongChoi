@@ -9,6 +9,7 @@
 #include "Physics/SSColision.h"
 #include "Engine/DamageEvents.h"
 #include "Character/SSCharacterPlayer.h"
+#include "SuperSoldier.h"
 
 ASS_Kraken::ASS_Kraken(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -76,17 +77,33 @@ ASS_Kraken::ASS_Kraken(const FObjectInitializer& ObjectInitializer)
 	// AI
 	AttackRange = 1550.0f * MeshScale;
 	AIControllerClass = ASSKrakenAIController::StaticClass();
+
+	// Attack
+	AttackMontageSectionNames.Add(TEXT("SmashAttack")); 
+	AttackMontageSectionNames.Add(TEXT("SweepAttack"));
+	AttackMontageSectionNames.Add(TEXT("ComboAttack"));
 }
 
-void ASS_Kraken::AttackHitCheck()
+void ASS_Kraken::AttackHitCheck(FName AttackId)
 {
-	Super::AttackHitCheck();
+	Super::AttackHitCheck(AttackId);
 
 	if (HasAuthority())
 	{
-		FVector CollisionBoxCenter = GetActorLocation() + GetActorForwardVector() * 1200.0f * MeshScale;
-		FVector CollisionBoxExtent = FVector(580.0f * MeshScale, 400.0f * MeshScale, 340.0f * MeshScale);
+		FVector CollisionBoxCenter = FVector::Zero();
+		FVector CollisionBoxExtent = FVector::Zero();
 
+		if (AttackId == TEXT("SmashAttack"))
+		{
+			CollisionBoxCenter = GetActorLocation() + GetActorForwardVector() * 1200.0f * MeshScale;
+			CollisionBoxExtent = FVector(620.0f * MeshScale, 400.0f * MeshScale, 380.0f * MeshScale);
+		}
+
+		if (AttackId == TEXT("SweepAttack"))
+		{
+			CollisionBoxCenter = GetActorLocation() + GetActorForwardVector() * 1200.0f * MeshScale;
+			CollisionBoxExtent = FVector(480.0f * MeshScale, 800.0f * MeshScale, 380.0f * MeshScale);
+		}
 
 		FCollisionQueryParams CollisionParams;
 		CollisionParams.AddIgnoredActor(this);
@@ -103,10 +120,10 @@ void ASS_Kraken::AttackHitCheck()
 			CollisionParams);
 
 
-//#if ENABLE_DRAW_DEBUG
-//		FColor DrawColor = bHitDetected ? FColor::Green : FColor::Red;
-//		DrawDebugBox(GetWorld(), CollisionBoxCenter, CollisionBoxExtent, GetActorRotation().Quaternion(), DrawColor, false, 2.0f);
-//#endif
+#if ENABLE_DRAW_DEBUG
+		FColor DrawColor = bHitDetected ? FColor::Green : FColor::Red;
+		DrawDebugBox(GetWorld(), CollisionBoxCenter, CollisionBoxExtent, GetActorRotation().Quaternion(), DrawColor, false, 2.0f);
+#endif
 	
 		for (const FOverlapResult& OverlapResult : OverlapResults)
 		{
@@ -146,7 +163,7 @@ void ASS_Kraken::Tick(float DeltaSeconds)
 				SetActorRotation(NewRotator);
 
 				double DeltaYaw = ToTargetRot.Yaw - GetActorRotation().Yaw;
-				if (FMath::Abs(DeltaYaw) < 20.0f)
+				if (FMath::Abs(DeltaYaw) < 8.0f)
 				{
 					bTurnInPlace = false;
 					SetActorTickEnabled(false);
@@ -164,7 +181,7 @@ void ASS_Kraken::TurnInPlace(bool bTurnRight)
 	bTurnInPlace = true;
 	SetActorTickEnabled(true);
 
-	const float AnimationSpeedRate = 2.0f;
+	const float AnimationSpeedRate = 1.0f;
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 
 	if (bTurnRight)

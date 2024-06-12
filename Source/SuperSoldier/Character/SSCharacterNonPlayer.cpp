@@ -75,19 +75,19 @@ float ASSCharacterNonPlayer::TakeDamage(float DamageAmount, FDamageEvent const& 
 	return Result;
 }
 
-void ASSCharacterNonPlayer::Attack()
+void ASSCharacterNonPlayer::Attack(FName AttackMontageSectionName)
 {
-	const float AnimationSpeedRate = 1.5f;
+	const float AnimationSpeedRate = 1.0f;
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 
-	NetMulticastRpcShowAnimationMontage(AttackMontage, AnimationSpeedRate);
+	NetMulticastRpcShowAnimationMontageWithSection(AttackMontage, AttackMontageSectionName, AnimationSpeedRate);
 
 	FOnMontageEnded EndDelegate;
 	EndDelegate.BindUObject(this, &ASSCharacterNonPlayer::NotifyActionEnd);
 	AnimInstance->Montage_SetEndDelegate(EndDelegate, AttackMontage);
 }
 
-void ASSCharacterNonPlayer::AttackHitCheck()
+void ASSCharacterNonPlayer::AttackHitCheck(FName AttackId)
 {
 }
 

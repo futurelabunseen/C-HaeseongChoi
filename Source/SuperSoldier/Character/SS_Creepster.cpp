@@ -75,11 +75,14 @@ ASS_Creepster::ASS_Creepster(const FObjectInitializer& ObjectInitializer)
 	{
 		AttackSound = AttackSoundRef.Object;
 	}
+
+	// Attack
+	AttackMontageSectionNames.Add(TEXT("JumpAttack"));
 }
 
-void ASS_Creepster::AttackHitCheck()
+void ASS_Creepster::AttackHitCheck(FName AttackId)
 {
-	Super::AttackHitCheck();
+	Super::AttackHitCheck(AttackId);
 
 	if (HasAuthority())
 	{

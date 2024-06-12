@@ -40,8 +40,13 @@ EBTNodeResult::Type UBTTask_Attack::ExecuteTask(UBehaviorTreeComponent& OwnerCom
             FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
         });
 
+	TArray<FName> AttackMontageSectionNames = CharacterNonPlayer->GetAttackMontageSectionNames();
+	int RandomMontageSectionNameIndex = FMath::RandRange(0, AttackMontageSectionNames.Num() - 1);
+
+	check(AttackMontageSectionNames.IsValidIndex(RandomMontageSectionNameIndex));
+
     CharacterNonPlayer->SetAIActionDelegate(OnActionFinished);
-    CharacterNonPlayer->Attack();
+    CharacterNonPlayer->Attack(AttackMontageSectionNames[RandomMontageSectionNameIndex]);
 
     return EBTNodeResult::InProgress;
 }

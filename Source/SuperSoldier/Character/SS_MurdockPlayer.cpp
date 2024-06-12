@@ -413,8 +413,10 @@ void ASS_MurdockPlayer::Fire(const FInputActionValue& Value)
 	}
 }
 
-void ASS_MurdockPlayer::AttackHitCheck()
+void ASS_MurdockPlayer::AttackHitCheck(FName AttackId)
 {
+	Super::AttackHitCheck(AttackId);
+
 	if (MainWeapon)
 	{
 		FHitResult HitResult = MainWeapon->AttackHitCheck();
@@ -723,7 +725,13 @@ bool ASS_MurdockPlayer::ServerRpcFire_Validate()
 void ASS_MurdockPlayer::ServerRpcFire_Implementation()
 {
 	FTimerHandle HitCheckTimerHandle;
-	GetWorld()->GetTimerManager().SetTimer(HitCheckTimerHandle, this, &ASS_MurdockPlayer::AttackHitCheck, 0.07f, false);
+	GetWorld()->GetTimerManager().SetTimer(
+		HitCheckTimerHandle,
+		FTimerDelegate::CreateLambda([&]() {
+			AttackHitCheck(TEXT("None"));
+			}),
+		0.07f,
+		false);
 
 	RpcPlayAnimation(FireMontage);
 }

@@ -8,14 +8,19 @@ void UAnimNotify_ProcessAttack::Notify(USkeletalMeshComponent* MeshComp, UAnimSe
 {
 	Super::Notify(MeshComp, Animation, EventReference);
 
-	if (MeshComp->GetOwner())
+	AActor* MeshCompOwner = MeshComp->GetOwner();
+	if (MeshCompOwner)
 	{
-		ISSAnimationAttackInterface* AttackPawn = Cast<ISSAnimationAttackInterface>(MeshComp->GetOwner());
+		ISSAnimationAttackInterface* AttackPawn = Cast<ISSAnimationAttackInterface>(MeshCompOwner);
 
 		if (AttackPawn)
 		{
-			AttackPawn->AttackHitCheck();
-			AttackPawn->PlaySoundEffect();
+			if (!MeshCompOwner->HasAuthority())
+			{
+				AttackPawn->PlaySoundEffect();
+			}
+
+			AttackPawn->AttackHitCheck(ProcessAttackId);
 		}
 	}
 }

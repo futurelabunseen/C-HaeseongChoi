@@ -31,12 +31,17 @@ protected:
 
 // Attack Section
 public:
-	void Attack();
-	virtual void AttackHitCheck() override;
+	virtual void Attack(FName AttackMontageSectionName);
+	virtual void AttackHitCheck(FName AttackId = TEXT("None")) override;
 
 	void NotifyActionEnd(UAnimMontage* TargetMontage, bool IsProperlyEnded);
 	virtual void SetAIActionDelegate(const FAICharacterActionFinished& InOnActionFinished) override;
+
+	FORCEINLINE virtual const TArray<FName>& GetAttackMontageSectionNames() { return AttackMontageSectionNames; }
 protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
+	TArray<FName> AttackMontageSectionNames;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
 	TObjectPtr<class UAnimMontage> AttackMontage;
 

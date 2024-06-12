@@ -75,11 +75,14 @@ ASS_Scorobey::ASS_Scorobey(const FObjectInitializer& ObjectInitializer)
 	{
 		DeadSound = DeadSoundRef.Object;
 	}
+
+	// Attack
+	AttackMontageSectionNames.Add(TEXT("BiteAttack"));
 }
 
-void ASS_Scorobey::AttackHitCheck()
+void ASS_Scorobey::AttackHitCheck(FName AttackId)
 {
-	Super::AttackHitCheck();
+	Super::AttackHitCheck(AttackId);
 
 	if (HasAuthority())
 	{

@@ -16,5 +16,5 @@ class SUPERSOLDIER_API ASS_LandBug : public ASSCharacterNonPlayer
 public:
 	ASS_LandBug(const FObjectInitializer& ObjectInitializer);
 protected:
-	virtual void AttackHitCheck() override;
+	virtual void AttackHitCheck(FName AttackId = TEXT("None")) override;
 };

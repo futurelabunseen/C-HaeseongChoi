@@ -78,6 +78,7 @@ void ASSCharacterPlayer::PlayMoanSound()
 
 	if (!HasAuthority())
 	{
+		SS_LOG(LogSSNetwork, Log, TEXT("Character HitMoan"))
 		UGameplayStatics::SpawnSoundAtLocation(
 			GetWorld(),
 			MoanSound,

@@ -62,6 +62,9 @@ void ASSCharacterNonPlayer::OnRep_ServerCharacterbDead()
 float ASSCharacterNonPlayer::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	float Result = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	AnimInstance->StopAllMontages(0.0f);
 
 	if (GetCharacterMovement())
 	{
@@ -75,10 +78,33 @@ float ASSCharacterNonPlayer::TakeDamage(float DamageAmount, FDamageEvent const& 
 	return Result;
 }
 
+void ASSCharacterNonPlayer::SetRotToTarget()
+{
+	AAIController* CustomController = Cast<AAIController>(GetController());
+	if (CustomController)
+	{
+		UObject* TargetPlayerPtr = CustomController->GetBlackboardComponent()->GetValueAsObject(TEXT("TargetPlayer"));
+		APawn* TargetPawn = Cast<APawn>(TargetPlayerPtr);
+
+		if (TargetPawn)
+		{
+			FVector ToTargetVec = TargetPawn->GetActorLocation() - GetActorLocation();
+			ToTargetVec.Z = 0.0f;
+
+			FRotator ToTargetRot = FRotationMatrix::MakeFromX(ToTargetVec).Rotator();
+			SetActorRotation(ToTargetRot);
+		}
+	}
+}
+
 void ASSCharacterNonPlayer::Attack(FName AttackMontageSectionName)
 {
+	SetRotToTarget();
+
 	const float AnimationSpeedRate = 1.0f;
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	AnimInstance->Montage_Play(AttackMontage, AnimationSpeedRate);
+	AnimInstance->Montage_JumpToSection(AttackMontageSectionName, AttackMontage);
 
 	NetMulticastRpcShowAnimationMontageWithSection(AttackMontage, AttackMontageSectionName, AnimationSpeedRate);
 

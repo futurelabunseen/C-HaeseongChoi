@@ -257,7 +257,10 @@ void ASS_RespawnTankPlayer::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>
 
 void ASS_RespawnTankPlayer::NetMulticastEndNiagaraEffect_Implementation()
 {
-	TrailNiagara->SetActive(false);
+	if (!HasAuthority())
+	{
+		TrailNiagara->SetActive(false);
+	}
 }
 
 void ASS_RespawnTankPlayer::ClientRpcStartCameraEffect_Implementation(ASSCharacterPlayer* RespawnCharacter)

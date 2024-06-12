@@ -34,9 +34,8 @@ bool UBTDecorator_AttackInRange::CalculateRawConditionValue(UBehaviorTreeCompone
     }
 
     float DistanceToTarget = ControllingPawn->GetDistanceTo(TargetPawn);
-    
     const float AttackRange = AICharacter->GetAttackRange();
-    bResult = (DistanceToTarget <= AttackRange);
+	bResult = (DistanceToTarget <= AttackRange);
     
 	return bResult;
 }

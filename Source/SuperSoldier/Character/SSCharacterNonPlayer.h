@@ -31,6 +31,7 @@ protected:
 
 // Attack Section
 public:
+	void SetRotToTarget();
 	virtual void Attack(FName AttackMontageSectionName);
 	virtual void AttackHitCheck(FName AttackId = TEXT("None")) override;
 

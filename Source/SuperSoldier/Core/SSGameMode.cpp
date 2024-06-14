@@ -95,8 +95,9 @@ void ASSGameMode::RespawnAllPlayer(FVector TargetLocation)
 	}
 }
 
-void ASSGameMode::RespawnPlayers(FVector TargetLocation)
+int32 ASSGameMode::RespawnPlayers(FVector TargetLocation)
 {
+	int32 RespawnedPlayerNum = 0;
 	for (APlayerController* PlayerController : TActorRange<APlayerController>(GetWorld()))
 	{
 		ASSCharacterPlayer* PlayerCharacter = CastChecked<ASSCharacterPlayer>(PlayerController->GetCharacter());
@@ -116,8 +117,12 @@ void ASSGameMode::RespawnPlayers(FVector TargetLocation)
 			PlayerController->Possess(RespawnTank);
 			PlayerCharacter->SetActorHiddenInGame(true);
 			PlayerCharacter->SetLifeSpan(2.0f);
+
+			RespawnedPlayerNum += 1;
 		}
 	}
+
+	return RespawnedPlayerNum;
 }
 
 bool ASSGameMode::IsAllPlayerDead()

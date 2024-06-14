@@ -2,6 +2,7 @@
 
 
 #include "Strata/SSStrataAirStrike.h"
+#include "Strata/SSStrataRocket.h"
 
 USSStrataAirStrike::USSStrataAirStrike()
 {
@@ -12,7 +13,7 @@ USSStrataAirStrike::USSStrataAirStrike()
 	CommandArray = TArray<EStrataCommand>{ EStrataCommand::UP, EStrataCommand::RIGHT, EStrataCommand::DOWN, EStrataCommand::RIGHT };
 }
 
-void USSStrataAirStrike::ActivateStratagem(UWorld* const CurWorld, const FVector& TargetLocation)
+void USSStrataAirStrike::ActivateStratagem(UWorld* const CurWorld, AActor* const StrataCauser, const FVector& TargetLocation)
 {
 	// 미사일 스폰
 	ThrowedDirection.Normalize();
@@ -44,7 +45,8 @@ void USSStrataAirStrike::ActivateStratagem(UWorld* const CurWorld, const FVector
 	{
 		for (int i = 0; i < SpawnStrikeNum; ++i)
 		{
-			AActor* AirStrikeActor = CurWorld->SpawnActor<AActor>(AirStrikeClass);
+			ASSStrataRocket* AirStrikeActor = CurWorld->SpawnActor<ASSStrataRocket>(AirStrikeClass);
+			AirStrikeActor->SetStrataCauser(StrataCauser);
 
 			FVector AirStrikeLocation = StrikePosition[i];
 			AirStrikeLocation.Z += 4000.0f + 850.0f * i;
@@ -54,7 +56,7 @@ void USSStrataAirStrike::ActivateStratagem(UWorld* const CurWorld, const FVector
 			if (StrikeFunction)
 			{
 				FVector StrikeLocation = StrikePosition[i] - PerpendicularVector * 800;
-				AirStrikeActor->ProcessEvent(StrikeFunction, &StrikeLocation);
+				AirStrikeActor->Strike(StrikeLocation);
 			}
 		}
 	}

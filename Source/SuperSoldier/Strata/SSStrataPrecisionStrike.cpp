@@ -2,6 +2,8 @@
 
 
 #include "Strata/SSStrataPrecisionStrike.h"
+#include "Strata/SSStrataRocket.h"
+
 USSStrataPrecisionStrike::USSStrataPrecisionStrike()
 {
 	DelayTime = 5.0f;
@@ -11,15 +13,16 @@ USSStrataPrecisionStrike::USSStrataPrecisionStrike()
 	CommandArray = TArray<EStrataCommand>{ EStrataCommand::RIGHT, EStrataCommand::RIGHT, EStrataCommand::UP };
 }
 
-void USSStrataPrecisionStrike::ActivateStratagem(UWorld* const CurWorld, const FVector& TargetLocation)
+void USSStrataPrecisionStrike::ActivateStratagem(UWorld* const CurWorld, AActor* const StrataCauser, const FVector& TargetLocation)
 {
 	// 미사일 스폰
 	FString PrecisionStrikePath = TEXT("/Game/SuperSoldier/Props/BP_PrecisionStrike.BP_PrecisionStrike_C");
 	UClass* PrecisionStrikeClass = StaticLoadClass(UObject::StaticClass(), nullptr, *PrecisionStrikePath);
 	if (PrecisionStrikeClass)
 	{
-		AActor* PrecisionStrikeActor = CurWorld->SpawnActor<AActor>(PrecisionStrikeClass);
-		
+		ASSStrataRocket* PrecisionStrikeActor = CurWorld->SpawnActor<ASSStrataRocket>(PrecisionStrikeClass);
+		PrecisionStrikeActor->SetStrataCauser(StrataCauser);
+
 		FVector PrecisionStrikeLocation = TargetLocation;
 		PrecisionStrikeLocation.Z += 4000.0f;
 		PrecisionStrikeActor->SetActorLocation(PrecisionStrikeLocation);
@@ -28,7 +31,7 @@ void USSStrataPrecisionStrike::ActivateStratagem(UWorld* const CurWorld, const F
 		if (StrikeFunction)
 		{
 			FVector StrikeLocation = TargetLocation;
-			PrecisionStrikeActor->ProcessEvent(StrikeFunction, &StrikeLocation);
+			PrecisionStrikeActor->Strike(StrikeLocation);
 		}
 	}
 }

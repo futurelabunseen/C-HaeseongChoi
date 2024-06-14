@@ -22,7 +22,7 @@ USStrataReinforcements::USStrataReinforcements()
 		EStrataCommand::UP };
 }
 
-void USStrataReinforcements::ActivateStratagem(UWorld* const CurWorld, const FVector& TargetLocation)
+void USStrataReinforcements::ActivateStratagem(UWorld* const CurWorld, AActor* const StrataCauser, const FVector& TargetLocation)
 {
 	// Revive All Dead Player
 	if (!IsValid(CurWorld)) return;
@@ -33,7 +33,8 @@ void USStrataReinforcements::ActivateStratagem(UWorld* const CurWorld, const FVe
 		if (PlayerCharacter->bDead)
 		{
 			ASSGameMode* SSGameMode = CastChecked<ASSGameMode>(CurWorld->GetAuthGameMode());
-			SSGameMode->RespawnPlayers(TargetLocation);
+
+			int32 RespawnedPlayerNum = SSGameMode->RespawnPlayers(TargetLocation);
 		}
 	}
 }

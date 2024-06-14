@@ -677,13 +677,24 @@ void ASS_MurdockPlayer::ProcessCommandInput(const FInputActionValue& Value)
 	}
 }
 
+void ASS_MurdockPlayer::DetachStrataIndicator()
+{
+	if (CurStrataIndicator)
+	{
+		CurStrataIndicator->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+		CurStrataIndicator->SetActorRotation(FRotator(0.0f, 0.0f, 0.0f).Quaternion());
+		CurStrataIndicator->SetSimulateCollision();
+		CurStrataIndicator->SetStrataCauser(GetController());
+		CurStrataIndicator = nullptr;
+	}
+}
+
 void ASS_MurdockPlayer::ReleaseThrowable()
 {
 	// Throw StrataIndicator
 	if (CurStrataIndicator)
 	{
-		CurStrataIndicator->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-		CurStrataIndicator->SetActorRotation(FRotator(0.0f, 0.0f, 0.0f).Quaternion());
+		DetachStrataIndicator();
 
 		// Throw Camera Direction Vector
 		FVector CameraLocation;
@@ -694,36 +705,21 @@ void ASS_MurdockPlayer::ReleaseThrowable()
 		FVector ThrowDirection = ThrowPos - CurStrataIndicator->GetActorLocation();
 		ThrowDirection.Normalize();
 
-		CurStrataIndicator->SetSimulateCollision();
 		CurStrataIndicator->Throw(ThrowDirection);
-		CurStrataIndicator = nullptr;
 	}
 }
 
 void ASS_MurdockPlayer::SetDead()
 {
 	Super::SetDead();
-
-	if (CurStrataIndicator)
-	{
-		CurStrataIndicator->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-		CurStrataIndicator->SetActorRotation(FRotator(0.0f, 0.0f, 0.0f).Quaternion());
-		CurStrataIndicator->SetSimulateCollision();
-		CurStrataIndicator = nullptr;
-	}
+	DetachStrataIndicator();
 }
 
 float ASS_MurdockPlayer::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	float Result = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
-	if (CurStrataIndicator)
-	{
-		CurStrataIndicator->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-		CurStrataIndicator->SetActorRotation(FRotator(0.0f, 0.0f, 0.0f).Quaternion());
-		CurStrataIndicator->SetSimulateCollision();
-		CurStrataIndicator = nullptr;
-	}
+	DetachStrataIndicator();
 
 	return Result;
 }

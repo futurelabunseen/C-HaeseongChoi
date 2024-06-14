@@ -13,6 +13,6 @@ const TArray<EStrataCommand>& USSStratagem::GetCommandSequence() const
 	return CommandArray;
 }
 
-void USSStratagem::ActivateStratagem(UWorld* const CurWorld, const FVector& TargetLocation)
+void USSStratagem::ActivateStratagem(UWorld* const CurWorld, AActor* const StrataCauser, const FVector& TargetLocation)
 {
 }

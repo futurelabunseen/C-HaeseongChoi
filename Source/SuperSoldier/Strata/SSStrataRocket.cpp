@@ -81,7 +81,7 @@ void ASSStrataRocket::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActo
 
             FDamageEvent DamageEvent;
             const float AttackDamage = 2000.0f;
-            OverlappingCharater->TakeDamage(AttackDamage, DamageEvent, nullptr, nullptr);
+            OverlappingCharater->TakeDamage(AttackDamage, DamageEvent, nullptr, StrataCauser);
         }
 
         SetActorHiddenInGame(true);

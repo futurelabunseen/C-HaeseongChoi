@@ -34,7 +34,7 @@ public:
 	void RespawnAllPlayer(FVector TargetLocation);
 
 	UFUNCTION()
-	void RespawnPlayers(FVector TargetLocation);
+	int32 RespawnPlayers(FVector TargetLocation);
 
 protected:
 	bool IsAllPlayerDead();

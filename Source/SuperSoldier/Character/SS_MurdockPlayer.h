@@ -134,8 +134,9 @@ protected:
 	void TranslateInput(const FInputActionValue& Value);
 	bool MatchingInput();
 	void ProcessCommandInput(const FInputActionValue& Value);
+	void DetachStrataIndicator();
 	virtual void ReleaseThrowable() override;
-
+	
 // Take Damage Section
 public:
 	virtual void SetDead();

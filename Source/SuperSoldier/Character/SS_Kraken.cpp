@@ -120,10 +120,10 @@ void ASS_Kraken::AttackHitCheck(FName AttackId)
 			CollisionParams);
 
 
-#if ENABLE_DRAW_DEBUG
-		FColor DrawColor = bHitDetected ? FColor::Green : FColor::Red;
-		DrawDebugBox(GetWorld(), CollisionBoxCenter, CollisionBoxExtent, GetActorRotation().Quaternion(), DrawColor, false, 2.0f);
-#endif
+//#if ENABLE_DRAW_DEBUG
+//		FColor DrawColor = bHitDetected ? FColor::Green : FColor::Red;
+//		DrawDebugBox(GetWorld(), CollisionBoxCenter, CollisionBoxExtent, GetActorRotation().Quaternion(), DrawColor, false, 2.0f);
+//#endif
 	
 		for (const FOverlapResult& OverlapResult : OverlapResults)
 		{

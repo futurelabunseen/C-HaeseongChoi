@@ -23,6 +23,5 @@ void ASSGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 
 void ASSGameState::OnRep_TotalKilledMonsterCount()
 {
-	SS_LOG(LogSSNetwork, Log, TEXT("TotalKilledMonsterCount : %d"), TotalKilledMonsterCount);
 	OnTotalKilledMonsterCountChangedDelegate.Broadcast(TotalKilledMonsterCount);
 }

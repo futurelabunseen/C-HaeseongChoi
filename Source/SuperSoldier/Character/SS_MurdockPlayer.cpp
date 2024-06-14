@@ -702,6 +702,8 @@ void ASS_MurdockPlayer::ReleaseThrowable()
 
 void ASS_MurdockPlayer::SetDead()
 {
+	Super::SetDead();
+
 	if (CurStrataIndicator)
 	{
 		CurStrataIndicator->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);

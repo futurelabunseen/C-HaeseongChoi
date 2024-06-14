@@ -42,16 +42,12 @@ void ASSPlayerController::BeginPlay()
 
 void ASSPlayerController::PostInitializeComponents()
 {
-	SS_LOG(LogSSNetwork, Log, TEXT("%s"), TEXT("Begin"));
 	Super::PostInitializeComponents();
-	SS_LOG(LogSSNetwork, Log, TEXT("%s"), TEXT("End"));
 }
 
 void ASSPlayerController::PostNetInit()
 {
-	SS_LOG(LogSSNetwork, Log, TEXT("%s"), TEXT("Begin"));
 	Super::PostNetInit();
-	SS_LOG(LogSSNetwork, Log, TEXT("%s"), TEXT("End"));
 }
 
 void ASSPlayerController::AcknowledgePossession(APawn* P)
@@ -76,6 +72,5 @@ void ASSPlayerController::AcknowledgePossession(APawn* P)
 
 void ASSPlayerController::ClientRpcBlendViewTargetToNewPawn_Implementation(APawn* NewPawn)
 {
-	SS_LOG(LogSSNetwork, Log, TEXT("BlendViewTargetToNewPawn"));
 	SetViewTargetWithBlend(NewPawn, 0.8f);
 }

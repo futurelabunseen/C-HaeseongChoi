@@ -31,6 +31,8 @@ ASSGameMode::ASSGameMode()
 
 	// Set GameState
 	GameStateClass = ASSGameState::StaticClass();
+
+	ClearTotalKilledNonPlayerCharacterNum = 10;
 }
 
 void ASSGameMode::StartPlay()
@@ -126,4 +128,18 @@ bool ASSGameMode::IsAllPlayerDead()
 		}
 	}
 	return bAllPlayerDead;
+}
+
+void ASSGameMode::OnNonPlayerCharacterDead()
+{
+	ASSGameState* SSGameState = GetGameState<ASSGameState>();
+	int32 NewTotalKilledMonsterCount = SSGameState->GetTotalKilledMonsterCount() + 1;
+	NewTotalKilledMonsterCount = FMath::Clamp(NewTotalKilledMonsterCount, 0, ClearTotalKilledNonPlayerCharacterNum);
+	SSGameState->SetTotalKilledMonsterCount(NewTotalKilledMonsterCount);
+
+	if (NewTotalKilledMonsterCount == ClearTotalKilledNonPlayerCharacterNum)
+	{
+		SSGameState->NetMulticast_GameClear();
+		ClearTotalKilledNonPlayerCharacterNum = 0;
+	}
 }

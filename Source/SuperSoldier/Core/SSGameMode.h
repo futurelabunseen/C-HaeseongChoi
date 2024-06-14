@@ -37,4 +37,10 @@ public:
 
 protected:
 	bool IsAllPlayerDead();
+
+// Game Clear Section
+public:
+	void OnNonPlayerCharacterDead();
+protected:
+	int32 ClearTotalKilledNonPlayerCharacterNum;
 };

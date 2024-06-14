@@ -24,7 +24,7 @@ protected:
 // InGame KilledMonsterCount Section
 public:
 	FORCEINLINE const int32& GetTotalKilledMonsterCount() { return TotalKilledMonsterCount; }
-	FORCEINLINE void AddKilledMonsterCount() { TotalKilledMonsterCount += 1; }
+	FORCEINLINE void SetTotalKilledMonsterCount(int32 NewTotalKilledMonsterCount) { TotalKilledMonsterCount = NewTotalKilledMonsterCount; }
 
 	FOnTotalKilledMonsterCountChangedDelegate OnTotalKilledMonsterCountChangedDelegate;
 protected:
@@ -33,4 +33,8 @@ protected:
 
 	UPROPERTY(ReplicatedUsing = OnRep_TotalKilledMonsterCount)
 	int32 TotalKilledMonsterCount = 0;
+
+public:
+	UFUNCTION(NetMulticast, Reliable)
+	void NetMulticast_GameClear();
 };

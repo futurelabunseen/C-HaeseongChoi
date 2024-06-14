@@ -80,6 +80,8 @@ ASS_RespawnTankPlayer::ASS_RespawnTankPlayer(const FObjectInitializer& ObjectIni
 	TrailNiagara->SetRelativeLocation(FVector(0.0f, 0.0f, -90.0f));
 	TrailNiagara->SetRelativeRotation(FRotator(-90.0f, 0.0f, 0.0f));
 	TrailNiagara->bAutoActivate = false;
+
+	LerpCharacterAlpha = 0.0f;
 }
 
 void ASS_RespawnTankPlayer::Landed(const FHitResult& Hit)
@@ -216,6 +218,8 @@ void ASS_RespawnTankPlayer::SetRespawnMurdockLocation()
 {
 	check(MurdockCharacter);
 
+	LerpCharacterAlpha = FMath::Clamp(LerpCharacterAlpha + 0.048f, 0.0f, 1.0f);
+
 	FName RespawnStartLocationSocketName = TEXT("Socket_MurdockCharacter");
 	FName RespawnEndLocationSocketName = TEXT("Socket_RespawnComplete");
 
@@ -224,12 +228,10 @@ void ASS_RespawnTankPlayer::SetRespawnMurdockLocation()
 	FVector LocationDist = RespawnEndLocation - RespawnStartLocation;
 	RespawnEndLocation += LocationDist * 0.5f;
 
-	FVector MurdockCurLocation = MurdockCharacter->GetActorLocation();
-	FVector FinalLocation = FMath::Lerp(MurdockCurLocation, RespawnEndLocation, 0.075f);
-	MurdockCharacter->SetActorLocation(FinalLocation);
+	FVector FinalLocation = FMath::Lerp(RespawnStartLocation, RespawnEndLocation, LerpCharacterAlpha);
+	MurdockCharacter->SetActorLocation(RespawnEndLocation);
 
-	FVector FinalLocDist = RespawnEndLocation - MurdockCharacter->GetActorLocation();
-	if (FinalLocDist.IsNearlyZero(3.0f))
+	if (LerpCharacterAlpha >= 1.0f)
 	{
 		Controller->Possess(MurdockCharacter);
 		MurdockCharacter->Respawn(MurdockCharacter->GetActorLocation());
@@ -270,5 +272,5 @@ void ASS_RespawnTankPlayer::ClientRpcStartCameraEffect_Implementation(ASSCharact
 	APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
 	MurdockCharacter = RespawnCharacter;
 
-	PlayerController->SetViewTargetWithBlend(RespawnCharacter, 0.8f);
+	PlayerController->SetViewTargetWithBlend(RespawnCharacter, 0.6f);
 }

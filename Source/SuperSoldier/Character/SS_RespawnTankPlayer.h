@@ -30,6 +30,8 @@ public:
 	virtual void Tick(float DeltaSeconds) override;
 
 protected:
+	float LerpCharacterAlpha;
+
 	UFUNCTION()
 	void RespawnMurdockCharacter();
 

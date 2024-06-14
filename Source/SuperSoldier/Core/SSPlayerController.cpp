@@ -32,7 +32,7 @@ void ASSPlayerController::BeginPlay()
 
 		UserPlayWidget = CreateWidget<USSUserPlayWidget>(this, UserPlayWidgetClass);
 		UserPlayWidget->AddToViewport();
-		UserPlayWidget->SetVisibility(ESlateVisibility::Hidden);
+		UserPlayWidget->SetVisibility(ESlateVisibility::Visible);
 
 		ASSGameState* SSGameState = CastChecked<ASSGameState>(GetWorld()->GetGameState());
 		SSGameState->OnTotalKilledMonsterCountChangedDelegate.AddUObject(UserPlayWidget, &USSUserPlayWidget::UpdateTotalKillCount);

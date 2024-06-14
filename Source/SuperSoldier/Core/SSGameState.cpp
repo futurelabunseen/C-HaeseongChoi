@@ -4,6 +4,7 @@
 #include "Core/SSGameState.h"
 #include "SuperSoldier.h"
 #include "Net/UnrealNetwork.h"
+#include "Kismet/GameplayStatics.h"
 
 void ASSGameState::HandleBeginPlay()
 {
@@ -24,4 +25,12 @@ void ASSGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 void ASSGameState::OnRep_TotalKilledMonsterCount()
 {
 	OnTotalKilledMonsterCountChangedDelegate.Broadcast(TotalKilledMonsterCount);
+}
+
+void ASSGameState::NetMulticast_GameClear_Implementation()
+{
+	if (HasAuthority()) return;
+
+	SS_LOG(LogSSNetwork, Log, TEXT("Game Clear"));
+	UGameplayStatics::OpenLevel(GetWorld(), FName(TEXT("/Game/SuperSoldier/Maps/SuperSoldierEntry.SuperSoldierEntry")), true);
 }

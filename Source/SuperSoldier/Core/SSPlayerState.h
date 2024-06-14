@@ -22,6 +22,12 @@ public:
 	FORCEINLINE const int32& GetDeathCount() { return DeathCount; }
 	FORCEINLINE const int32& GetRevivedTeammateCount() { return RevivedTeammateCount; }
 	FORCEINLINE const int32& GetUsedStratagemCount() { return UsedStratagemCount; }
+
+	FORCEINLINE void AddKilledMonsterCount(int32 Count) { KilledMonsterCount = KilledMonsterCount + Count; }
+	FORCEINLINE void AddKilledTeammateCount(int32 Count) { KilledTeammateCount = KilledTeammateCount + Count; }
+	FORCEINLINE void AddDeathCount(int32 Count) { DeathCount = DeathCount + Count; }
+	FORCEINLINE void AddRevivedTeammateCount(int32 Count) { RevivedTeammateCount = RevivedTeammateCount + Count; }
+	FORCEINLINE void AddUsedStratagemCount(int32 Count) { UsedStratagemCount = UsedStratagemCount + Count; }
 protected:
 	UPROPERTY(Replicated)
 	int32 KilledMonsterCount;

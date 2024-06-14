@@ -22,8 +22,9 @@ public:
 	virtual void PreLogin(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage) override;
 	virtual APlayerController* Login(UPlayer* NewPlayer, ENetRole InRemoteRole, const FString& Portal, const FString& Options, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage) override;
 	virtual void PostLogin(APlayerController* NewPlayer) override;
-
+	virtual void Logout(AController* Exiting) override;
 protected:
+	bool bWaitingForResetServer = false;
 	const uint32 MaxPlayerNum = 3;
 	uint32 CurPlayerNum = 0;
 
@@ -41,6 +42,10 @@ protected:
 // Game Clear Section
 public:
 	void OnNonPlayerCharacterDead();
+	void SetNonPlayerCharacterSpawn(bool bNewSpawn);
+	void SetNonPlayerCharacterStopAI();
+	void StopServer();
+	void ResetServer();
 protected:
 	int32 ClearTotalKilledNonPlayerCharacterNum;
 };

@@ -18,8 +18,10 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
+public:
+	virtual void StopAI();
 protected:
-	virtual void SetDead();
+	virtual void SetDead() override;
 	virtual void OnRep_ServerCharacterbDead() override;
 public:
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;

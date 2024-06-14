@@ -4,11 +4,13 @@
 #include "Core/SSPlayerController.h"
 #include "SuperSoldier.h"
 #include "UI/SSUserPlayWidget.h"
+#include "UI/SSUserResultWidget.h"
 #include "Character/SSCharacterPlayer.h"
 #include "InputMappingContext.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Core/SSGameState.h"
+#include "Core/SSPlayerState.h"
 
 ASSPlayerController::ASSPlayerController()
 {
@@ -18,6 +20,13 @@ ASSPlayerController::ASSPlayerController()
 	if (UserPlayWidgetRef.Class)
 	{
 		UserPlayWidgetClass = UserPlayWidgetRef.Class;
+	}
+
+	static ConstructorHelpers::FClassFinder<USSUserResultWidget> UserResultWidgetRef(
+		TEXT("/Game/SuperSoldier/UI/WBP_UserStatistics.WBP_UserStatistics_C"));
+	if (UserResultWidgetRef.Class)
+	{
+		UserResultWidgetClass = UserResultWidgetRef.Class;
 	}
 }
 
@@ -68,6 +77,29 @@ void ASSPlayerController::AcknowledgePossession(APawn* P)
 			Subsystem->AddMappingContext(SSCharacterPlayer->GetIMC(), 0);
 		}
 	}
+}
+
+void ASSPlayerController::ShowGameResult(bool bIsVictory)
+{
+	ASSPlayerState* SSPlayerState = GetPlayerState<ASSPlayerState>();
+	UserResultWidget = CreateWidget<USSUserResultWidget>(this, UserResultWidgetClass);
+	
+	UserResultWidget->AddToViewport();
+	UserResultWidget->SetVisibility(ESlateVisibility::Visible);
+
+	UserResultWidget->UpdateKillCount(SSPlayerState->GetKilledMonsterCount());
+	UserResultWidget->UpdateTeamKillCount(SSPlayerState->GetKilledTeammateCount());
+	UserResultWidget->UpdateDeathCount(SSPlayerState->GetDeathCount());
+	UserResultWidget->UpdateReviveCount(SSPlayerState->GetRevivedTeammateCount());
+	UserResultWidget->UpdateUsedStratagemNum(SSPlayerState->GetUsedStratagemCount());
+
+	if (UEnhancedInputLocalPlayerSubsystem* Subsystem =
+		ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
+	{
+		Subsystem->ClearAllMappings();
+	}
+
+	bShowMouseCursor = true;
 }
 
 void ASSPlayerController::ClientRpcBlendViewTargetToNewPawn_Implementation(APawn* NewPawn)

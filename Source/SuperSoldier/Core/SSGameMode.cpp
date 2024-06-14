@@ -4,35 +4,31 @@
 #include "Core/SSGameMode.h"
 #include "Core/SSPlayerController.h"
 #include "Core/SSGameState.h"
+#include "Core/SSPlayerState.h"
 #include "GameFramework/HUD.h"
 #include "EngineUtils.h"
 #include "Character/SS_RespawnTankPlayer.h"
+#include "Character/SSCharacterNonPlayer.h"
 #include "Strata/SStrataReinforcements.h"
 #include "SuperSoldier.h"
+#include "Kismet/GameplayStatics.h"
 
 
 ASSGameMode::ASSGameMode()
 {
 	// Set Character
-	static ConstructorHelpers::FClassFinder<APawn> DefaultPawnClassRef(
-		TEXT("/Script/SuperSoldier.SS_RespawnTankPlayer"));
-	if (DefaultPawnClassRef.Class)
-	{
-		DefaultPawnClass = DefaultPawnClassRef.Class;
-	}
+	DefaultPawnClass = ASS_RespawnTankPlayer::StaticClass();
 
 	// Set PlayerController
-	static ConstructorHelpers::FClassFinder<APlayerController> PlayerControllerClassRef(
-		TEXT("/Script/SuperSoldier.SSPlayerController"));
-	if (PlayerControllerClassRef.Class)
-	{
-		PlayerControllerClass = PlayerControllerClassRef.Class;
-	}
+	PlayerControllerClass = ASSPlayerController::StaticClass();
 
 	// Set GameState
 	GameStateClass = ASSGameState::StaticClass();
 
-	ClearTotalKilledNonPlayerCharacterNum = 10;
+	// Set PlayerState
+	PlayerStateClass = ASSPlayerState::StaticClass();
+
+	ClearTotalKilledNonPlayerCharacterNum = 1;
 }
 
 void ASSGameMode::StartPlay()
@@ -44,9 +40,10 @@ void ASSGameMode::StartPlay()
 void ASSGameMode::PreLogin(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage)
 {
 	// 클라이언트의 접속 요청을 처리한다.
-	if (CurPlayerNum < MaxPlayerNum)
+	if (CurPlayerNum < MaxPlayerNum && !bWaitingForResetServer)
 	{
 		++CurPlayerNum;
+
 		Super::PreLogin(Options, Address, UniqueId, ErrorMessage);
 	}
 	else
@@ -68,6 +65,18 @@ void ASSGameMode::PostLogin(APlayerController* NewPlayer)
 {
 	// 플레이어 입장을 위해 플레이어에 필요한 기본 설정을 모두 마무리 한다.
 	Super::PostLogin(NewPlayer);
+}
+
+void ASSGameMode::Logout(AController* Exiting)
+{
+	Super::Logout(Exiting);
+
+	--CurPlayerNum;
+
+	if (bWaitingForResetServer && CurPlayerNum == 0)
+	{
+		ResetServer();
+	}
 }
 
 void ASSGameMode::RespawnAllPlayer(FVector TargetLocation)
@@ -140,6 +149,71 @@ void ASSGameMode::OnNonPlayerCharacterDead()
 	if (NewTotalKilledMonsterCount == ClearTotalKilledNonPlayerCharacterNum)
 	{
 		SSGameState->NetMulticast_GameClear();
-		ClearTotalKilledNonPlayerCharacterNum = 0;
+		bWaitingForResetServer = true;
+		StopServer();
 	}
+}
+
+void ASSGameMode::SetNonPlayerCharacterSpawn(bool bNewSpawn)
+{
+	TArray<AActor*> Actors;
+
+	UClass* MonsterSpawnerClass = StaticLoadClass(UObject::StaticClass(), nullptr, TEXT("/Game/SuperSoldier/Characters/Monsters/BP_MonsterSpawner.BP_MonsterSpawner_C"));
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), MonsterSpawnerClass, Actors);
+	bool bEnableSpawn = bNewSpawn;
+
+	if (!Actors.IsEmpty())
+	{
+		for (AActor* Actor : Actors)
+		{
+			UFunction* SetEnableSpawnFunc = MonsterSpawnerClass->FindFunctionByName(TEXT("SetEnableSpawn"));
+			Actor->ProcessEvent(SetEnableSpawnFunc, &bEnableSpawn);
+		}
+	}
+}
+
+void ASSGameMode::SetNonPlayerCharacterStopAI()
+{
+	TArray<AActor*> Actors;
+
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ASSCharacterNonPlayer::StaticClass(), Actors);
+
+	if (!Actors.IsEmpty())
+	{
+		for (AActor* Actor : Actors)
+		{
+			if (ASSCharacterNonPlayer* NonPlayerCharacter = Cast<ASSCharacterNonPlayer>(Actor))
+			{
+				NonPlayerCharacter->StopAI();
+			}
+		}
+	}
+}
+
+void ASSGameMode::StopServer()
+{
+	SetNonPlayerCharacterStopAI();
+	SetNonPlayerCharacterSpawn(false);	
+}
+
+void ASSGameMode::ResetServer()
+{
+	ClearTotalKilledNonPlayerCharacterNum = 0;
+
+	TArray<AActor*> Actors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ASSCharacterNonPlayer::StaticClass(), Actors);
+
+	if (!Actors.IsEmpty())
+	{
+		for (AActor* Actor : Actors)
+		{
+			if (ASSCharacterNonPlayer* NonPlayerCharacter = Cast<ASSCharacterNonPlayer>(Actor))
+			{
+				NonPlayerCharacter->Destroy(true);
+			}
+		}
+	}
+
+	SetNonPlayerCharacterSpawn(true);
+	bWaitingForResetServer = false;
 }

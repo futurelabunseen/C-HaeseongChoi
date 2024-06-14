@@ -23,7 +23,7 @@ protected:
 
 	virtual void AcknowledgePossession(class APawn* P) override;
 
-// UI Widget Section
+// UI Play Widget Section
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = UI, Meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<class USSUserPlayWidget> UserPlayWidgetClass;
@@ -35,4 +35,15 @@ protected:
 public:
 	UFUNCTION(Client, Unreliable)
 	void ClientRpcBlendViewTargetToNewPawn(APawn* NewPawn);
+
+// Show GameResult
+public:
+	void ShowGameResult(bool bIsVictory);
+
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = UI, Meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<class USSUserResultWidget> UserResultWidgetClass;
+
+	UPROPERTY()
+	TObjectPtr<class USSUserResultWidget> UserResultWidget;
 };

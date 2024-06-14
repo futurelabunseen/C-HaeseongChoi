@@ -5,6 +5,7 @@
 #include "SuperSoldier.h"
 #include "Net/UnrealNetwork.h"
 #include "Kismet/GameplayStatics.h"
+#include "Core/SSPlayerController.h"
 
 void ASSGameState::HandleBeginPlay()
 {
@@ -31,6 +32,6 @@ void ASSGameState::NetMulticast_GameClear_Implementation()
 {
 	if (HasAuthority()) return;
 
-	SS_LOG(LogSSNetwork, Log, TEXT("Game Clear"));
-	UGameplayStatics::OpenLevel(GetWorld(), FName(TEXT("/Game/SuperSoldier/Maps/SuperSoldierEntry.SuperSoldierEntry")), true);
+	ASSPlayerController* SSLocalPlayerController = Cast<ASSPlayerController>(GetWorld()->GetFirstPlayerController());
+	SSLocalPlayerController->ShowGameResult(true);
 }

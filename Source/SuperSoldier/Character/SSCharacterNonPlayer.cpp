@@ -35,17 +35,21 @@ void ASSCharacterNonPlayer::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 }
 
-void ASSCharacterNonPlayer::SetDead()
+void ASSCharacterNonPlayer::StopAI()
 {
-	Super::SetDead();
-	
-	SetLifeSpan(15.0f);
-
 	ASSAIController* AIController = Cast<ASSAIController>(GetController());
 	if (AIController)
 	{
 		AIController->StopAI();
 	}
+}
+
+void ASSCharacterNonPlayer::SetDead()
+{
+	Super::SetDead();
+	
+	SetLifeSpan(15.0f);
+	StopAI();
 
 	ASSGameMode* SSGameMode = CastChecked<ASSGameMode>(GetWorld()->GetAuthGameMode());
 	SSGameMode->OnNonPlayerCharacterDead();

@@ -10,6 +10,7 @@
 #include "Engine/DamageEvents.h"
 #include "Character/SSCharacterPlayer.h"
 #include "SuperSoldier.h"
+#include "Character/CharacterStat/SSCharacterStatComponent.h"
 
 ASS_Kraken::ASS_Kraken(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -67,12 +68,15 @@ ASS_Kraken::ASS_Kraken(const FObjectInitializer& ObjectInitializer)
 	GetCapsuleComponent()->InitCapsuleSize(200.f, 200.0f);
 
 	// Movement
-	DefaultWalkSpeed = 400.0f;
+	DefaultWalkSpeed = 500.0f;
 	GetCharacterMovement()->MaxWalkSpeed = DefaultWalkSpeed;
 
 	// Mesh & AnimInstance
 	GetMesh()->SetRelativeLocationAndRotation(FVector(-10.0f, 0.0f, -199.0f), FRotator(0.0f, -90.0f, 0.0f));
 	GetMesh()->SetRelativeScale3D(FVector(MeshScale, MeshScale, MeshScale));
+
+	// Stat
+	Stat->SetMaxHP(300.0f);
 
 	// AI
 	AttackRange = 1550.0f * MeshScale;
@@ -133,7 +137,7 @@ void ASS_Kraken::AttackHitCheck(FName AttackId)
 			if (CharacterPlayer)
 			{
 				FDamageEvent DamageEvent;
-				const float AttackDamage = 30.0f;
+				const float AttackDamage = 60.0f;
 				CharacterPlayer->TakeDamage(AttackDamage, DamageEvent, GetController(), this);
 			}
 		}

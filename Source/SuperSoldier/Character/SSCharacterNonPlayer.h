@@ -28,6 +28,7 @@ public:
 protected:
 	FAICharacterActionFinished OnActionFinished;
 
+	float DefaultMaxHP;
 	float DefaultWalkSpeed;
 	const float SpeedReductionFactor = 0.1f;
 

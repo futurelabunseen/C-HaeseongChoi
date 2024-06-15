@@ -8,6 +8,7 @@
 #include "Physics/SSColision.h"
 #include "Engine/DamageEvents.h"
 #include "Character/SSCharacterPlayer.h"
+#include "Character/CharacterStat/SSCharacterStatComponent.h"
 
 ASS_Scorobey::ASS_Scorobey(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -46,12 +47,15 @@ ASS_Scorobey::ASS_Scorobey(const FObjectInitializer& ObjectInitializer)
 	GetCapsuleComponent()->InitCapsuleSize(75.f, 75.0f);
 
 	// Movement
-	DefaultWalkSpeed = 250.0f;
+	DefaultWalkSpeed = 450.0f;
 	GetCharacterMovement()->MaxWalkSpeed = DefaultWalkSpeed;
 
 	// Mesh & AnimInstance
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -75.0f), FRotator(0.0f, -90.0f, 0.0f));
 	GetMesh()->SetRelativeScale3D(FVector(1.0f, 1.0f, 1.0f));
+
+	// Stat
+	Stat->SetMaxHP(90.0f);
 
 	// AI
 	AttackRange = 140.0f;
@@ -116,7 +120,7 @@ void ASS_Scorobey::AttackHitCheck(FName AttackId)
 			if (CharacterPlayer)
 			{
 				FDamageEvent DamageEvent;
-				const float AttackDamage = 30.0f;
+				const float AttackDamage = 10.0f;
 				CharacterPlayer->TakeDamage(AttackDamage, DamageEvent, GetController(), this);
 			}
 		}

@@ -28,7 +28,7 @@ ASSGameMode::ASSGameMode()
 	// Set PlayerState
 	PlayerStateClass = ASSPlayerState::StaticClass();
 
-	ClearTotalKilledNonPlayerCharacterNum = 1;
+	ClearTotalKilledNonPlayerCharacterNum = 500;
 }
 
 void ASSGameMode::StartPlay()

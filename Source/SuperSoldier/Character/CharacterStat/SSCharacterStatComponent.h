@@ -22,6 +22,7 @@ public:
 	FOnHPZeroDelegate OnHpZero;
 	FOnHPChangedDelegate OnHpChanged;
 
+	void SetMaxHP(float NewMaxHP) { MaxHP = NewMaxHP; }
 	FORCEINLINE float GetMaxHP() { return MaxHP; }
 	FORCEINLINE float GetCurrentHP() { return CurrentHP; }
 

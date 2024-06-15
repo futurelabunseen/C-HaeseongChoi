@@ -112,7 +112,7 @@ void ASSStrataIndicator::SetStratagem(USSStratagem* NewStratagem)
 
 void ASSStrataIndicator::ActivateStrataAndDestroy()
 {
-	CurStratagem->ActivateStratagem(GetWorld(), GetActorLocation());
+	CurStratagem->ActivateStratagem(GetWorld(), StrataCauser,GetActorLocation());
 	Destroy();
 }
 

@@ -3,6 +3,7 @@
 
 #include "Character/SS_MurdockPlayer.h"
 #include "Core/SSGameInstance.h"
+#include "Core/SSStatisticsManager.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "SSCharacterMovementComponent.h"
@@ -685,7 +686,6 @@ void ASS_MurdockPlayer::DetachStrataIndicator()
 		CurStrataIndicator->SetActorRotation(FRotator(0.0f, 0.0f, 0.0f).Quaternion());
 		CurStrataIndicator->SetSimulateCollision();
 		CurStrataIndicator->SetStrataCauser(GetController());
-		CurStrataIndicator = nullptr;
 	}
 }
 
@@ -706,13 +706,22 @@ void ASS_MurdockPlayer::ReleaseThrowable()
 		ThrowDirection.Normalize();
 
 		CurStrataIndicator->Throw(ThrowDirection);
+
+		CurStrataIndicator = nullptr;
 	}
 }
 
 void ASS_MurdockPlayer::SetDead()
 {
 	Super::SetDead();
+
 	DetachStrataIndicator();
+	CurStrataIndicator = nullptr;
+
+	USSGameInstance* SSGameInstance = CastChecked<USSGameInstance>(GetGameInstance());
+	USSStatisticsManager* SSStatisticsManager = SSGameInstance->GetStatisticsManager();
+	SSStatisticsManager->AddDeathCount(GetController(), 1);
+	SSStatisticsManager->AddKilledTeammateCount(LastDamageInstigator, 1);
 }
 
 float ASS_MurdockPlayer::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -720,6 +729,7 @@ float ASS_MurdockPlayer::TakeDamage(float DamageAmount, FDamageEvent const& Dama
 	float Result = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
 	DetachStrataIndicator();
+	CurStrataIndicator = nullptr;
 
 	return Result;
 }

@@ -18,7 +18,11 @@ public:
 	virtual void Init() override;
 
 	class USSStratagemManager* const GetStratagemManager() { return StratagemManager.Get(); }
+	class USSStatisticsManager* const GetStatisticsManager() { return StatisticsManager.Get(); }
 private:
 	UPROPERTY()
 	TObjectPtr<class USSStratagemManager> StratagemManager;
+
+	UPROPERTY()
+	TObjectPtr<class USSStatisticsManager> StatisticsManager;
 };

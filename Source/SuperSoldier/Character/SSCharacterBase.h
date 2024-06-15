@@ -43,6 +43,8 @@ protected:
 	virtual void ShowAttackEffect();
 public:
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+protected:
+	AController* LastDamageInstigator;
 
 // Throw Section
 public:

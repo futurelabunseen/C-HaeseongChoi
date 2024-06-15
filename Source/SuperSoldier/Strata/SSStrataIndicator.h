@@ -41,7 +41,7 @@ public:
 protected:
 	class USSStratagem* CurStratagem;
 public:
-	FORCEINLINE void SetStrataCauser(AActor* NewStrataCauser) { StrataCauser = NewStrataCauser; }
+	FORCEINLINE void SetStrataCauser(AController* NewStrataCauser) { StrataCauser = NewStrataCauser; }
 protected:
-	AActor* StrataCauser;
+	AController* StrataCauser;
 };

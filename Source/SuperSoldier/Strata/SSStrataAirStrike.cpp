@@ -13,8 +13,12 @@ USSStrataAirStrike::USSStrataAirStrike()
 	CommandArray = TArray<EStrataCommand>{ EStrataCommand::UP, EStrataCommand::RIGHT, EStrataCommand::DOWN, EStrataCommand::RIGHT };
 }
 
-void USSStrataAirStrike::ActivateStratagem(UWorld* const CurWorld, AActor* const StrataCauser, const FVector& TargetLocation)
+void USSStrataAirStrike::ActivateStratagem(UWorld* const CurWorld, AController* const StrataCauser, const FVector& TargetLocation)
 {
+	Super::ActivateStratagem(CurWorld, StrataCauser, TargetLocation);
+
+	if (!IsValid(CurWorld)) return;
+
 	// 미사일 스폰
 	ThrowedDirection.Normalize();
 

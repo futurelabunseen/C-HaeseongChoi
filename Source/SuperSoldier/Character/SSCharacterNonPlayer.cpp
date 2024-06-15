@@ -9,6 +9,8 @@
 #include "SuperSoldier.h"
 #include "Kismet/GameplayStatics.h"
 #include "Core/SSGameMode.h"
+#include "Core/SSGameInstance.h"
+#include "Core/SSStatisticsManager.h"
 
 ASSCharacterNonPlayer::ASSCharacterNonPlayer(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -50,6 +52,10 @@ void ASSCharacterNonPlayer::SetDead()
 	
 	SetLifeSpan(15.0f);
 	StopAI();
+
+	USSGameInstance* SSGameInstance = CastChecked<USSGameInstance>(GetGameInstance());
+	USSStatisticsManager* SSStatisticsManager = SSGameInstance->GetStatisticsManager();
+	SSStatisticsManager->AddKilledMonsterCount(LastDamageInstigator, 1);
 
 	ASSGameMode* SSGameMode = CastChecked<ASSGameMode>(GetWorld()->GetAuthGameMode());
 	SSGameMode->OnNonPlayerCharacterDead();

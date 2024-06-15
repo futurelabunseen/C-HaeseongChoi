@@ -40,6 +40,8 @@ public:
 public:
 	void ShowGameResult(bool bIsVictory);
 
+	UFUNCTION(Client, Reliable)
+	void ClientRpcSetAndShowFinalGameStatistics(const struct FPlayStatistics& FinalPlayStatistics);
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = UI, Meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<class USSUserResultWidget> UserResultWidgetClass;

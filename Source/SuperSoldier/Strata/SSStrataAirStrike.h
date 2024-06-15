@@ -15,5 +15,5 @@ class SUPERSOLDIER_API USSStrataAirStrike : public USSStratagem
 	GENERATED_BODY()
 public:
 	USSStrataAirStrike();
-	virtual void ActivateStratagem(UWorld* const CurWorld, AActor* const StrataCauser, const FVector& TargetLocation);
+	virtual void ActivateStratagem(UWorld* const CurWorld, AController* const StrataCauser, const FVector& TargetLocation) override;
 };

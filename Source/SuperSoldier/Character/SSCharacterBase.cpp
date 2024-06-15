@@ -113,6 +113,7 @@ float ASSCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 {
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
+	LastDamageInstigator = EventInstigator;
 	NetMulticastRpcShowAnimationMontage(HitReactMontage, 1.0f);
 	Stat->ApplyDamage(DamageAmount);
 	

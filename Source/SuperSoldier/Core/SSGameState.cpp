@@ -6,6 +6,7 @@
 #include "Net/UnrealNetwork.h"
 #include "Kismet/GameplayStatics.h"
 #include "Core/SSPlayerController.h"
+#include "Core/SSPlayerState.h"
 
 void ASSGameState::HandleBeginPlay()
 {
@@ -26,12 +27,4 @@ void ASSGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 void ASSGameState::OnRep_TotalKilledMonsterCount()
 {
 	OnTotalKilledMonsterCountChangedDelegate.Broadcast(TotalKilledMonsterCount);
-}
-
-void ASSGameState::NetMulticast_GameClear_Implementation()
-{
-	if (HasAuthority()) return;
-
-	ASSPlayerController* SSLocalPlayerController = Cast<ASSPlayerController>(GetWorld()->GetFirstPlayerController());
-	SSLocalPlayerController->ShowGameResult(true);
 }

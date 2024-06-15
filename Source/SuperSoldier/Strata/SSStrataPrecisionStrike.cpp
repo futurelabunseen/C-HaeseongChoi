@@ -13,8 +13,12 @@ USSStrataPrecisionStrike::USSStrataPrecisionStrike()
 	CommandArray = TArray<EStrataCommand>{ EStrataCommand::RIGHT, EStrataCommand::RIGHT, EStrataCommand::UP };
 }
 
-void USSStrataPrecisionStrike::ActivateStratagem(UWorld* const CurWorld, AActor* const StrataCauser, const FVector& TargetLocation)
+void USSStrataPrecisionStrike::ActivateStratagem(UWorld* const CurWorld, AController* const StrataCauser, const FVector& TargetLocation)
 {
+	Super::ActivateStratagem(CurWorld, StrataCauser, TargetLocation);
+
+	if (!IsValid(CurWorld)) return;
+
 	// 미사일 스폰
 	FString PrecisionStrikePath = TEXT("/Game/SuperSoldier/Props/BP_PrecisionStrike.BP_PrecisionStrike_C");
 	UClass* PrecisionStrikeClass = StaticLoadClass(UObject::StaticClass(), nullptr, *PrecisionStrikePath);

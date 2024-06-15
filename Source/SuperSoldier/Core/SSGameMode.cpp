@@ -153,7 +153,20 @@ void ASSGameMode::OnNonPlayerCharacterDead()
 
 	if (NewTotalKilledMonsterCount == ClearTotalKilledNonPlayerCharacterNum)
 	{
-		SSGameState->NetMulticast_GameClear();
+		for (APlayerController* PlayerController : TActorRange<APlayerController>(GetWorld()))
+		{
+			if (PlayerController)
+			{
+				ASSPlayerController* SSPlayerController = CastChecked<ASSPlayerController>(PlayerController);
+				ASSPlayerState* SSPlayerState = SSPlayerController->GetPlayerState<ASSPlayerState>();
+
+				if (IsValid(SSPlayerController) && IsValid(SSPlayerState))
+				{
+					SSPlayerController->ClientRpcSetAndShowFinalGameStatistics(SSPlayerState->GetPlayStatistics());
+				}
+			}
+		}
+
 		bWaitingForResetServer = true;
 		StopServer();
 	}

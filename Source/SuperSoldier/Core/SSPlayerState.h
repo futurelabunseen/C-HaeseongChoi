@@ -6,6 +6,27 @@
 #include "GameFramework/PlayerState.h"
 #include "SSPlayerState.generated.h"
 
+USTRUCT()
+struct FPlayStatistics
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	int32 KilledMonsterCount;
+
+	UPROPERTY()
+	int32 KilledTeammateCount;
+
+	UPROPERTY()
+	int32 DeathCount;
+
+	UPROPERTY()
+	int32 RevivedTeammateCount;
+
+	UPROPERTY()
+	int32 UsedStratagemCount;
+};
+
 /**
  * 
  */
@@ -15,32 +36,21 @@ class SUPERSOLDIER_API ASSPlayerState : public APlayerState
 	GENERATED_BODY()
 public:
 	ASSPlayerState();
-	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
 
-	FORCEINLINE const int32& GetKilledMonsterCount() { return KilledMonsterCount; }
-	FORCEINLINE const int32& GetKilledTeammateCount() { return KilledTeammateCount; }
-	FORCEINLINE const int32& GetDeathCount() { return DeathCount; }
-	FORCEINLINE const int32& GetRevivedTeammateCount() { return RevivedTeammateCount; }
-	FORCEINLINE const int32& GetUsedStratagemCount() { return UsedStratagemCount; }
+	FORCEINLINE const int32& GetKilledMonsterCount() { return PlayStatistics.KilledMonsterCount; }
+	FORCEINLINE const int32& GetKilledTeammateCount() { return PlayStatistics.KilledTeammateCount; }
+	FORCEINLINE const int32& GetDeathCount() { return PlayStatistics.DeathCount; }
+	FORCEINLINE const int32& GetRevivedTeammateCount() { return PlayStatistics.RevivedTeammateCount; }
+	FORCEINLINE const int32& GetUsedStratagemCount() { return PlayStatistics.UsedStratagemCount; }
 
-	FORCEINLINE void AddKilledMonsterCount(int32 Count) { KilledMonsterCount = KilledMonsterCount + Count; }
-	FORCEINLINE void AddKilledTeammateCount(int32 Count) { KilledTeammateCount = KilledTeammateCount + Count; }
-	FORCEINLINE void AddDeathCount(int32 Count) { DeathCount = DeathCount + Count; }
-	FORCEINLINE void AddRevivedTeammateCount(int32 Count) { RevivedTeammateCount = RevivedTeammateCount + Count; }
-	FORCEINLINE void AddUsedStratagemCount(int32 Count) { UsedStratagemCount = UsedStratagemCount + Count; }
+	FORCEINLINE void AddKilledMonsterCount(int32 Count) { PlayStatistics.KilledMonsterCount = PlayStatistics.KilledMonsterCount + Count; }
+	FORCEINLINE void AddKilledTeammateCount(int32 Count) { PlayStatistics.KilledTeammateCount = PlayStatistics.KilledTeammateCount + Count; }
+	FORCEINLINE void AddDeathCount(int32 Count) { PlayStatistics.DeathCount = PlayStatistics.DeathCount + Count; }
+	FORCEINLINE void AddRevivedTeammateCount(int32 Count) { PlayStatistics.RevivedTeammateCount = PlayStatistics.RevivedTeammateCount + Count; }
+	FORCEINLINE void AddUsedStratagemCount(int32 Count) { PlayStatistics.UsedStratagemCount = PlayStatistics.UsedStratagemCount + Count; }
+
+	FORCEINLINE void SetPlayStatistics(const FPlayStatistics& NewPlayStatistics) { PlayStatistics = NewPlayStatistics; }
+	FORCEINLINE const FPlayStatistics& GetPlayStatistics() { return PlayStatistics; }
 protected:
-	UPROPERTY(Replicated)
-	int32 KilledMonsterCount;
-
-	UPROPERTY(Replicated)
-	int32 KilledTeammateCount;
-
-	UPROPERTY(Replicated)
-	int32 DeathCount;
-
-	UPROPERTY(Replicated)
-	int32 RevivedTeammateCount;
-
-	UPROPERTY(Replicated)
-	int32 UsedStratagemCount;
+	FPlayStatistics PlayStatistics;
 };

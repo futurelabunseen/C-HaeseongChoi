@@ -33,8 +33,4 @@ protected:
 
 	UPROPERTY(ReplicatedUsing = OnRep_TotalKilledMonsterCount)
 	int32 TotalKilledMonsterCount = 0;
-
-public:
-	UFUNCTION(NetMulticast, Reliable)
-	void NetMulticast_GameClear();
 };

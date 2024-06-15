@@ -51,7 +51,7 @@ public:
     UFUNCTION(NetMulticast, Unreliable)
     void NetMulticastRpcPlayEffect(FVector_NetQuantize Location, FRotator Rotation);
 public:
-	FORCEINLINE void SetStrataCauser(AActor* NewStrataCauser) { StrataCauser = NewStrataCauser; }
+	FORCEINLINE void SetStrataCauser(AController* NewStrataCauser) { StrataCauser = NewStrataCauser; }
 protected:
-	AActor* StrataCauser;
+	AController* StrataCauser;
 };

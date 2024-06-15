@@ -7,6 +7,8 @@
 #include "Core/SSPlayerController.h"
 #include "EngineUtils.h"
 #include "Core/SSGameMode.h"
+#include "Core/SSGameInstance.h"
+#include "Core/SSStatisticsManager.h"
 
 USStrataReinforcements::USStrataReinforcements()
 {
@@ -22,19 +24,17 @@ USStrataReinforcements::USStrataReinforcements()
 		EStrataCommand::UP };
 }
 
-void USStrataReinforcements::ActivateStratagem(UWorld* const CurWorld, AActor* const StrataCauser, const FVector& TargetLocation)
+void USStrataReinforcements::ActivateStratagem(UWorld* const CurWorld, AController* const StrataCauser, const FVector& TargetLocation)
 {
+	Super::ActivateStratagem(CurWorld, StrataCauser, TargetLocation);
+
 	// Revive All Dead Player
 	if (!IsValid(CurWorld)) return;
 
-	for (APlayerController* PlayerController : TActorRange<APlayerController>(CurWorld))
-	{
-		ASSCharacterPlayer* PlayerCharacter = CastChecked<ASSCharacterPlayer>(PlayerController->GetCharacter());
-		if (PlayerCharacter->bDead)
-		{
-			ASSGameMode* SSGameMode = CastChecked<ASSGameMode>(CurWorld->GetAuthGameMode());
+	ASSGameMode* SSGameMode = CastChecked<ASSGameMode>(CurWorld->GetAuthGameMode());
+	int32 RespawnedPlayerNum = SSGameMode->RespawnPlayers(TargetLocation);
 
-			int32 RespawnedPlayerNum = SSGameMode->RespawnPlayers(TargetLocation);
-		}
-	}
+	USSGameInstance* SSGameInstance = CastChecked<USSGameInstance>(CurWorld->GetGameInstance());
+	USSStatisticsManager* SSStatisticsManager = SSGameInstance->GetStatisticsManager();
+	SSStatisticsManager->AddRevivedTeammateCount(StrataCauser, RespawnedPlayerNum);
 }

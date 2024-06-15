@@ -102,6 +102,13 @@ void ASSPlayerController::ShowGameResult(bool bIsVictory)
 	bShowMouseCursor = true;
 }
 
+void ASSPlayerController::ClientRpcSetAndShowFinalGameStatistics_Implementation(const FPlayStatistics& FinalPlayStatistics)
+{
+	ASSPlayerState* SSPlayerState = GetPlayerState<ASSPlayerState>();
+	SSPlayerState->SetPlayStatistics(FinalPlayStatistics);
+	ShowGameResult(true);
+}
+
 void ASSPlayerController::ClientRpcBlendViewTargetToNewPawn_Implementation(APawn* NewPawn)
 {
 	SetViewTargetWithBlend(NewPawn, 0.8f);

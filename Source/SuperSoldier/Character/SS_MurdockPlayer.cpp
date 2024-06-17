@@ -689,8 +689,8 @@ float ASS_MurdockPlayer::TakeDamage(float DamageAmount, FDamageEvent const& Dama
 {
 	float Result = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
-	// DetachStrataIndicator();
-	// CurStrataIndicator = nullptr;
+	DetachStrataIndicator();
+	CurStrataIndicator = nullptr;
 
 	return Result;
 }

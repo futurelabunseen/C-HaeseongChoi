@@ -47,7 +47,7 @@ ASS_Scorobey::ASS_Scorobey(const FObjectInitializer& ObjectInitializer)
 	GetCapsuleComponent()->InitCapsuleSize(75.f, 75.0f);
 
 	// Movement
-	DefaultWalkSpeed = 450.0f;
+	DefaultWalkSpeed = 600.0f;
 	GetCharacterMovement()->MaxWalkSpeed = DefaultWalkSpeed;
 
 	// Mesh & AnimInstance
@@ -58,7 +58,7 @@ ASS_Scorobey::ASS_Scorobey(const FObjectInitializer& ObjectInitializer)
 	Stat->SetMaxHP(90.0f);
 
 	// AI
-	AttackRange = 140.0f;
+	AttackRange = 180.0f;
 	AIControllerClass = ASSScorobeyAIController::StaticClass();
 
 	// SFX
@@ -90,8 +90,8 @@ void ASS_Scorobey::AttackHitCheck(FName AttackId)
 
 	if (HasAuthority())
 	{
-		FVector CollisionCenter = GetActorLocation() + GetActorForwardVector() * 80.0f;
-		float CollisionRadius = 50.0f;
+		FVector CollisionCenter = GetActorLocation() + GetActorForwardVector() * 100.0f;
+		float CollisionRadius = 80.0f;
 
 		FCollisionQueryParams CollisionParams;
 		CollisionParams.AddIgnoredActor(this);
@@ -108,10 +108,10 @@ void ASS_Scorobey::AttackHitCheck(FName AttackId)
 			CollisionParams);
 
 
-//#if ENABLE_DRAW_DEBUG
-//		FColor DrawColor = bHitDetected ? FColor::Green : FColor::Red;
-//		DrawDebugSphere(GetWorld(), CollisionCenter, CollisionRadius, 18, DrawColor, false, 2.0f);
-//#endif
+#if ENABLE_DRAW_DEBUG
+		FColor DrawColor = bHitDetected ? FColor::Green : FColor::Red;
+		DrawDebugSphere(GetWorld(), CollisionCenter, CollisionRadius, 18, DrawColor, false, 2.0f);
+#endif
 		for (const FOverlapResult& OverlapResult : OverlapResults)
 		{
 			AActor* OverlapActor = OverlapResult.GetActor();

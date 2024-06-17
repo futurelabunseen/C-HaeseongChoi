@@ -16,14 +16,14 @@ ASSPlayerController::ASSPlayerController()
 {
 	// Widget Component
 	static ConstructorHelpers::FClassFinder<USSUserPlayWidget> UserPlayWidgetRef(
-		TEXT("/Game/SuperSoldier/UI/WBP_PlayWidget.WBP_PlayWidget_C"));
+		TEXT("/Game/SuperSoldier/UI/BP/WBP_PlayWidget.WBP_PlayWidget_C"));
 	if (UserPlayWidgetRef.Class)
 	{
 		UserPlayWidgetClass = UserPlayWidgetRef.Class;
 	}
 
 	static ConstructorHelpers::FClassFinder<USSUserResultWidget> UserResultWidgetRef(
-		TEXT("/Game/SuperSoldier/UI/WBP_UserStatistics.WBP_UserStatistics_C"));
+		TEXT("/Game/SuperSoldier/UI/BP/WBP_UserStatistics.WBP_UserStatistics_C"));
 	if (UserResultWidgetRef.Class)
 	{
 		UserResultWidgetClass = UserResultWidgetRef.Class;

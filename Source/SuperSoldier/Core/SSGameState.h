@@ -7,6 +7,7 @@
 #include "SSGameState.generated.h"
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnTotalKilledMonsterCountChangedDelegate, int32);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnRemainPlayerRespawnCountChangedDelegate, int32);
 
 /**
  * 
@@ -33,4 +34,17 @@ protected:
 
 	UPROPERTY(ReplicatedUsing = OnRep_TotalKilledMonsterCount)
 	int32 TotalKilledMonsterCount = 0;
+
+// InGame RemainPlayerRespawnCount Section
+public:
+	FORCEINLINE const int32& GetRemainPlayerRespawnCount() { return RemainPlayerRespawnCount; }
+	FORCEINLINE void SetRemainPlayerRespawnCount(int32 NewRemainPlayerRespawnCount) { RemainPlayerRespawnCount = NewRemainPlayerRespawnCount; }
+
+	FOnRemainPlayerRespawnCountChangedDelegate OnRemainPlayerRespawnCountChangedDelegate;
+
+	UFUNCTION()
+	virtual void OnRep_RemainPlayerRespawnCount();
+
+	UPROPERTY(ReplicatedUsing = OnRep_RemainPlayerRespawnCount)
+	int32 RemainPlayerRespawnCount = 0;
 };

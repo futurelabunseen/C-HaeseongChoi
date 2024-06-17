@@ -39,7 +39,7 @@ void ASSCharacterPlayer::SetDead()
 	Super::SetDead();
 
 	ASSGameMode* SuperSoldierGameMode = CastChecked<ASSGameMode>(GetWorld()->GetAuthGameMode());
-	SuperSoldierGameMode->RespawnAllPlayer(GetActorLocation());
+	SuperSoldierGameMode->OnPlayerCharacterDead(GetActorLocation());
 }
 
 void ASSCharacterPlayer::OnRep_ServerCharacterbDead()
@@ -78,7 +78,6 @@ void ASSCharacterPlayer::PlayMoanSound()
 
 	if (!HasAuthority())
 	{
-		SS_LOG(LogSSNetwork, Log, TEXT("Character HitMoan"))
 		UGameplayStatics::SpawnSoundAtLocation(
 			GetWorld(),
 			MoanSound,

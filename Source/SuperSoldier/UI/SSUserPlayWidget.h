@@ -35,6 +35,9 @@ public:
 	void UpdateTotalKillCount(int32 TotalKilledMonsterCount);
 
 	UFUNCTION()
+	void UpdateRemainPlayerSpawnCount(int32 RemainPlayerSpawnCount);
+
+	UFUNCTION()
 	void ShowStratagemList(bool bCalling);
 
 	UFUNCTION()
@@ -54,6 +57,9 @@ protected:
 
 	UPROPERTY()
 	TObjectPtr<class UTextBlock> TotalKillCountText;
+
+	UPROPERTY()
+	TObjectPtr<class UTextBlock> RemainPlayerSpawnCountText;
 
 	UPROPERTY(BlueprintReadWrite)
 	TObjectPtr<class UWidgetAnimation> AnimFadeInOut;

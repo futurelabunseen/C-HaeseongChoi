@@ -107,11 +107,10 @@ void ASS_Scorobey::AttackHitCheck(FName AttackId)
 			CollisionSphere,
 			CollisionParams);
 
-
-#if ENABLE_DRAW_DEBUG
-		FColor DrawColor = bHitDetected ? FColor::Green : FColor::Red;
-		DrawDebugSphere(GetWorld(), CollisionCenter, CollisionRadius, 18, DrawColor, false, 2.0f);
-#endif
+//#if ENABLE_DRAW_DEBUG
+//		FColor DrawColor = bHitDetected ? FColor::Green : FColor::Red;
+//		DrawDebugSphere(GetWorld(), CollisionCenter, CollisionRadius, 18, DrawColor, false, 2.0f);
+//#endif
 		for (const FOverlapResult& OverlapResult : OverlapResults)
 		{
 			AActor* OverlapActor = OverlapResult.GetActor();

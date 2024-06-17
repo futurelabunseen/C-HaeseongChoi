@@ -25,6 +25,9 @@ void USSUserPlayWidget::NativeConstruct()
 	TotalKillCountText = Cast<UTextBlock>(GetWidgetFromName(TEXT("TextTotalKillCount")));
 	ensure(TotalKillCountText);
 
+	RemainPlayerSpawnCountText = Cast<UTextBlock>(GetWidgetFromName(TEXT("TextRemainPlayerSpawnCount")));
+	ensure(RemainPlayerSpawnCountText);
+
 	BloodyEffectImage = Cast<UImage>(GetWidgetFromName(TEXT("ImgBloodyEffect")));
 	ensure(BloodyEffectImage);
 }
@@ -63,6 +66,11 @@ void USSUserPlayWidget::UpdateCrossHair(bool bAiming)
 void USSUserPlayWidget::UpdateTotalKillCount(int32 TotalKilledMonsterCount)
 {
 	TotalKillCountText->SetText(FText::FromString(FString::FromInt(TotalKilledMonsterCount)));
+}
+
+void USSUserPlayWidget::UpdateRemainPlayerSpawnCount(int32 RemainPlayerSpawnCount)
+{
+	RemainPlayerSpawnCountText->SetText(FText::FromString(FString::FromInt(RemainPlayerSpawnCount)));
 }
 
 void USSUserPlayWidget::ShowStratagemList(bool bCalling)

@@ -36,7 +36,7 @@ public:
 	void UpdateUsedStratagemNum(int32 NewUsedStratagemNum);
 
 	UFUNCTION()
-	void UpdateGameResultText(bool bIsVictory);
+	void UpdateGameResultText(bool bCleared);
 protected:
 	UPROPERTY()
 	TObjectPtr<class UTextBlock> KillCountText;

@@ -27,14 +27,13 @@ ASSGameMode::ASSGameMode()
 
 	// Set PlayerState
 	PlayerStateClass = ASSPlayerState::StaticClass();
-
-	ClearTotalKilledNonPlayerCharacterNum = 500;
 }
 
 void ASSGameMode::StartPlay()
 {
 	// 게임의 시작을 지시한다.
 	Super::StartPlay();
+	ResetServer();
 }
 
 void ASSGameMode::PreLogin(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage)
@@ -80,31 +79,19 @@ void ASSGameMode::Logout(AController* Exiting)
 	}
 }
 
-void ASSGameMode::RespawnAllPlayer(FVector TargetLocation)
-{
-	if (IsAllPlayerDead())
-	{
-		FTimerHandle RespawnTimerHandle;
-		GetWorld()->GetTimerManager().SetTimer(
-			RespawnTimerHandle, 
-			FTimerDelegate::CreateLambda([&]() {
-				RespawnPlayers(TargetLocation);
-				}),
-			1.0f, 
-			false, 
-			5.0f);
-	}
-}
-
 int32 ASSGameMode::RespawnPlayers(FVector TargetLocation)
 {
+	ASSGameState* SSGameState = GetGameState<ASSGameState>();
+
 	int32 RespawnedPlayerNum = 0;
+	int32 CurPlayerRespawnRemain = SSGameState->GetRemainPlayerRespawnCount();
+
 	for (APlayerController* PlayerController : TActorRange<APlayerController>(GetWorld()))
 	{
 		ASSCharacterPlayer* PlayerCharacter = CastChecked<ASSCharacterPlayer>(PlayerController->GetCharacter());
 		ASSPlayerController* SSPlayerController = CastChecked<ASSPlayerController>(PlayerController);
 
-		if (PlayerCharacter->bDead)
+		if (PlayerCharacter->bDead && (CurPlayerRespawnRemain > 0))
 		{
 			FVector RespawnLocation = TargetLocation;
 			RespawnLocation.X += FMath::RandRange(-200.0f, 200.0f);
@@ -120,8 +107,11 @@ int32 ASSGameMode::RespawnPlayers(FVector TargetLocation)
 			PlayerCharacter->SetLifeSpan(2.0f);
 
 			RespawnedPlayerNum += 1;
+			--CurPlayerRespawnRemain;
 		}
 	}
+
+	SSGameState->SetRemainPlayerRespawnCount(CurPlayerRespawnRemain);
 
 	return RespawnedPlayerNum;
 }
@@ -154,22 +144,32 @@ void ASSGameMode::OnNonPlayerCharacterDead()
 
 	if (NewTotalKilledMonsterCount == ClearTotalKilledNonPlayerCharacterNum)
 	{
-		for (APlayerController* PlayerController : TActorRange<APlayerController>(GetWorld()))
+		EndServer(true);
+	}
+}
+
+void ASSGameMode::OnPlayerCharacterDead(FVector DeadLocation)
+{
+	if (IsAllPlayerDead())
+	{
+		ASSGameState* SSGameState = GetGameState<ASSGameState>();
+		int32 CurPlayerRespawnRemain = SSGameState->GetRemainPlayerRespawnCount();
+		if (CurPlayerRespawnRemain > 0)
 		{
-			if (PlayerController)
-			{
-				ASSPlayerController* SSPlayerController = CastChecked<ASSPlayerController>(PlayerController);
-				ASSPlayerState* SSPlayerState = SSPlayerController->GetPlayerState<ASSPlayerState>();
-
-				if (IsValid(SSPlayerController) && IsValid(SSPlayerState))
-				{
-					SSPlayerController->ClientRpcSetAndShowFinalGameStatistics(SSPlayerState->GetPlayStatistics());
-				}
-			}
+			FTimerHandle RespawnTimerHandle;
+			GetWorld()->GetTimerManager().SetTimer(
+				RespawnTimerHandle,
+				FTimerDelegate::CreateLambda([&]() {
+					RespawnPlayers(DeadLocation);
+					}),
+				1.0f,
+				false,
+				5.0f);
 		}
-
-		bWaitingForResetServer = true;
-		StopServer();
+		else
+		{
+			EndServer(false);
+		}
 	}
 }
 
@@ -209,6 +209,26 @@ void ASSGameMode::SetNonPlayerCharacterStopAI()
 	}
 }
 
+void ASSGameMode::EndServer(bool bCleared)
+{
+	for (APlayerController* PlayerController : TActorRange<APlayerController>(GetWorld()))
+	{
+		if (PlayerController)
+		{
+			ASSPlayerController* SSPlayerController = CastChecked<ASSPlayerController>(PlayerController);
+			ASSPlayerState* SSPlayerState = SSPlayerController->GetPlayerState<ASSPlayerState>();
+
+			if (IsValid(SSPlayerController) && IsValid(SSPlayerState))
+			{
+				SSPlayerController->ClientRpcSetAndShowFinalGameStatistics(bCleared, SSPlayerState->GetPlayStatistics());
+			}
+		}
+	}
+
+	bWaitingForResetServer = true;
+	StopServer();
+}
+
 void ASSGameMode::StopServer()
 {
 	SetNonPlayerCharacterStopAI();
@@ -218,7 +238,10 @@ void ASSGameMode::StopServer()
 void ASSGameMode::ResetServer()
 {
 	SS_LOG(LogSSNetwork, Log, TEXT("ResetServer"))
-	ClearTotalKilledNonPlayerCharacterNum = 0;
+
+	ASSGameState* SSGameState = GetGameState<ASSGameState>();
+	SSGameState->SetTotalKilledMonsterCount(0);
+	SSGameState->SetRemainPlayerRespawnCount(PlayerRespawnLimits);
 
 	TArray<AActor*> Actors;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ASSCharacterNonPlayer::StaticClass(), Actors);

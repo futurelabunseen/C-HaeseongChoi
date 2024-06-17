@@ -31,9 +31,6 @@ protected:
 // Respawn Section
 public:
 	UFUNCTION()
-	void RespawnAllPlayer(FVector TargetLocation);
-
-	UFUNCTION()
 	int32 RespawnPlayers(FVector TargetLocation);
 
 protected:
@@ -42,10 +39,13 @@ protected:
 // Game Clear Section
 public:
 	void OnNonPlayerCharacterDead();
+	void OnPlayerCharacterDead(FVector DeadLocation);
 	void SetNonPlayerCharacterSpawn(bool bNewSpawn);
 	void SetNonPlayerCharacterStopAI();
+	void EndServer(bool bCleared);
 	void StopServer();
 	void ResetServer();
 protected:
-	int32 ClearTotalKilledNonPlayerCharacterNum;
+	const int32 ClearTotalKilledNonPlayerCharacterNum = 500;
+	const int32 PlayerRespawnLimits = 30;
 };

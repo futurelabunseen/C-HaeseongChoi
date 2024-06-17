@@ -45,6 +45,7 @@ void ASSPlayerController::BeginPlay()
 
 		ASSGameState* SSGameState = CastChecked<ASSGameState>(GetWorld()->GetGameState());
 		SSGameState->OnTotalKilledMonsterCountChangedDelegate.AddUObject(UserPlayWidget, &USSUserPlayWidget::UpdateTotalKillCount);
+		SSGameState->OnRemainPlayerRespawnCountChangedDelegate.AddUObject(UserPlayWidget, &USSUserPlayWidget::UpdateRemainPlayerSpawnCount);
 		UserPlayWidget->UpdateTotalKillCount(SSGameState->GetTotalKilledMonsterCount());
 		UserPlayWidget->FadeInOut(true);
 	}
@@ -80,7 +81,7 @@ void ASSPlayerController::AcknowledgePossession(APawn* P)
 	}
 }
 
-void ASSPlayerController::ShowGameResult(bool bIsVictory)
+void ASSPlayerController::ShowGameResult(bool bCleared)
 {
 	ASSPlayerState* SSPlayerState = GetPlayerState<ASSPlayerState>();
 	UserResultWidget = CreateWidget<USSUserResultWidget>(this, UserResultWidgetClass);
@@ -93,6 +94,7 @@ void ASSPlayerController::ShowGameResult(bool bIsVictory)
 	UserResultWidget->UpdateDeathCount(SSPlayerState->GetDeathCount());
 	UserResultWidget->UpdateReviveCount(SSPlayerState->GetRevivedTeammateCount());
 	UserResultWidget->UpdateUsedStratagemNum(SSPlayerState->GetUsedStratagemCount());
+	UserResultWidget->UpdateGameResultText(bCleared);
 
 	if (UEnhancedInputLocalPlayerSubsystem* Subsystem =
 		ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
@@ -103,11 +105,11 @@ void ASSPlayerController::ShowGameResult(bool bIsVictory)
 	bShowMouseCursor = true;
 }
 
-void ASSPlayerController::ClientRpcSetAndShowFinalGameStatistics_Implementation(const FPlayStatistics& FinalPlayStatistics)
+void ASSPlayerController::ClientRpcSetAndShowFinalGameStatistics_Implementation(bool bCleared, const FPlayStatistics& FinalPlayStatistics)
 {
 	ASSPlayerState* SSPlayerState = GetPlayerState<ASSPlayerState>();
 	SSPlayerState->SetPlayStatistics(FinalPlayStatistics);
-	ShowGameResult(true);
+	ShowGameResult(bCleared);
 }
 
 void ASSPlayerController::ClientRpcBlendViewTargetToNewPawn_Implementation(APawn* NewPawn)

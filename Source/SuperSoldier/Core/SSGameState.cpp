@@ -22,9 +22,15 @@ void ASSGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(ASSGameState, TotalKilledMonsterCount);
+	DOREPLIFETIME(ASSGameState, RemainPlayerRespawnCount);
 }
 
 void ASSGameState::OnRep_TotalKilledMonsterCount()
 {
 	OnTotalKilledMonsterCountChangedDelegate.Broadcast(TotalKilledMonsterCount);
+}
+
+void ASSGameState::OnRep_RemainPlayerRespawnCount()
+{
+	OnRemainPlayerRespawnCountChangedDelegate.Broadcast(RemainPlayerRespawnCount);
 }

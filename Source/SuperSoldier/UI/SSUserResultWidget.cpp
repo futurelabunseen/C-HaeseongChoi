@@ -56,9 +56,9 @@ void USSUserResultWidget::UpdateUsedStratagemNum(int32 NewUsedStratagemNum)
 	UsedStratagemNumText->SetText(FText::FromString(FString::FromInt(NewUsedStratagemNum)));
 }
 
-void USSUserResultWidget::UpdateGameResultText(bool bIsVictory)
+void USSUserResultWidget::UpdateGameResultText(bool bCleared)
 {
-	if (bIsVictory)
+	if (bCleared)
 	{
 		GameResultText->SetText(FText::FromString(TEXT("Victory!!!")));
 	}

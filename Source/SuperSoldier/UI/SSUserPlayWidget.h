@@ -26,6 +26,9 @@ public:
 	void UpdateHPBar(float NewCurrentHP);
 
 	UFUNCTION()
+	void UpdateBloodyEffect(float NewCurrentHP);
+
+	UFUNCTION()
 	void UpdateCrossHair(bool bAiming);
 
 	UFUNCTION()
@@ -34,6 +37,8 @@ public:
 	UFUNCTION()
 	void ShowStratagemList(bool bCalling);
 
+	UFUNCTION()
+	void FadeInOut(bool bFadeOut);
 protected:
 	UPROPERTY()
 	TObjectPtr<class UImage> CrossHairImage;
@@ -49,4 +54,10 @@ protected:
 
 	UPROPERTY()
 	TObjectPtr<class UTextBlock> TotalKillCountText;
+
+	UPROPERTY(BlueprintReadWrite)
+	TObjectPtr<class UWidgetAnimation> AnimFadeInOut;
+
+	UPROPERTY()
+	TObjectPtr<class UImage> BloodyEffectImage;
 };

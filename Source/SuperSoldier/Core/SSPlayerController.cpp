@@ -46,6 +46,7 @@ void ASSPlayerController::BeginPlay()
 		ASSGameState* SSGameState = CastChecked<ASSGameState>(GetWorld()->GetGameState());
 		SSGameState->OnTotalKilledMonsterCountChangedDelegate.AddUObject(UserPlayWidget, &USSUserPlayWidget::UpdateTotalKillCount);
 		UserPlayWidget->UpdateTotalKillCount(SSGameState->GetTotalKilledMonsterCount());
+		UserPlayWidget->FadeInOut(true);
 	}
 }
 

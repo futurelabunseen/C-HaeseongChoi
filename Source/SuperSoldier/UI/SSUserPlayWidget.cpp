@@ -23,7 +23,10 @@ void USSUserPlayWidget::NativeConstruct()
 	CrossHairImage->SetVisibility(ESlateVisibility::Hidden);
 
 	TotalKillCountText = Cast<UTextBlock>(GetWidgetFromName(TEXT("TextTotalKillCount")));
-	ensure(CrossHairImage);
+	ensure(TotalKillCountText);
+
+	BloodyEffectImage = Cast<UImage>(GetWidgetFromName(TEXT("ImgBloodyEffect")));
+	ensure(BloodyEffectImage);
 }
 
 void USSUserPlayWidget::UpdateHPBar(float NewCurrentHP)
@@ -33,6 +36,15 @@ void USSUserPlayWidget::UpdateHPBar(float NewCurrentHP)
 	if (HPProgressBar)
 	{
 		HPProgressBar->SetPercent(NewCurrentHP / MaxHP);
+	}
+}
+
+void USSUserPlayWidget::UpdateBloodyEffect(float NewCurrentHP)
+{
+	ensure(MaxHP > 0.0f);
+	if (BloodyEffectImage)
+	{
+		BloodyEffectImage->SetRenderOpacity(1.0f - (NewCurrentHP / MaxHP));
 	}
 }
 
@@ -62,5 +74,17 @@ void USSUserPlayWidget::ShowStratagemList(bool bCalling)
 	else
 	{
 		PlayAnimation(AnimShowStrataList, 0.0f, 1, EUMGSequencePlayMode::Reverse);
+	}
+}
+
+void USSUserPlayWidget::FadeInOut(bool bFadeOut)
+{
+	if (bFadeOut)
+	{
+		PlayAnimation(AnimFadeInOut);
+	}
+	else
+	{
+		PlayAnimation(AnimFadeInOut, 0.0f, 1, EUMGSequencePlayMode::Reverse);
 	}
 }

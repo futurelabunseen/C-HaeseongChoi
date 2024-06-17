@@ -101,8 +101,10 @@ void ASSCharacterPlayer::SetupCharacterWidget(USSUserPlayWidget* InUserWidget)
 	if (InUserWidget)
 	{
 		Stat->OnHpChanged.AddUObject(InUserWidget, &USSUserPlayWidget::UpdateHPBar);
+		Stat->OnHpChanged.AddUObject(InUserWidget, &USSUserPlayWidget::UpdateBloodyEffect);
 		InUserWidget->SetMaxHP(Stat->GetMaxHP());
 		InUserWidget->UpdateHPBar(Stat->GetCurrentHP());
+		InUserWidget->UpdateBloodyEffect(Stat->GetCurrentHP());
 	}
 }
 

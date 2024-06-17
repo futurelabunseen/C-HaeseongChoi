@@ -47,7 +47,7 @@ ASS_LandBug::ASS_LandBug(const FObjectInitializer& ObjectInitializer)
 	GetCapsuleComponent()->InitCapsuleSize(75.f, 75.0f);
 
 	// Movement
-	DefaultWalkSpeed = 375.0f;
+	DefaultWalkSpeed = 750.0f;
 	GetCharacterMovement()->MaxWalkSpeed = DefaultWalkSpeed;
 
 	// Mesh & AnimInstance
@@ -58,7 +58,7 @@ ASS_LandBug::ASS_LandBug(const FObjectInitializer& ObjectInitializer)
 	Stat->SetMaxHP(120.0f);
 
 	// AI
-	AttackRange = 140.0f;
+	AttackRange = 220.0f;
 	AIControllerClass = ASSLandBugAIController::StaticClass();
 
 	// SFX

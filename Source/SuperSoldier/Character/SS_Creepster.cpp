@@ -59,7 +59,7 @@ ASS_Creepster::ASS_Creepster(const FObjectInitializer& ObjectInitializer)
 	GetCapsuleComponent()->InitCapsuleSize(75.f, 75.0f);
 
 	// Movement
-	DefaultWalkSpeed = 400.0f;
+	DefaultWalkSpeed = 800.0f;
 	GetCharacterMovement()->MaxWalkSpeed = DefaultWalkSpeed;
 
 	// Mesh & AnimInstance
@@ -70,7 +70,7 @@ ASS_Creepster::ASS_Creepster(const FObjectInitializer& ObjectInitializer)
 	Stat->SetMaxHP(150.0f);
 
 	// AI
-	AttackRange = 140.0f;
+	AttackRange = 200.0f;
 	AIControllerClass = ASSCreepsterAIController::StaticClass();
 
 	// SFX
@@ -90,8 +90,8 @@ void ASS_Creepster::AttackHitCheck(FName AttackId)
 
 	if (HasAuthority())
 	{
-		FVector CollisionCenter = GetActorLocation() + GetActorForwardVector() * 80.0f;
-		float CollisionRadius = 80.0f;
+		FVector CollisionCenter = GetActorLocation() + GetActorForwardVector() * 100.0f;
+		float CollisionRadius = 100.0f;
 
 		FCollisionQueryParams CollisionParams;
 		CollisionParams.AddIgnoredActor(this);

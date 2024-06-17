@@ -12,19 +12,19 @@ struct FPlayStatistics
 	GENERATED_BODY()
 
 	UPROPERTY()
-	int32 KilledMonsterCount;
+	int32 KilledMonsterCount = 0;
 
 	UPROPERTY()
-	int32 KilledTeammateCount;
+	int32 KilledTeammateCount = 0;
 
 	UPROPERTY()
-	int32 DeathCount;
+	int32 DeathCount = 0;
 
 	UPROPERTY()
-	int32 RevivedTeammateCount;
+	int32 RevivedTeammateCount = 0;
 
 	UPROPERTY()
-	int32 UsedStratagemCount;
+	int32 UsedStratagemCount = 0;
 };
 
 /**

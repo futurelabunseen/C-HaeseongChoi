@@ -18,8 +18,11 @@ public:
 protected:
 	virtual void BeginPlay() override;
 public:
-	FORCEINLINE FName GetTargetSocketName();
-	FORCEINLINE UStaticMeshComponent* GetMesh();
+	UFUNCTION()
+	FName GetTargetSocketName();
+	
+	UFUNCTION()
+	UStaticMeshComponent* GetMesh();
 protected:
 	UPROPERTY()
 	FName TargetSocketName;

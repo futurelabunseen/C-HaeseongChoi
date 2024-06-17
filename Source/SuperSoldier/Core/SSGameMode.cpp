@@ -73,8 +73,9 @@ void ASSGameMode::Logout(AController* Exiting)
 
 	--CurPlayerNum;
 
-	if (bWaitingForResetServer && CurPlayerNum == 0)
+	if (CurPlayerNum == 0)
 	{
+		bWaitingForResetServer = true;
 		ResetServer();
 	}
 }
@@ -216,6 +217,7 @@ void ASSGameMode::StopServer()
 
 void ASSGameMode::ResetServer()
 {
+	SS_LOG(LogSSNetwork, Log, TEXT("ResetServer"))
 	ClearTotalKilledNonPlayerCharacterNum = 0;
 
 	TArray<AActor*> Actors;

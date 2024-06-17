@@ -29,6 +29,8 @@ ASSStrataRocket::ASSStrataRocket()
     RocketTrailNiagara->SetupAttachment(RootComponent);
 
     Speed = 0.0f;
+	ExplosionSystemScale = FVector(1.0f);
+	SmokeSystemScale = FVector(1.0f);
 
     bReplicates = true;
     SetReplicateMovement(true);
@@ -102,7 +104,7 @@ void ASSStrataRocket::NetMulticastRpcPlayEffect_Implementation(FVector_NetQuanti
             ExplosionSystem,
             Location,
             Rotation,
-            FVector(10.0f, 4.0f, 4.0f));
+			ExplosionSystemScale);
     }
     
     if (SmokeSystem)
@@ -112,7 +114,7 @@ void ASSStrataRocket::NetMulticastRpcPlayEffect_Implementation(FVector_NetQuanti
             SmokeSystem,
             Location,
             Rotation,
-            FVector(10.0f, 4.0f, 4.0f));
+			SmokeSystemScale);
     }
 
 	if (ExplodeSound)
@@ -122,7 +124,7 @@ void ASSStrataRocket::NetMulticastRpcPlayEffect_Implementation(FVector_NetQuanti
 			ExplodeSound,
 			Location,
 			FRotator::ZeroRotator,
-			1.25f);
+			1.0f);
 	}
 }
 

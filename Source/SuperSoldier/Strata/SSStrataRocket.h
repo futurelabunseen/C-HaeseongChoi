@@ -33,14 +33,22 @@ protected:
     UPROPERTY(EditAnywhere, BlueprintReadOnly)
     TObjectPtr<class UNiagaraSystem> ExplosionSystem;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FVector ExplosionSystemScale;
+
     UPROPERTY(EditAnywhere, BlueprintReadOnly)
     TObjectPtr<class UNiagaraSystem> SmokeSystem;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FVector SmokeSystemScale;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<class USoundBase> ExplodeSound;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly)
     float Speed;
+
+	
 public:
     UFUNCTION()
     virtual void Strike(const FVector& TargetLocation);

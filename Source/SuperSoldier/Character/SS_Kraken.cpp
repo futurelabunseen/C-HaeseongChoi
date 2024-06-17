@@ -68,7 +68,7 @@ ASS_Kraken::ASS_Kraken(const FObjectInitializer& ObjectInitializer)
 	GetCapsuleComponent()->InitCapsuleSize(200.f, 200.0f);
 
 	// Movement
-	DefaultWalkSpeed = 500.0f;
+	DefaultWalkSpeed = 725.0f;
 	GetCharacterMovement()->MaxWalkSpeed = DefaultWalkSpeed;
 
 	// Mesh & AnimInstance
@@ -79,7 +79,7 @@ ASS_Kraken::ASS_Kraken(const FObjectInitializer& ObjectInitializer)
 	Stat->SetMaxHP(300.0f);
 
 	// AI
-	AttackRange = 1550.0f * MeshScale;
+	AttackRange = 1350.0f * MeshScale;
 	AIControllerClass = ASSKrakenAIController::StaticClass();
 
 	// Attack
@@ -100,13 +100,13 @@ void ASS_Kraken::AttackHitCheck(FName AttackId)
 		if (AttackId == TEXT("SmashAttack"))
 		{
 			CollisionBoxCenter = GetActorLocation() + GetActorForwardVector() * 1200.0f * MeshScale;
-			CollisionBoxExtent = FVector(620.0f * MeshScale, 400.0f * MeshScale, 380.0f * MeshScale);
+			CollisionBoxExtent = FVector(680.0f * MeshScale, 400.0f * MeshScale, 380.0f * MeshScale);
 		}
 
 		if (AttackId == TEXT("SweepAttack"))
 		{
 			CollisionBoxCenter = GetActorLocation() + GetActorForwardVector() * 1200.0f * MeshScale;
-			CollisionBoxExtent = FVector(480.0f * MeshScale, 800.0f * MeshScale, 380.0f * MeshScale);
+			CollisionBoxExtent = FVector(540.0f * MeshScale, 800.0f * MeshScale, 380.0f * MeshScale);
 		}
 
 		FCollisionQueryParams CollisionParams;
@@ -124,10 +124,10 @@ void ASS_Kraken::AttackHitCheck(FName AttackId)
 			CollisionParams);
 
 
-//#if ENABLE_DRAW_DEBUG
-//		FColor DrawColor = bHitDetected ? FColor::Green : FColor::Red;
-//		DrawDebugBox(GetWorld(), CollisionBoxCenter, CollisionBoxExtent, GetActorRotation().Quaternion(), DrawColor, false, 2.0f);
-//#endif
+#if ENABLE_DRAW_DEBUG
+		FColor DrawColor = bHitDetected ? FColor::Green : FColor::Red;
+		DrawDebugBox(GetWorld(), CollisionBoxCenter, CollisionBoxExtent, GetActorRotation().Quaternion(), DrawColor, false, 2.0f);
+#endif
 	
 		for (const FOverlapResult& OverlapResult : OverlapResults)
 		{

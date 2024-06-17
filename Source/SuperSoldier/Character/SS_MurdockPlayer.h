@@ -89,16 +89,6 @@ protected:
 	virtual void AttackHitCheck(FName AttackId = TEXT("None")) override;
 	virtual void PlaySoundEffect() override;
 
-// Throw Section
-protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
-	TObjectPtr<class UAnimMontage> ThrowMontage;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UInputAction> ThrowAction;
-
-	void Throw(const FInputActionValue& Value);
-
 // Strata Section
 protected:
 	FOnCallingDelegate OnCalling;
@@ -135,8 +125,10 @@ protected:
 	bool MatchingInput();
 	void ProcessCommandInput(const FInputActionValue& Value);
 	void DetachStrataIndicator();
+
+	UFUNCTION()
 	virtual void ReleaseThrowable() override;
-	
+
 // Take Damage Section
 public:
 	virtual void SetDead();
@@ -160,9 +152,6 @@ protected:
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerRpcNotifyFireHit(const FHitResult& HitResult);
-
-	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerRpcThrow();
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerRpcCalling();

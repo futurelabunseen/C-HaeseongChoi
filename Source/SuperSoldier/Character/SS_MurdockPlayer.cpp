@@ -104,25 +104,6 @@ ASS_MurdockPlayer::ASS_MurdockPlayer(const FObjectInitializer& ObjectInitializer
 		}
 	}
 
-	// Throw Section
-	{
-		// Throw Action
-		static ConstructorHelpers::FObjectFinder<UInputAction> ThrowActionRef(
-			TEXT("/Game/SuperSoldier/Input/Actions/IA_Grenade.IA_Grenade"));
-		if (ThrowActionRef.Object)
-		{
-			ThrowAction = ThrowActionRef.Object;
-		}
-
-		// Throw Montage
-		static ConstructorHelpers::FObjectFinder<UAnimMontage> ThrowMontageRef(
-			TEXT("/Game/SuperSoldier/Characters/Murdock/Animations/AM_Throw.AM_Throw"));
-		if (ThrowMontageRef.Object)
-		{
-			ThrowMontage = ThrowMontageRef.Object;
-		}
-	}
-
 	// Call Section
 	{
 		// Call Action
@@ -254,7 +235,6 @@ void ASS_MurdockPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Triggered, this, &ASS_MurdockPlayer::Sprint);
 	EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Triggered, this, &ASS_MurdockPlayer::Aim);
 	EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &ASS_MurdockPlayer::Fire);
-	EnhancedInputComponent->BindAction(ThrowAction, ETriggerEvent::Triggered, this, &ASS_MurdockPlayer::Throw);
 	EnhancedInputComponent->BindAction(CallAction, ETriggerEvent::Triggered, this, &ASS_MurdockPlayer::Call);
 	EnhancedInputComponent->BindAction(CommandAction, ETriggerEvent::Triggered, this, &ASS_MurdockPlayer::ProcessCommandInput);
 }
@@ -315,11 +295,12 @@ void ASS_MurdockPlayer::InitializeStratagem()
 void ASS_MurdockPlayer::InitializeWeapon()
 {
 	MainWeapon = NewObject<USSWeaponComponent_Rifle>(this);
+	FName SocketName = MainWeapon->GetTargetSocketName();
 
 	MainWeapon->AttachToComponent(
 		GetMesh(),
 		FAttachmentTransformRules::SnapToTargetIncludingScale,
-		MainWeapon->GetTargetSocketName());
+		SocketName);
 
 	MainWeapon->RegisterComponent();
 }
@@ -334,7 +315,7 @@ void ASS_MurdockPlayer::Look(const FInputActionValue& Value)
 
 void ASS_MurdockPlayer::AttemptSprint()
 {
-	if (!bAiming && bSprintKeyPressing && !GetAnyMontagePlaying())
+	if (!bAiming && bSprintKeyPressing && !GetAnyMontagePlaying(RespawnMontage))
 	{
 		SetSprintToMovementComponent(true);
 	}
@@ -451,26 +432,6 @@ void ASS_MurdockPlayer::AttackHitCheck(FName AttackId)
 void ASS_MurdockPlayer::PlaySoundEffect()
 {
 	MainWeapon->PlaySoundEffect();
-}
-
-void ASS_MurdockPlayer::Throw(const FInputActionValue& Value)
-{
-	if (bDead) return;
-
-	if (!GetAnyMontagePlaying())
-	{
-		SetSprintToMovementComponent(false);
-
-		const float AnimationSpeedRate = 1.0f;
-		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-		AnimInstance->Montage_Play(ThrowMontage, AnimationSpeedRate);
-
-		ServerRpcThrow();
-
-		FOnMontageEnded EndDelegate;
-		EndDelegate.BindUObject(this, &ASS_MurdockPlayer::AttemptSprintEndDelegate);
-		AnimInstance->Montage_SetEndDelegate(EndDelegate, ThrowMontage);
-	}
 }
 
 void ASS_MurdockPlayer::Call(const FInputActionValue& Value)
@@ -728,8 +689,8 @@ float ASS_MurdockPlayer::TakeDamage(float DamageAmount, FDamageEvent const& Dama
 {
 	float Result = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
-	DetachStrataIndicator();
-	CurStrataIndicator = nullptr;
+	// DetachStrataIndicator();
+	// CurStrataIndicator = nullptr;
 
 	return Result;
 }
@@ -797,20 +758,6 @@ void ASS_MurdockPlayer::ServerRpcNotifyFireHit_Implementation(const FHitResult& 
 	}
 }
 
-bool ASS_MurdockPlayer::ServerRpcThrow_Validate()
-{
-	return true;
-}
-
-void ASS_MurdockPlayer::ServerRpcThrow_Implementation()
-{
-	const float AnimationSpeedRate = 1.0f;
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	AnimInstance->Montage_Play(ThrowMontage, AnimationSpeedRate);
-
-	RpcPlayAnimation(ThrowMontage);
-}
-
 bool ASS_MurdockPlayer::ServerRpcCalling_Validate()
 {
 	return true;
@@ -871,13 +818,12 @@ bool ASS_MurdockPlayer::ServerRpcStrataThrow_Validate()
 
 void ASS_MurdockPlayer::ServerRpcStrataThrow_Implementation()
 {
-	FRotator ControlRotation = GetControlRotation();
-	FRotator CurRotation = GetActorRotation();
-	SetActorRotation(FRotator(CurRotation.Pitch, ControlRotation.Yaw, CurRotation.Roll));
-
-	const float AnimationSpeedRate = 1.0f;
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	AnimInstance->Montage_Play(StrataThrowMontage, AnimationSpeedRate);
+	FTimerHandle ThrowTimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(ThrowTimerHandle, 
+		this, 
+		&ASS_MurdockPlayer::ReleaseThrowable, 
+		0.22f, 
+		false);
 
 	RpcPlayAnimation(StrataThrowMontage);
 }
@@ -886,12 +832,12 @@ void ASS_MurdockPlayer::NetMulticastRpcShowAnimationMontage_Implementation(UAnim
 {
 	Super::NetMulticastRpcShowAnimationMontage_Implementation(MontageToPlay, AnimationSpeedRate);
 
-	if (IsLocallyControlled())
+	/*if (IsLocallyControlled())
 	{
 		if (MontageToPlay == HitReactMontage)
 		{
 			ResetPlayerInputVariable();
 			OnCalling.Broadcast(bCalling);
 		}
-	}
+	}*/
 }

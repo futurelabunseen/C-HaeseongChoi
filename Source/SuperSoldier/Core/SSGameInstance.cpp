@@ -7,6 +7,9 @@
 USSGameInstance::USSGameInstance()
 {
 	StratagemManager = CreateDefaultSubobject<USSStratagemManager>(TEXT("StratagemManager"));
+	DeadSoundConcurrency = CreateDefaultSubobject<USoundConcurrency>(TEXT("DeadSoundConcurrency"));
+	DeadSoundConcurrency->Concurrency.MaxCount = 4;
+	DeadSoundConcurrency->Concurrency.ResolutionRule = EMaxConcurrentResolutionRule::StopFarthestThenOldest;
 }
 
 void USSGameInstance::Init()

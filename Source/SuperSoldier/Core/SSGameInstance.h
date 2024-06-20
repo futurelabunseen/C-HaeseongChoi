@@ -19,10 +19,14 @@ public:
 
 	class USSStratagemManager* const GetStratagemManager() { return StratagemManager.Get(); }
 	class USSStatisticsManager* const GetStatisticsManager() { return StatisticsManager.Get(); }
+	USoundConcurrency* const GetDeadSoundConcurrency() const { return DeadSoundConcurrency; }
 private:
 	UPROPERTY()
 	TObjectPtr<class USSStratagemManager> StratagemManager;
 
 	UPROPERTY()
 	TObjectPtr<class USSStatisticsManager> StatisticsManager;
+
+	UPROPERTY()
+	TObjectPtr<class USoundConcurrency> DeadSoundConcurrency;
 };

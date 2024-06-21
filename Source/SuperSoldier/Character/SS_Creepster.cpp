@@ -90,8 +90,8 @@ void ASS_Creepster::AttackHitCheck(FName AttackId)
 
 	if (HasAuthority())
 	{
-		FVector CollisionCenter = GetActorLocation() + GetActorForwardVector() * 100.0f;
-		float CollisionRadius = 100.0f;
+		FVector CollisionCenter = GetActorLocation() + GetActorUpVector() * 60.0f + GetActorForwardVector() * 120.0f;
+		float CollisionRadius = 50.0f;
 
 		FCollisionQueryParams CollisionParams;
 		CollisionParams.AddIgnoredActor(this);
@@ -108,10 +108,10 @@ void ASS_Creepster::AttackHitCheck(FName AttackId)
 			CollisionParams);
 
 
-//#if ENABLE_DRAW_DEBUG
-//		FColor DrawColor = bHitDetected ? FColor::Green : FColor::Red;
-//		DrawDebugSphere(GetWorld(), CollisionCenter, CollisionRadius, 18, DrawColor, false, 2.0f);
-//#endif
+#if ENABLE_DRAW_DEBUG
+		FColor DrawColor = bHitDetected ? FColor::Green : FColor::Red;
+		DrawDebugSphere(GetWorld(), CollisionCenter, CollisionRadius, 18, DrawColor, false, 2.0f);
+#endif
 		for (const FOverlapResult& OverlapResult : OverlapResults)
 		{
 			AActor* OverlapActor = OverlapResult.GetActor();
@@ -120,7 +120,7 @@ void ASS_Creepster::AttackHitCheck(FName AttackId)
 			if (CharacterPlayer)
 			{
 				FDamageEvent DamageEvent;
-				const float AttackDamage = 35.0f;
+				const float AttackDamage = 25.0f;
 				CharacterPlayer->TakeDamage(AttackDamage, DamageEvent, GetController(), this);
 			}
 		}

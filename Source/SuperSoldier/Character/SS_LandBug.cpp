@@ -91,7 +91,7 @@ void ASS_LandBug::AttackHitCheck(FName AttackId)
 	if (HasAuthority())
 	{
 		FVector CollisionCenter = GetActorLocation() + GetActorForwardVector() * 150.0f;
-		float CollisionRadius = 75.0f;
+		float CollisionRadius = 45.0f;
 
 		FCollisionQueryParams CollisionParams;
 		CollisionParams.AddIgnoredActor(this);

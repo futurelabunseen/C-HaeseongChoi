@@ -47,7 +47,7 @@ ASS_Scorobey::ASS_Scorobey(const FObjectInitializer& ObjectInitializer)
 	GetCapsuleComponent()->InitCapsuleSize(75.f, 75.0f);
 
 	// Movement
-	DefaultWalkSpeed = 600.0f;
+	DefaultWalkSpeed = 400.0f;
 	GetCharacterMovement()->MaxWalkSpeed = DefaultWalkSpeed;
 
 	// Mesh & AnimInstance

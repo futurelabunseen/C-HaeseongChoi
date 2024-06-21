@@ -223,6 +223,9 @@ ASS_MurdockPlayer::ASS_MurdockPlayer(const FObjectInitializer& ObjectInitializer
 			AimAction = InputActionAimRef.Object;
 		}
 	}
+
+	bIsOverwhelming = true;
+	OverwhelmingTime = 1.0f;
 }
 
 void ASS_MurdockPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -682,9 +685,6 @@ float ASS_MurdockPlayer::TakeDamage(float DamageAmount, FDamageEvent const& Dama
 {
 	float Result = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
-	// DetachStrataIndicator();
-	// CurStrataIndicator = nullptr;
-
 	return Result;
 }
 
@@ -705,6 +705,15 @@ void ASS_MurdockPlayer::Respawn(const FVector& TargetLocation)
 
 	RpcPlayAnimation(RespawnMontage);
 	ClientRpcPlayAnimation(this, RespawnMontage);
+
+	FTimerHandle OverwhelmingTimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(
+		OverwhelmingTimerHandle,
+		FTimerDelegate::CreateLambda([&]() {
+			bIsOverwhelming = false;
+			}),
+		OverwhelmingTime,
+		false);
 }
 
 bool ASS_MurdockPlayer::ServerRpcFire_Validate()

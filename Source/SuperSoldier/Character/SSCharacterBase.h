@@ -45,6 +45,11 @@ public:
 protected:
 	AController* LastDamageInstigator;
 
+// Overwhelming Section
+protected:
+	bool bIsOverwhelming;
+	float OverwhelmingTime;
+
 // Throw Section
 public:
 	virtual void ReleaseThrowable();

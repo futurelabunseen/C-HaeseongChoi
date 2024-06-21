@@ -37,6 +37,8 @@ ASSCharacterBase::ASSCharacterBase(const FObjectInitializer& ObjectInitializer)
 	}
 
 	bDead = false;
+	bIsOverwhelming = false;
+	OverwhelmingTime = 0.0f;
 	CharacterCollisionType = ECharacterCollisionType::Normal;
 }
 
@@ -107,6 +109,8 @@ void ASSCharacterBase::ShowAttackEffect()
 
 float ASSCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
+	if (bIsOverwhelming) return 0.0f;
+
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
 	LastDamageInstigator = EventInstigator;

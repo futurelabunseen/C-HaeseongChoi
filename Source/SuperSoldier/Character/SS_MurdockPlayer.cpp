@@ -15,7 +15,6 @@
 #include "Strata/SSStrataIndicator.h"
 #include "Weapon/SSWeaponComponent_Rifle.h"
 #include "Character/SSCharacterControlData.h"
-#include "Engine/DamageEvents.h"
 #include "UI/SSUserPlayWidget.h"
 #include "SuperSoldier.h"
 
@@ -397,8 +396,8 @@ void ASS_MurdockPlayer::Fire(const FInputActionValue& Value)
 		return;
 	}
 
-	// 애니메이션 몽타주가 재생 중이 아니고, 조준 중이라면 격발
-	if (!GetAnyMontagePlaying() && bAiming)
+	// 애니메이션 몽타주가 재생 중이 아니고, 격발 가능하다면 격발
+	if (!GetAnyMontagePlaying() && CanFire())
 	{
 		const float AnimationSpeedRate = 1.0f;
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
@@ -408,30 +407,22 @@ void ASS_MurdockPlayer::Fire(const FInputActionValue& Value)
 	}
 }
 
+bool ASS_MurdockPlayer::CanFire()
+{
+	if (!bAiming) return false;
+	if (!IsValid(MainWeapon)) return false;
+	if (!MainWeapon->GetCanFire()) return false;
+	return true;
+}
+
 void ASS_MurdockPlayer::AttackHitCheck(FName AttackId)
 {
 	Super::AttackHitCheck(AttackId);
 
 	if (MainWeapon)
 	{
-		FHitResult HitResult = MainWeapon->AttackHitCheck();
-		if (IsLocallyControlled())
-		{
-			MainWeapon->ShowAttackEffect(HitResult);
-		}
-
-		if (HasAuthority() && HitResult.bBlockingHit)
-		{
-			FDamageEvent DamageEvent;
-			const float AttackDamage = 30.0f;
-			HitResult.GetActor()->TakeDamage(AttackDamage, DamageEvent, GetController(), this);
-		}
+		MainWeapon->AttackHitCheck();
 	}
-}
-
-void ASS_MurdockPlayer::PlaySoundEffect()
-{
-	MainWeapon->PlaySoundEffect();
 }
 
 void ASS_MurdockPlayer::Call(const FInputActionValue& Value)
@@ -731,33 +722,7 @@ void ASS_MurdockPlayer::ServerRpcFire_Implementation()
 			}),
 		0.07f,
 		false);
-
 	RpcPlayAnimation(FireMontage);
-}
-
-bool ASS_MurdockPlayer::ServerRpcNotifyFireHit_Validate(const FHitResult& HitResult)
-{
-	return true;
-}
-
-void ASS_MurdockPlayer::ServerRpcNotifyFireHit_Implementation(const FHitResult& HitResult)
-{
-	AActor* HitActor = HitResult.GetActor();
-	if (IsValid(HitActor))
-	{
-		const float AcceptCheckDistance = 300.0f;
-
-		const FVector HitLocation = HitResult.Location;
-		const FBox HitBox = HitActor->GetComponentsBoundingBox();
-		const FVector ActorBoxCenter = (HitBox.Min + HitBox.Max) * 0.5f;
-
-		if (FVector::DistSquared(HitLocation, ActorBoxCenter) <= AcceptCheckDistance * AcceptCheckDistance)
-		{
-			FDamageEvent DamageEvent;
-			const float AttackDamage = 30.0f;
-			HitResult.GetActor()->TakeDamage(AttackDamage, DamageEvent, GetController(), this);
-		}
-	}
 }
 
 bool ASS_MurdockPlayer::ServerRpcCalling_Validate()
@@ -835,13 +800,4 @@ void ASS_MurdockPlayer::ServerRpcStrataThrow_Implementation()
 void ASS_MurdockPlayer::NetMulticastRpcShowAnimationMontage_Implementation(UAnimMontage* MontageToPlay, const float AnimationSpeedRate)
 {
 	Super::NetMulticastRpcShowAnimationMontage_Implementation(MontageToPlay, AnimationSpeedRate);
-
-	/*if (IsLocallyControlled())
-	{
-		if (MontageToPlay == HitReactMontage)
-		{
-			ResetPlayerInputVariable();
-			OnCalling.Broadcast(bCalling);
-		}
-	}*/
 }

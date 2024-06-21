@@ -19,13 +19,11 @@ public:
 
 // Attack Section
 public:
-	virtual const FHitResult AttackHitCheck() override;
+	virtual void AttackHitCheck() override;
 
 // VFX Section
+public:
 	virtual void ShowAttackEffect(const FHitResult& HitResult) override;
-
-	UFUNCTION(NetMulticast, Unreliable)
-	void NetMulticastShowVFX(const FHitResult& HitResult);
 
 // SFX Section
 public:

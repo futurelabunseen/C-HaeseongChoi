@@ -30,9 +30,18 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<class UStaticMeshComponent> WeaponMesh;
 
+
 // Attack Section
 public:
-	virtual const FHitResult AttackHitCheck();
+	void LineTraceAttackHitCheck();
+	void OnPostAttackHitCheck(const FHitResult& HitResult);
+	virtual void AttackHitCheck();
+	FORCEINLINE bool GetCanFire() { return bCanFire; }
+
+protected:
+	bool bCanFire;
+	float FireDelay;
+	float AttackDamage;
 
 // VFX Section
 public:
@@ -65,4 +74,9 @@ public:
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<class USoundBase> ShootSound;
+
+// FX Multicast Func Section
+protected:
+	UFUNCTION(NetMulticast, Unreliable)
+	void NetMulticastShowFX(const FHitResult& HitResult);
 };

@@ -3,11 +3,17 @@
 
 #include "Weapon/SSWeaponComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "GameFramework/Character.h"
+#include "Physics/SSColision.h"
+#include "Engine/DamageEvents.h"
 #include "SuperSoldier.h"
 
 // Sets default values for this component's properties
 USSWeaponComponent::USSWeaponComponent()
 {
+	bCanFire = true;
+	FireDelay = 0.0f;
+	AttackDamage = 0.0f;
 }
 
 void USSWeaponComponent::BeginPlay()
@@ -33,9 +39,61 @@ UStaticMeshComponent* USSWeaponComponent::GetMesh()
 	return WeaponMesh;
 }
 
-const FHitResult USSWeaponComponent::AttackHitCheck()
+void USSWeaponComponent::LineTraceAttackHitCheck()
 {
-	return FHitResult();
+	if (ACharacter* PlayerCharacter = Cast<ACharacter>(GetOwner()))
+	{
+		AController* PlayerController = PlayerCharacter->GetController();
+
+		if (PlayerController)
+		{
+			FVector CameraLocation;
+			FRotator CameraRotation;
+
+			PlayerController->GetPlayerViewPoint(CameraLocation, CameraRotation);
+
+			FVector TraceStart = CameraLocation;
+			FVector TraceEnd = TraceStart + CameraRotation.Vector() * 5000.0f;
+
+			FHitResult HitResult;
+			FCollisionQueryParams TraceParams(FName(TEXT("Attack")), false, PlayerCharacter);
+
+			GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, CCHANNEL_SSACTION, TraceParams);
+//#if ENABLE_DRAW_DEBUG
+//			FColor DrawColor = HitResult.bBlockingHit ? FColor::Green : FColor::Red;
+//			DrawDebugLine(GetWorld(), TraceStart, TraceEnd, DrawColor, false, 5.0f);
+//#endif
+			OnPostAttackHitCheck(HitResult);
+		}
+	}
+}
+
+void USSWeaponComponent::OnPostAttackHitCheck(const FHitResult& HitResult)
+{
+	if (ACharacter* PlayerCharacter = Cast<ACharacter>(GetOwner()))
+	{
+		if (PlayerCharacter->IsLocallyControlled())
+		{
+			ShowAttackEffect(HitResult);
+			PlaySoundEffect();
+		}
+
+		if (PlayerCharacter->HasAuthority())
+		{
+			NetMulticastShowFX(HitResult);
+			
+			if (HitResult.bBlockingHit)
+			{
+				FDamageEvent DamageEvent;
+				HitResult.GetActor()->TakeDamage(AttackDamage, DamageEvent, PlayerCharacter->GetController(), PlayerCharacter);
+			}
+		}
+	}
+}
+
+void USSWeaponComponent::AttackHitCheck()
+{
+	
 }
 
 void USSWeaponComponent::ShowAttackEffect(const FHitResult& HitResult)
@@ -44,4 +102,14 @@ void USSWeaponComponent::ShowAttackEffect(const FHitResult& HitResult)
 
 void USSWeaponComponent::PlaySoundEffect()
 {
+}
+
+void USSWeaponComponent::NetMulticastShowFX_Implementation(const FHitResult& HitResult)
+{
+	ACharacter* PlayerCharacter = Cast<ACharacter>(GetOwner());
+	if (PlayerCharacter->GetLocalRole() == ROLE_SimulatedProxy)
+	{
+		ShowAttackEffect(HitResult);
+		PlaySoundEffect();
+	}
 }

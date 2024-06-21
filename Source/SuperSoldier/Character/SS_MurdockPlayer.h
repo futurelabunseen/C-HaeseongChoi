@@ -86,8 +86,8 @@ protected:
 
 // Attack Hit Section
 protected:
+	bool CanFire();
 	virtual void AttackHitCheck(FName AttackId = TEXT("None")) override;
-	virtual void PlaySoundEffect() override;
 
 // Strata Section
 protected:
@@ -149,9 +149,6 @@ public:
 protected:
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerRpcFire();
-
-	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerRpcNotifyFireHit(const FHitResult& HitResult);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerRpcCalling();

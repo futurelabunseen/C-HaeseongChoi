@@ -3,7 +3,6 @@
 
 #include "Weapon/SSWeaponComponent_Rifle.h"
 #include "GameFramework/Character.h"
-#include "Physics/SSColision.h"
 #include "Particles/ParticleSystem.h"
 #include "Kismet/GameplayStatics.h"
 #include "NiagaraComponent.h"
@@ -64,39 +63,45 @@ USSWeaponComponent_Rifle::USSWeaponComponent_Rifle()
 	{
 		ShootSound = ShootSoundRef.Object;
 	}
+
+	FireDelay = 0.75f;
+	AttackDamage = 30.0f;
 }
 
-const FHitResult USSWeaponComponent_Rifle::AttackHitCheck()
+void USSWeaponComponent_Rifle::AttackHitCheck()
 {
+	FTimerHandle BurstTimerHandle[2];
+
+	LineTraceAttackHitCheck();
+	GetWorld()->GetTimerManager().SetTimer(
+		BurstTimerHandle[0],
+		this, 
+		&USSWeaponComponent_Rifle::LineTraceAttackHitCheck,
+		0.1f, 
+		false);
+	GetWorld()->GetTimerManager().SetTimer(
+		BurstTimerHandle[1],
+		this,
+		&USSWeaponComponent_Rifle::LineTraceAttackHitCheck,
+		0.2f,
+		false);
+
 	if (ACharacter* PlayerCharacter = Cast<ACharacter>(GetOwner()))
 	{
-		AController* PlayerController = PlayerCharacter->GetController();
-
-		if (PlayerController)
+		if (PlayerCharacter->IsLocallyControlled())
 		{
-			FVector CameraLocation;
-			FRotator CameraRotation;
+			bCanFire = false;
 
-			PlayerController->GetPlayerViewPoint(CameraLocation, CameraRotation);
-
-			FVector TraceStart = CameraLocation;
-			FVector TraceEnd = TraceStart + CameraRotation.Vector() * 5000.0f;
-
-			FHitResult HitResult;
-			FCollisionQueryParams TraceParams(FName(TEXT("Attack")), false, PlayerCharacter);
-
-			GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, CCHANNEL_SSACTION, TraceParams);
-
-			NetMulticastShowVFX(HitResult);
-//#if ENABLE_DRAW_DEBUG
-//			FColor DrawColor = HitResult.bBlockingHit ? FColor::Green : FColor::Red;
-//			DrawDebugLine(GetWorld(), TraceStart, TraceEnd, DrawColor, false, 5.0f);
-//#endif
-			return HitResult;
+			FTimerHandle RestoreCanFire;
+			GetWorld()->GetTimerManager().SetTimer(
+				RestoreCanFire,
+				FTimerDelegate::CreateLambda([&]() {
+					bCanFire = true;
+					}),
+				FireDelay,
+				false);
 		}
 	}
-
-	return FHitResult();
 }
 
 void USSWeaponComponent_Rifle::ShowAttackEffect(const FHitResult& HitResult)
@@ -198,14 +203,5 @@ void USSWeaponComponent_Rifle::PlaySoundEffect()
 			GetWorld(),
 			ShootSound,
 			MuzzleSocketTransform.GetLocation());
-	}
-}
-
-void USSWeaponComponent_Rifle::NetMulticastShowVFX_Implementation(const FHitResult& HitResult)
-{
-	ACharacter* PlayerCharacter = Cast<ACharacter>(GetOwner());
-	if (PlayerCharacter->GetLocalRole() == ROLE_SimulatedProxy)
-	{
-		ShowAttackEffect(HitResult);
 	}
 }

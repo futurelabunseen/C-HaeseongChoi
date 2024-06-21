@@ -129,6 +129,13 @@ void ASSCharacterNonPlayer::Attack(FName AttackMontageSectionName)
 
 void ASSCharacterNonPlayer::AttackHitCheck(FName AttackId)
 {
+	if (!HasAuthority() && AttackSound)
+	{
+		UGameplayStatics::SpawnSoundAtLocation(
+			GetWorld(),
+			AttackSound,
+			GetActorLocation());
+	}
 }
 
 void ASSCharacterNonPlayer::NotifyActionEnd(UAnimMontage* TargetMontage, bool IsProperlyEnded)
@@ -148,17 +155,6 @@ void ASSCharacterNonPlayer::TurnInPlace(bool bTurnRight)
 float ASSCharacterNonPlayer::GetAttackRange()
 {
 	return AttackRange;
-}
-
-void ASSCharacterNonPlayer::PlaySoundEffect()
-{
-	if (AttackSound)
-	{
-		UGameplayStatics::SpawnSoundAtLocation(
-			GetWorld(),
-			AttackSound,
-			GetActorLocation());
-	}
 }
 
 void ASSCharacterNonPlayer::PlayMoanSound()

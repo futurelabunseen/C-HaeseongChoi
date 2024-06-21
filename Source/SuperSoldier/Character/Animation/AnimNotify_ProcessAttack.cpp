@@ -15,11 +15,6 @@ void UAnimNotify_ProcessAttack::Notify(USkeletalMeshComponent* MeshComp, UAnimSe
 
 		if (AttackPawn)
 		{
-			if (!MeshCompOwner->HasAuthority())
-			{
-				AttackPawn->PlaySoundEffect();
-			}
-
 			AttackPawn->AttackHitCheck(ProcessAttackId);
 		}
 	}

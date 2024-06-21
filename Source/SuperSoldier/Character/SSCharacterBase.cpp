@@ -97,10 +97,6 @@ void ASSCharacterBase::AttackHitCheck(FName AttackId)
 {
 }
 
-void ASSCharacterBase::PlaySoundEffect()
-{
-}
-
 void ASSCharacterBase::PlayMoanSound()
 {
 }

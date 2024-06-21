@@ -66,7 +66,6 @@ protected:
 
 // SFX Section
 public:
-	virtual void PlaySoundEffect() override;
 	virtual void PlayMoanSound() override;
 	virtual void PlayDeadSound() override;
 protected:

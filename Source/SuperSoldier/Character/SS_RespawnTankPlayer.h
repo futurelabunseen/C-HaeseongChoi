@@ -61,6 +61,18 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<class UNiagaraComponent> TrailNiagara;
 
+// SFX Section
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<class USoundBase> FallingSound;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<class USoundBase> LandingSound;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<class UAudioComponent> FallingSoundComponent;
+
+protected:
 	UFUNCTION(NetMulticast, UnReliable)
-	void NetMulticastEndNiagaraEffect();
+	void NetMulticastSettingEffectOnLand();
 };

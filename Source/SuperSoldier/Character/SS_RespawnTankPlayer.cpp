@@ -13,6 +13,8 @@
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Net/UnrealNetwork.h"
+#include "Kismet/GameplayStatics.h"
+#include "Components/AudioComponent.h"
 #include "SuperSoldier.h"
 
 ASS_RespawnTankPlayer::ASS_RespawnTankPlayer(const FObjectInitializer& ObjectInitializer) :
@@ -81,6 +83,19 @@ ASS_RespawnTankPlayer::ASS_RespawnTankPlayer(const FObjectInitializer& ObjectIni
 	TrailNiagara->SetRelativeRotation(FRotator(-90.0f, 0.0f, 0.0f));
 	TrailNiagara->bAutoActivate = false;
 
+	// SFX
+	static ConstructorHelpers::FObjectFinder<USoundBase> FallingSoundRef(TEXT("/Game/SuperSoldier/Sounds/SC_Falling.SC_Falling"));
+	if (FallingSoundRef.Object)
+	{
+		FallingSound = FallingSoundRef.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<USoundBase> LandingSoundRef(TEXT("/Game/SuperSoldier/Sounds/SC_Landing.SC_Landing"));
+	if (LandingSoundRef.Object)
+	{
+		LandingSound = LandingSoundRef.Object;
+	}
+
 	LerpCharacterAlpha = 0.0f;
 }
 
@@ -106,7 +121,7 @@ void ASS_RespawnTankPlayer::Landed(const FHitResult& Hit)
 			RespawnMurdockCharacter();
 		}), 0.8f, false);
 
-		NetMulticastEndNiagaraEffect();
+		NetMulticastSettingEffectOnLand();
 	}
 
 	else 
@@ -119,6 +134,10 @@ void ASS_RespawnTankPlayer::Landed(const FHitResult& Hit)
 
 			// Play the Camera Shake
 			PlayerController->ClientStartCameraShake(LandingCameraLocationShakeClass);
+
+			// Stop Falling Sound
+			FallingSoundComponent->Stop();
+			UGameplayStatics::SpawnSound2D(GetWorld(), LandingSound, 1.0f, 1.0f, 2.2f);
 		}
 	}
 }
@@ -163,6 +182,10 @@ void ASS_RespawnTankPlayer::BeginPlay()
 			}
 
 			FollowCamera->SetRelativeLocation(RespawnStartCameraRelativeLocation);
+
+			FallingSoundComponent = UGameplayStatics::SpawnSound2D(
+				GetWorld(), 
+				FallingSound);
 		}
 	}
 }
@@ -257,11 +280,16 @@ void ASS_RespawnTankPlayer::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>
 	DOREPLIFETIME(ASS_RespawnTankPlayer, RespawnStartCameraRelativeLocation);
 }
 
-void ASS_RespawnTankPlayer::NetMulticastEndNiagaraEffect_Implementation()
+void ASS_RespawnTankPlayer::NetMulticastSettingEffectOnLand_Implementation()
 {
 	if (!HasAuthority())
 	{
 		TrailNiagara->SetActive(false);
+
+		if (GetLocalRole() == ENetRole::ROLE_SimulatedProxy)
+		{
+			UGameplayStatics::SpawnSoundAtLocation(GetWorld(), LandingSound, GetActorLocation(), FRotator::ZeroRotator, 1.0f, 1.0f, 2.2f);
+		}
 	}
 }
 

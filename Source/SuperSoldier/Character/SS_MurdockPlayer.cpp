@@ -478,6 +478,8 @@ void ASS_MurdockPlayer::Call(const FInputActionValue& Value)
 
 void ASS_MurdockPlayer::EndCalling(UAnimMontage* TargetMontage, bool IsProperlyEnded)
 {
+	if(bDead) return;
+
 	if (bChangeMontageForThrowingStrata)
 	{
 		bReadyForThrowingStrata = true;
@@ -785,6 +787,8 @@ bool ASS_MurdockPlayer::ServerRpcStrataReady_Validate(const FName& StratagemName
 
 void ASS_MurdockPlayer::ServerRpcStrataReady_Implementation(const FName& StratagemName)
 {
+	if (bDead) return;
+
 	RpcPlayAnimation(StrataReadyMontage);
 
 	CurStrataIndicator = GetWorld()->SpawnActor<ASSStrataIndicator>(ASSStrataIndicator::StaticClass());

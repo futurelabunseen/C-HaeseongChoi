@@ -14,6 +14,11 @@ USSWeaponComponent::USSWeaponComponent()
 	bCanFire = true;
 	FireDelay = 0.0f;
 	AttackDamage = 0.0f;
+	
+	RecoilPitchMin = 0.0f;
+	RecoilPitchMax = 0.0f;
+	RecoilYawMin = 0.0f;
+	RecoilYawMax = 0.0f;
 }
 
 void USSWeaponComponent::BeginPlay()
@@ -76,6 +81,7 @@ void USSWeaponComponent::OnPostAttackHitCheck(const FHitResult& HitResult)
 		{
 			ShowAttackEffect(HitResult);
 			PlaySoundEffect();
+			AddRecoil();
 		}
 
 		if (PlayerCharacter->HasAuthority())
@@ -102,6 +108,18 @@ void USSWeaponComponent::ShowAttackEffect(const FHitResult& HitResult)
 
 void USSWeaponComponent::PlaySoundEffect()
 {
+}
+
+void USSWeaponComponent::AddRecoil()
+{
+	ACharacter* PlayerCharacter = Cast<ACharacter>(GetOwner());
+	check(PlayerCharacter);
+
+	APlayerController* PlayerController = Cast<APlayerController>(PlayerCharacter->GetController());
+	check(PlayerController);
+
+	PlayerController->AddPitchInput(FMath::FRandRange(-RecoilPitchMin, RecoilPitchMax));
+	PlayerController->AddYawInput(FMath::FRandRange(-RecoilYawMin, RecoilYawMax));
 }
 
 void USSWeaponComponent::NetMulticastShowFX_Implementation(const FHitResult& HitResult)

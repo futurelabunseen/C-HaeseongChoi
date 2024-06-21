@@ -66,6 +66,11 @@ USSWeaponComponent_Rifle::USSWeaponComponent_Rifle()
 
 	FireDelay = 0.75f;
 	AttackDamage = 30.0f;
+
+	RecoilPitchMin = -0.1f;
+	RecoilPitchMax = -0.5f;
+	RecoilYawMin = -0.5f;
+	RecoilYawMax = 0.5f;
 }
 
 void USSWeaponComponent_Rifle::AttackHitCheck()

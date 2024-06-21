@@ -79,4 +79,13 @@ protected:
 protected:
 	UFUNCTION(NetMulticast, Unreliable)
 	void NetMulticastShowFX(const FHitResult& HitResult);
+
+// Recoil Section
+public:
+	virtual void AddRecoil();
+protected:
+	float RecoilPitchMin;
+	float RecoilPitchMax;
+	float RecoilYawMin;
+	float RecoilYawMax;
 };

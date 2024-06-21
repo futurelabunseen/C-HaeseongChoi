@@ -50,6 +50,12 @@ ASS_Kraken::ASS_Kraken(const FObjectInitializer& ObjectInitializer)
 		HitReactMontage = HitReactMontageRef.Object;
 	}
 
+	static ConstructorHelpers::FObjectFinder<USoundBase> AttackSoundRef(TEXT("/Game/SuperSoldier/Characters/Monsters/Kraken/Sounds/SC_KrakenAttack.SC_KrakenAttack"));
+	if (AttackSoundRef.Object)
+	{
+		AttackSound = AttackSoundRef.Object;
+	}
+
 	static ConstructorHelpers::FObjectFinder<USoundBase> MoanSoundRef(TEXT("/Game/SuperSoldier/Characters/Monsters/Kraken/Sounds/SC_KrakenHitMoan.SC_KrakenHitMoan"));
 	if (MoanSoundRef.Object)
 	{

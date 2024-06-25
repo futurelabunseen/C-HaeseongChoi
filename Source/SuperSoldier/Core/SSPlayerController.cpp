@@ -28,6 +28,30 @@ ASSPlayerController::ASSPlayerController()
 	{
 		UserResultWidgetClass = UserResultWidgetRef.Class;
 	}
+
+	// Spectate Input Action & Input Mapping Context
+	{
+		static ConstructorHelpers::FObjectFinder<UInputMappingContext> InputMappingContextRef(
+			TEXT("/Game/SuperSoldier/Input/IMC_Spectate.IMC_Spectate"));
+		if (InputMappingContextRef.Object)
+		{
+			SpectateInputMappingContext = InputMappingContextRef.Object;
+		}
+
+		static ConstructorHelpers::FObjectFinder<UInputAction> InputActionSpectateNextRef(
+			TEXT("/Game/SuperSoldier/Input/Actions/IA_SpectateNext.IA_SpectateNext"));
+		if (InputActionSpectateNextRef.Object)
+		{
+			SpectateNextAction = InputActionSpectateNextRef.Object;
+		}
+
+		static ConstructorHelpers::FObjectFinder<UInputAction> InputActionSpectatePreviousRef(
+			TEXT("/Game/SuperSoldier/Input/Actions/IA_SpectatePrevious.IA_SpectatePrevious"));
+		if (InputActionSpectatePreviousRef.Object)
+		{
+			SpectatePreviousAction = InputActionSpectatePreviousRef.Object;
+		}
+	}
 }
 
 void ASSPlayerController::BeginPlay()
@@ -74,7 +98,12 @@ void ASSPlayerController::AcknowledgePossession(APawn* P)
 		Subsystem->ClearAllMappings();
 
 		UInputMappingContext* MappingContext = SSCharacterPlayer->GetIMC();
-		if (MappingContext)
+		if (IsValid(SpectateInputMappingContext))
+		{
+			Subsystem->AddMappingContext(SpectateInputMappingContext, 0);
+		}
+
+		if (IsValid(MappingContext))
 		{
 			Subsystem->AddMappingContext(SSCharacterPlayer->GetIMC(), 0);
 		}
@@ -103,6 +132,27 @@ void ASSPlayerController::ShowGameResult(bool bCleared)
 	}
 
 	bShowMouseCursor = true;
+}
+
+void ASSPlayerController::SetupInputComponent()
+{
+	Super::SetupInputComponent();
+
+	SS_LOG(LogSSNetwork, Log, TEXT("SetupInputComponent"));
+
+	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
+	EnhancedInputComponent->BindAction(SpectateNextAction, ETriggerEvent::Triggered, this, &ASSPlayerController::SpectateNext);
+	EnhancedInputComponent->BindAction(SpectatePreviousAction, ETriggerEvent::Triggered, this, &ASSPlayerController::SpectatePrevious);
+}
+
+void ASSPlayerController::SpectatePrevious(const FInputActionValue& Value)
+{
+	SS_LOG(LogSSNetwork, Log, TEXT("SpectatePrevious"));
+}
+
+void ASSPlayerController::SpectateNext(const FInputActionValue& Value)
+{
+	SS_LOG(LogSSNetwork, Log, TEXT("SpectateNext"));
 }
 
 void ASSPlayerController::ClientRpcSetAndShowFinalGameStatistics_Implementation(bool bCleared, const FPlayStatistics& FinalPlayStatistics)

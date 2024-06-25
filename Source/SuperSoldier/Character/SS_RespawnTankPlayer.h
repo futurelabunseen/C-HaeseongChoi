@@ -53,9 +53,6 @@ protected:
 	FVector_NetQuantize RespawnStartCameraRelativeLocation;
 	FVector RespawnEndCameraRelativeLocation;
 
-	UFUNCTION(Client, UnReliable)
-	void ClientRpcStartCameraEffect(ASSCharacterPlayer* RespawnCharacter);
-
 // VFX Section
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)

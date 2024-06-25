@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "InputActionValue.h"
 #include "SSPlayerController.generated.h"
 
 /**
@@ -48,4 +49,21 @@ protected:
 
 	UPROPERTY()
 	TObjectPtr<class USSUserResultWidget> UserResultWidget;
+
+// Spectate Section
+public:
+	virtual void SetupInputComponent() override;
+
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputMappingContext> SpectateInputMappingContext;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction> SpectatePreviousAction;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction> SpectateNextAction;
+
+	void SpectatePrevious(const FInputActionValue& Value);
+	void SpectateNext(const FInputActionValue& Value);
 };

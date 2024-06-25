@@ -307,13 +307,3 @@ void ASS_RespawnTankPlayer::NetMulticastSettingEffectOnLand_Implementation()
 		}
 	}
 }
-
-void ASS_RespawnTankPlayer::ClientRpcStartCameraEffect_Implementation(ASSCharacterPlayer* RespawnCharacter)
-{
-	check(RespawnCharacter);
-
-	APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
-	MurdockCharacter = RespawnCharacter;
-
-	PlayerController->SetViewTargetWithBlend(MurdockCharacter, 0.6f);
-}

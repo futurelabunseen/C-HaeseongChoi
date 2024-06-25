@@ -48,4 +48,9 @@ public:
 protected:
 	const int32 ClearTotalKilledNonPlayerCharacterNum = 200;
 	const int32 PlayerRespawnLimits = 10;
+
+// Game Clear Section
+public:
+	const int32 GetPlayerIndex(APlayerController* QueryPlayerController);
+	const int32 ClampPlayerIndex(int32 CurIndex);
 };

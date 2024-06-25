@@ -7,6 +7,7 @@
 #include "InputActionValue.h"
 #include "SSPlayerController.generated.h"
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnPossessionChanged, APawn*);
 /**
  * 
  */
@@ -22,6 +23,7 @@ protected:
 	virtual void PostInitializeComponents() override;
 	virtual void PostNetInit() override;
 
+	virtual void OnPossess(APawn* aPawn) override;
 	virtual void AcknowledgePossession(class APawn* P) override;
 
 // UI Play Widget Section
@@ -31,11 +33,6 @@ protected:
 
 	UPROPERTY()
 	TObjectPtr<class USSUserPlayWidget> UserPlayWidget;
-
-// Respawn Camera Lerp Section
-public:
-	UFUNCTION(Client, Unreliable)
-	void ClientRpcBlendViewTargetToNewPawn(APawn* NewPawn);
 
 // Show GameResult
 public:
@@ -52,8 +49,18 @@ protected:
 
 // Spectate Section
 public:
+	FOnPossessionChanged OnPossessionChanged;
+
 	virtual void SetupInputComponent() override;
 
+	UFUNCTION(Server, Unreliable)
+	void ServerRpcSpectatePrevious();
+
+	UFUNCTION(Server, Unreliable)
+	void ServerRpcSpectateNext();
+
+	UFUNCTION()
+	void UpdateViewTarget(APawn* aPawn);
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputMappingContext> SpectateInputMappingContext;
@@ -64,6 +71,14 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> SpectateNextAction;
 
+	int32 SpectateOffset;
+	int IndividualPlayerIndex;
+
 	void SpectatePrevious(const FInputActionValue& Value);
 	void SpectateNext(const FInputActionValue& Value);
+
+	void UpdatePlayerIndex();
+	void ClearPrevDelegate();
+	void SpectateTarget();
+
 };

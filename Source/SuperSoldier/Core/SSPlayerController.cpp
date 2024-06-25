@@ -11,6 +11,8 @@
 #include "EnhancedInputSubsystems.h"
 #include "Core/SSGameState.h"
 #include "Core/SSPlayerState.h"
+#include "Kismet/GameplayStatics.h"
+#include "Core/SSGameMode.h"
 
 ASSPlayerController::ASSPlayerController()
 {
@@ -85,6 +87,12 @@ void ASSPlayerController::PostNetInit()
 	Super::PostNetInit();
 }
 
+void ASSPlayerController::OnPossess(APawn* aPawn)
+{
+	Super::OnPossess(aPawn);
+	OnPossessionChanged.Broadcast(aPawn);
+}
+
 void ASSPlayerController::AcknowledgePossession(APawn* P)
 {
 	Super::AcknowledgePossession(P);
@@ -145,14 +153,95 @@ void ASSPlayerController::SetupInputComponent()
 	EnhancedInputComponent->BindAction(SpectatePreviousAction, ETriggerEvent::Triggered, this, &ASSPlayerController::SpectatePrevious);
 }
 
+void ASSPlayerController::UpdateViewTarget(APawn* aPawn)
+{
+	if(IsValid(aPawn))
+	{
+		SetViewTargetWithBlend(aPawn);
+	}
+	else
+	{
+		SpectateTarget();
+	}
+}
+
+void ASSPlayerController::ServerRpcSpectatePrevious_Implementation()
+{
+	UpdatePlayerIndex();
+	ClearPrevDelegate();
+
+	SpectateOffset -= 1;
+	
+	SpectateTarget();
+}
+
+void ASSPlayerController::ServerRpcSpectateNext_Implementation()
+{
+	UpdatePlayerIndex();
+	ClearPrevDelegate();
+
+	SpectateOffset += 1;
+
+	SpectateTarget();
+}
+
 void ASSPlayerController::SpectatePrevious(const FInputActionValue& Value)
 {
-	SS_LOG(LogSSNetwork, Log, TEXT("SpectatePrevious"));
+	ASSCharacterPlayer* SSCharacterPlayer = CastChecked<ASSCharacterPlayer>(GetCharacter());
+	if (!SSCharacterPlayer->bDead) return;
+
+	bool bPressed = Value.Get<bool>();
+	if (bPressed)
+	{
+		ServerRpcSpectatePrevious();
+	}
 }
 
 void ASSPlayerController::SpectateNext(const FInputActionValue& Value)
 {
-	SS_LOG(LogSSNetwork, Log, TEXT("SpectateNext"));
+	ASSCharacterPlayer* SSCharacterPlayer = CastChecked<ASSCharacterPlayer>(GetCharacter());
+	if (!SSCharacterPlayer->bDead) return;
+
+	bool bPressed = Value.Get<bool>();
+	if (bPressed)
+	{
+		ServerRpcSpectateNext();
+	}
+}
+
+void ASSPlayerController::ClearPrevDelegate()
+{
+	// 기존 델리게이트를 삭제
+	ASSPlayerController* CurrentViewTargetPlayerController =
+		Cast<ASSPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), IndividualPlayerIndex + SpectateOffset));
+	if (IsValid(CurrentViewTargetPlayerController))
+	{
+		CurrentViewTargetPlayerController->OnPossessedPawnChanged.RemoveAll(this);
+	}
+}
+
+void ASSPlayerController::UpdatePlayerIndex()
+{
+	ASSGameMode* SSGameMode = CastChecked<ASSGameMode>(GetWorld()->GetAuthGameMode());
+	IndividualPlayerIndex = SSGameMode->GetPlayerIndex(this);
+}
+
+void ASSPlayerController::SpectateTarget()
+{
+	ASSGameMode* SSGameMode = CastChecked<ASSGameMode>(GetWorld()->GetAuthGameMode());
+	int32 PlayerIndex = SSGameMode->GetPlayerIndex(this);
+
+	int32 ClampedIndex = SSGameMode->ClampPlayerIndex(PlayerIndex + SpectateOffset);
+	SpectateOffset = ClampedIndex - PlayerIndex;
+
+	ASSPlayerController* SpectateTargetPlayerController =
+		Cast<ASSPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), ClampedIndex));
+	ACharacter* SpectateTarget = SpectateTargetPlayerController->GetCharacter();
+
+	SetViewTargetWithBlend(SpectateTarget);
+
+	// 새 델리게이트를 추가
+	SpectateTargetPlayerController->OnPossessionChanged.AddUObject(this, &ASSPlayerController::UpdateViewTarget);
 }
 
 void ASSPlayerController::ClientRpcSetAndShowFinalGameStatistics_Implementation(bool bCleared, const FPlayStatistics& FinalPlayStatistics)
@@ -160,9 +249,4 @@ void ASSPlayerController::ClientRpcSetAndShowFinalGameStatistics_Implementation(
 	ASSPlayerState* SSPlayerState = GetPlayerState<ASSPlayerState>();
 	SSPlayerState->SetPlayStatistics(FinalPlayStatistics);
 	ShowGameResult(bCleared);
-}
-
-void ASSPlayerController::ClientRpcBlendViewTargetToNewPawn_Implementation(APawn* NewPawn)
-{
-	SetViewTargetWithBlend(NewPawn, 0.8f);
 }

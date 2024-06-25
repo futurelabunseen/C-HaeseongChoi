@@ -39,6 +39,7 @@ void ASSGameMode::StartPlay()
 void ASSGameMode::PreLogin(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage)
 {
 	// 클라이언트의 접속 요청을 처리한다.
+	// 최대 플레이어 수가 되었거나 서버 리셋을 기다리는 중이라면 접속 거부
 	if (CurPlayerNum < MaxPlayerNum && !bWaitingForResetServer)
 	{
 		++CurPlayerNum;
@@ -47,7 +48,7 @@ void ASSGameMode::PreLogin(const FString& Options, const FString& Address, const
 	}
 	else
 	{
-		ErrorMessage = TEXT("[PreLogin Failed] Session already FullPlayer");
+		ErrorMessage = TEXT("[PreLogin Failed] Session Rejected");
 		FGameModeEvents::GameModePreLoginEvent.Broadcast(this, UniqueId, ErrorMessage);
 	}
 }
@@ -98,11 +99,14 @@ int32 ASSGameMode::RespawnPlayers(FVector TargetLocation)
 			RespawnLocation.Y += FMath::RandRange(-200.0f, 200.0f);
 			RespawnLocation.Z += 8000.0f;
 
+			// 리스폰 탱크를 스폰, 현재 카메라 위치 정보를 전달해준뒤, Possess하게 한다.
 			ASS_RespawnTankPlayer* RespawnTank = GetWorld()->SpawnActor<ASS_RespawnTankPlayer>(ASS_RespawnTankPlayer::StaticClass());
 			RespawnTank->SetActorLocation(RespawnLocation);
 			RespawnTank->SetRespawnStartCameraLocation(PlayerCharacter->GetFollowCameraWorldLocation());
 
 			PlayerController->Possess(RespawnTank);
+
+			// 원래 캐릭터는 게임에서 안보이게 한 뒤, 2초 후 삭제
 			PlayerCharacter->SetActorHiddenInGame(true);
 			PlayerCharacter->SetLifeSpan(2.0f);
 
@@ -220,17 +224,20 @@ void ASSGameMode::EndServer(bool bCleared)
 
 			if (IsValid(SSPlayerController) && IsValid(SSPlayerState))
 			{
+				// 플레이어 통계 & 게임 결과 출력을 위해 Client RPC 호출
 				SSPlayerController->ClientRpcSetAndShowFinalGameStatistics(bCleared, SSPlayerState->GetPlayStatistics());
 			}
 		}
 	}
 
+	// Server 리셋을 위해 준비 중임을 표시
 	bWaitingForResetServer = true;
 	StopServer();
 }
 
 void ASSGameMode::StopServer()
 {
+	// AI 동작을 멈추고, 몬스터가 더 스폰되지 않게 설정
 	SetNonPlayerCharacterStopAI();
 	SetNonPlayerCharacterSpawn(false);	
 }
@@ -259,4 +266,23 @@ void ASSGameMode::ResetServer()
 
 	SetNonPlayerCharacterSpawn(true);
 	bWaitingForResetServer = false;
+}
+
+const int32 ASSGameMode::GetPlayerIndex(APlayerController* QueryPlayerController)
+{
+	int32 RetIndex = 0;
+	for (APlayerController* PlayerController : TActorRange<APlayerController>(GetWorld()))
+	{
+		if (PlayerController == QueryPlayerController)
+		{
+			return RetIndex;
+		}
+		++RetIndex;
+	}
+	return -1;
+}
+
+const int32 ASSGameMode::ClampPlayerIndex(int32 CurIndex)
+{
+	return FMath::Clamp(CurIndex, 0, CurPlayerNum - 1);
 }

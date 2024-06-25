@@ -15,6 +15,5 @@ USSGameInstance::USSGameInstance()
 void USSGameInstance::Init()
 {
 	Super::Init();
-
 	StratagemManager->InitializeStratagem();
 }

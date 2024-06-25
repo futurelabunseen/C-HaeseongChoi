@@ -65,10 +65,19 @@ void ASSCharacterNonPlayer::OnRep_ServerCharacterbDead()
 {
 	Super::OnRep_ServerCharacterbDead();
 
+	// 몬스터의 LocalRole이 SimulatedProxy라면 사망시 효과를 보여지게한다.
 	if (GetLocalRole() == ENetRole::ROLE_SimulatedProxy)
 	{
+		// Dissolve 효과를 위한 타이머 설정
 		FTimerHandle DeadTimerHandle;
-		GetWorld()->GetTimerManager().SetTimer(DeadTimerHandle, this, &ASSCharacterNonPlayer::Dissolve, DissolveDelayTime, false);
+		GetWorld()->GetTimerManager().SetTimer(
+			DeadTimerHandle, 
+			this, 
+			&ASSCharacterNonPlayer::Dissolve, 
+			DissolveDelayTime, 
+			false);
+
+		// 죽었을 때의 사운드 출력
 		PlayDeadSound();
 	}
 }

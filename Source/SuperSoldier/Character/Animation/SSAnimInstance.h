@@ -21,6 +21,7 @@ protected:
 
 	void SetPitchOffset();
 	void SetYawOffset();
+	void ProcessTurnInPlace();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Character)
 	TObjectPtr<class ACharacter> Owner;
@@ -62,6 +63,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
 	float Yaw = 0.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
+	float YawCorrection = 0.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
 	float RootYawOffset = 0.f;

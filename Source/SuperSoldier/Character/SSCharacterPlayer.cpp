@@ -107,6 +107,11 @@ void ASSCharacterPlayer::SetupCharacterWidget(USSUserPlayWidget* InUserWidget)
 	}
 }
 
+void ASSCharacterPlayer::ResetCharacterWidget(USSUserPlayWidget* InUserWidget)
+{
+	Stat->OnHpChanged.RemoveAll(InUserWidget);
+}
+
 void ASSCharacterPlayer::Move(const FInputActionValue& Value)
 {
 	FVector2D MovementVector = Value.Get<FVector2D>();

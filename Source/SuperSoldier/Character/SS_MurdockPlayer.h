@@ -69,7 +69,6 @@ protected:
 	TObjectPtr<class UInputAction> AimAction;
 
 	void Aim(const FInputActionValue& Value);
-	void SetAimingToMovementComponent(bool bNewAiming);
 
 // Fire Section
 protected:

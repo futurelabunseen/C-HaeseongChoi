@@ -19,9 +19,7 @@ public:
 	virtual void SetMoveFor(ACharacter* C, float InDeltaTime, FVector const& NewAccel, class FNetworkPredictionData_Client_Character& ClientData) override;
 	virtual void PrepMoveFor(ACharacter* C) override;
 
-
 	uint8 bSprint : 1;
-	uint8 bAiming : 1;
 };
 
 // Indicating using custom
@@ -44,10 +42,8 @@ public:
 	USSCharacterMovementComponent();
 
 	void SetSprint(bool NewSprint);
-	void SetAiming(bool NewAiming);
 protected:
 	virtual void Sprint();
-	virtual void Aiming();
 	virtual void OnMovementUpdated(float DeltaSeconds, const FVector& OldLocation, const FVector& OldVelocity) override;
 
 	virtual class FNetworkPredictionData_Client* GetPredictionData_Client() const override;
@@ -56,7 +52,6 @@ public:
 	// Whether Client's Sprint
 	// Will be replicated to server
 	uint8 bSprint : 1;
-	uint8 bAiming : 1;
 protected:
 	float WalkSpeed;
 	float SprintSpeed;

@@ -22,20 +22,20 @@ void USSStrataPrecisionStrike::ActivateStratagem(UWorld* const CurWorld, AContro
 	// 미사일 스폰
 	FString PrecisionStrikePath = TEXT("/Game/SuperSoldier/Props/BP_PrecisionStrike.BP_PrecisionStrike_C");
 	UClass* PrecisionStrikeClass = StaticLoadClass(UObject::StaticClass(), nullptr, *PrecisionStrikePath);
+
 	if (PrecisionStrikeClass)
 	{
 		ASSStrataRocket* PrecisionStrikeActor = CurWorld->SpawnActor<ASSStrataRocket>(PrecisionStrikeClass);
 		PrecisionStrikeActor->SetStrataCauser(StrataCauser);
 
+		// 미사일 위치를 설정
 		FVector PrecisionStrikeLocation = TargetLocation;
-		PrecisionStrikeLocation.Z += 4000.0f;
+		const float SpawnOffset = 4000.0f;
+		PrecisionStrikeLocation.Z += SpawnOffset;
 		PrecisionStrikeActor->SetActorLocation(PrecisionStrikeLocation);
 
-		UFunction* StrikeFunction = PrecisionStrikeClass->FindFunctionByName(FName(TEXT("Strike")));
-		if (StrikeFunction)
-		{
-			FVector StrikeLocation = TargetLocation;
-			PrecisionStrikeActor->Strike(StrikeLocation);
-		}
+		// TargetLocation으로 미사일을 날린다
+		FVector StrikeLocation = TargetLocation;
+		PrecisionStrikeActor->Strike(StrikeLocation);
 	}
 }

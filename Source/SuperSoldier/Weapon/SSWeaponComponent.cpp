@@ -54,9 +54,9 @@ void USSWeaponComponent::LineTraceAttackHitCheck()
 		{
 			FVector CameraLocation;
 			FRotator CameraRotation;
-
 			PlayerController->GetPlayerViewPoint(CameraLocation, CameraRotation);
 
+			// 화면 중앙으로 향하는 벡터를 이용해 충돌을 검사
 			FVector TraceStart = CameraLocation;
 			FVector TraceEnd = TraceStart + CameraRotation.Vector() * 5000.0f;
 
@@ -64,11 +64,12 @@ void USSWeaponComponent::LineTraceAttackHitCheck()
 			FCollisionQueryParams TraceParams(FName(TEXT("Attack")), false, PlayerCharacter);
 
 			GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, CCHANNEL_SSACTION, TraceParams);
+			OnPostAttackHitCheck(HitResult);
+
 //#if ENABLE_DRAW_DEBUG
 //			FColor DrawColor = HitResult.bBlockingHit ? FColor::Green : FColor::Red;
 //			DrawDebugLine(GetWorld(), TraceStart, TraceEnd, DrawColor, false, 5.0f);
 //#endif
-			OnPostAttackHitCheck(HitResult);
 		}
 	}
 }
@@ -91,7 +92,11 @@ void USSWeaponComponent::OnPostAttackHitCheck(const FHitResult& HitResult)
 			if (HitResult.bBlockingHit)
 			{
 				FDamageEvent DamageEvent;
-				HitResult.GetActor()->TakeDamage(AttackDamage, DamageEvent, PlayerCharacter->GetController(), PlayerCharacter);
+				HitResult.GetActor()->TakeDamage(
+					AttackDamage, 
+					DamageEvent, 
+					PlayerCharacter->GetController(), 
+					PlayerCharacter);
 			}
 		}
 	}

@@ -53,17 +53,17 @@ void ASSStrataRocket::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	// 속도 * 시간으로 이동해야할 거리를 더해 새로운 위치로 설정
     FVector ActorForwardVector = GetActorForwardVector();
     FVector NewLocation = GetActorLocation() + ActorForwardVector * Speed * DeltaTime;
-
     SetActorLocation(NewLocation, true);
 }
 
 void ASSStrataRocket::Strike(const FVector& TargetLocation)
 {
+	// TargetLocation을 바라보게 액터를 설정하고 Tick을 활성화
     FVector ActorLocation = GetActorLocation();
     FRotator NewRotator = FRotationMatrix::MakeFromX(TargetLocation - ActorLocation).Rotator();
-
     SetActorRotation(NewRotator);
     SetActorTickEnabled(true);
 }
@@ -72,11 +72,12 @@ void ASSStrataRocket::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActo
 {
     if (HasAuthority() && Hit.bBlockingHit)
     {
+		// Multicast RPC로 클라이언트에 효과 출력
         NetMulticastRpcPlayEffect(Hit.Location, (Hit.ImpactNormal).ToOrientationRotator());
 
+		// DamageBox와 겹치는 액터에 대미지를 가한다.
         TArray<AActor*> OverlappingActors;
         DamageBox->GetOverlappingActors(OverlappingActors, ASSCharacterBase::StaticClass());
-
         for (AActor* OverlappingActor : OverlappingActors)
         {
             ASSCharacterBase* OverlappingCharater = Cast<ASSCharacterBase>(OverlappingActor);
@@ -86,6 +87,7 @@ void ASSStrataRocket::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActo
             OverlappingCharater->TakeDamage(AttackDamage, DamageEvent, StrataCauser, this);
         }
 
+		// RPC가 전달되도록 바로 삭제하지 않고, 게임에서 안보이게 한 뒤, 2초 후 삭제 
         SetActorHiddenInGame(true);
         SetActorTickEnabled(false);
         RocketStaticMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);

@@ -144,7 +144,9 @@ void ASSCharacterBase::UpdateDissolveProgress(const float Value)
 {
 	for (const auto& DynamicMaterialIndex : DynamicMaterialIndices)
 	{
-		UMaterialInstanceDynamic* DynamicMaterial = Cast<UMaterialInstanceDynamic>(GetMesh()->GetMaterial(DynamicMaterialIndex));
+		UMaterialInstanceDynamic* DynamicMaterial = 
+			Cast<UMaterialInstanceDynamic>(GetMesh()->GetMaterial(DynamicMaterialIndex));
+
 		DynamicMaterial->SetScalarParameterValue("DissolveParams", Value);
 	}
 	if (Value >= 1.f)
@@ -202,12 +204,16 @@ void ASSCharacterBase::OnRep_ServerCharacterCollisionType()
 
 void ASSCharacterBase::NetMulticastRpcShowAnimationMontage_Implementation(UAnimMontage* MontageToPlay, const float AnimationSpeedRate)
 {
+	if (HasAuthority()) return;
+
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	AnimInstance->Montage_Play(MontageToPlay, AnimationSpeedRate);
 }
 
 void ASSCharacterBase::NetMulticastRpcShowAnimationMontageWithSection_Implementation(UAnimMontage* MontageToPlay, FName SectionName, const float AnimationSpeedRate)
 {
+	if (HasAuthority()) return;
+
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	AnimInstance->Montage_Play(MontageToPlay, AnimationSpeedRate);
 

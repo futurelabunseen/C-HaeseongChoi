@@ -37,18 +37,19 @@ EBTNodeResult::Type UBTTask_TurnToTarget::ExecuteTask(UBehaviorTreeComponent& Ow
     ToTargetVec.Z = 0.0f;
     ToTargetVec.Normalize();
 
+	// 외적을 통해 오른쪽으로 회전해야하는지 왼쪽으로 회전하야하는지 판별
     FVector CrossVec = FVector::CrossProduct(ToTargetVec, ControllingPawn->GetActorForwardVector());
     bool bTurnRight = CrossVec.Z < 0.0f;
-
-    FAICharacterActionFinished OnActionFinished;
-    OnActionFinished.BindLambda(
-        [&]()
-        {
-            FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
-        });
-
-    AICharacter->SetAIActionDelegate(OnActionFinished);
     AICharacter->TurnInPlace(bTurnRight);
+
+	FAICharacterActionFinished OnActionFinished;
+	OnActionFinished.BindLambda(
+		[&]()
+		{
+			FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
+		});
+
+	AICharacter->SetAIActionDelegate(OnActionFinished);
 
 	return EBTNodeResult::InProgress;
 }

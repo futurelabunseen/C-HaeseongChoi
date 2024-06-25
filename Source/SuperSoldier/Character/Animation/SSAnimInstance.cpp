@@ -72,27 +72,37 @@ void USSAnimInstance::SetYawOffset()
 		}
 
 		YawChangeOverFrame = YawLastTick - Yaw;
-
 		RootYawOffset = UKismetMathLibrary::NormalizeAxis(RootYawOffset + YawChangeOverFrame);
 
-		if (GetCurveValue(TurnInPlace) > 0.f)
+		ProcessTurnInPlace();
+	}
+}
+
+void USSAnimInstance::ProcessTurnInPlace()
+{
+	// TurnInPlace 애니메이션이 재생 중이라면
+	if (GetCurveValue(TurnInPlace) > 0.f)
+	{
+		// 회전 방향을 결정
+		(RootYawOffset > 0.f) ? TurnDirection = -1.f : TurnDirection = 1.f;
+
+		// TurnInPlace를 위한 회전 값 Delta를 계산
+		DistanceCurveValueLastFrame = DistanceCurveValue;
+		DistanceCurveValue = GetCurveValue(DistanceCurve);
+		DistanceCurveDifference = DistanceCurveValueLastFrame - DistanceCurveValue;
+
+		// Root를 회전시키던 값을 0.0f로 서서히 되돌린다.
+		RootYawOffset = RootYawOffset - (DistanceCurveDifference * TurnDirection);
+
+		// 예상치 못한 회전을 방지하기 위해 최대 회전 각도를 벗어나려고 하면 값을 변경해준다.
+		ABSRootYawOffset = UKismetMathLibrary::Abs(RootYawOffset);
+		if (ABSRootYawOffset > MaxTurnAngle)
 		{
-			DistanceCurveValueLastFrame = DistanceCurveValue;
-			DistanceCurveValue = GetCurveValue(DistanceCurve);
+			YawToSubtract = ABSRootYawOffset - MaxTurnAngle;
+			YawMultiplier = 1.f;
+			(RootYawOffset > 0.f) ? YawMultiplier = 1.f : YawMultiplier = -1.f;
 
-			(RootYawOffset > 0.f) ? TurnDirection = -1.f : TurnDirection = 1.f;
-			DistanceCurveDifference = DistanceCurveValueLastFrame - DistanceCurveValue;
-
-			RootYawOffset = RootYawOffset - (DistanceCurveDifference * TurnDirection);
-			ABSRootYawOffset = UKismetMathLibrary::Abs(RootYawOffset);
-			if (ABSRootYawOffset > MaxTurnAngle)
-			{
-				YawToSubtract = ABSRootYawOffset - MaxTurnAngle;
-				YawMultiplier = 1.f;
-				(RootYawOffset > 0.f) ? YawMultiplier = 1.f : YawMultiplier = -1.f;
-
-				RootYawOffset = RootYawOffset - YawToSubtract * YawMultiplier;
-			}
+			RootYawOffset = RootYawOffset - YawToSubtract * YawMultiplier;
 		}
 	}
 }

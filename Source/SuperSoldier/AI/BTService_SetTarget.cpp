@@ -36,7 +36,8 @@ void UBTService_SetTarget::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* No
                     {
                         continue;
                     }
-
+					
+					// 가장 가까운 플레이어를 찾는다.
                     float Distance = FVector::Dist(ControllingPawn->GetActorLocation(), PlayerCharacter->GetActorLocation());
                     if (Distance < ClosestDistance)
                     {

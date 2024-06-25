@@ -236,8 +236,8 @@ void ASSPlayerController::SpectateTarget()
 
 	ASSPlayerController* SpectateTargetPlayerController =
 		Cast<ASSPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), ClampedIndex));
-	ACharacter* SpectateTarget = SpectateTargetPlayerController->GetCharacter();
-
+	ASSCharacterPlayer* SpectateTarget = Cast<ASSCharacterPlayer>(SpectateTargetPlayerController->GetCharacter());
+	SpectateTarget->SetupCharacterWidget(UserPlayWidget);
 	SetViewTargetWithBlend(SpectateTarget);
 
 	// 새 델리게이트를 추가

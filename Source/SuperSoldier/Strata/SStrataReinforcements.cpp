@@ -13,7 +13,7 @@
 USStrataReinforcements::USStrataReinforcements()
 {
 	DelayTime = 5.0f;
-	CoolTime = 20.0f;
+	CoolTime = 0.0f;
 	StrataType = EStrataType::SUPPORT;
 
 	CommandArray = TArray<EStrataCommand>{ 
@@ -28,9 +28,9 @@ void USStrataReinforcements::ActivateStratagem(UWorld* const CurWorld, AControll
 {
 	Super::ActivateStratagem(CurWorld, StrataCauser, TargetLocation);
 
-	// Revive All Dead Player
 	if (!IsValid(CurWorld)) return;
 
+	// 죽은 플레이어를 모두 되살린다.
 	ASSGameMode* SSGameMode = CastChecked<ASSGameMode>(CurWorld->GetAuthGameMode());
 	int32 RespawnedPlayerNum = SSGameMode->RespawnPlayers(TargetLocation);
 

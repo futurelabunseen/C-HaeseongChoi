@@ -164,16 +164,21 @@ void ASS_Kraken::Tick(float DeltaSeconds)
 
 			if (TargetPawn)
 			{
+				const float InterpSpeed = 8.0f;
+
+				// 타겟 플레이어를 향하기 위한 회전을 구한다.
 				FVector ToTargetVec = TargetPawn->GetActorLocation() - GetActorLocation();
 				ToTargetVec.Z = 0.0f;
-
 				FRotator ToTargetRot = FRotationMatrix::MakeFromX(ToTargetVec).Rotator();
-				FRotator NewRotator = FMath::RInterpTo(GetActorRotation(), ToTargetRot, DeltaSeconds, 4.0f);
-
+				
+				// 현재 회전에서 타겟 플레이어를 향하기 위한 회전으로 보간한다.
+				FRotator NewRotator = FMath::RInterpTo(GetActorRotation(), ToTargetRot, DeltaSeconds, InterpSpeed);
 				SetActorRotation(NewRotator);
 
+				// 현재 회전과 타겟 플레이어를 향하는 회전과의 Yaw 차이가 일정보다 작으면 종료
+				const float Tolerance = 8.0f;
 				double DeltaYaw = ToTargetRot.Yaw - GetActorRotation().Yaw;
-				if (FMath::Abs(DeltaYaw) < 8.0f)
+				if (FMath::Abs(DeltaYaw) < Tolerance)
 				{
 					bTurnInPlace = false;
 					SetActorTickEnabled(false);
@@ -191,14 +196,13 @@ void ASS_Kraken::TurnInPlace(bool bTurnRight)
 	bTurnInPlace = true;
 	SetActorTickEnabled(true);
 
+	// Multicast로 애니메이션 동기화
 	const float AnimationSpeedRate = 1.0f;
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-
 	if (bTurnRight)
 	{
 		NetMulticastRpcShowAnimationMontageWithSection(TurnInPlaceMontage, TEXT("TurnRight"), AnimationSpeedRate);
 	}
-
 	else
 	{
 		NetMulticastRpcShowAnimationMontage(TurnInPlaceMontage, AnimationSpeedRate);

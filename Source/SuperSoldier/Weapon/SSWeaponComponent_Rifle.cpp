@@ -75,22 +75,24 @@ USSWeaponComponent_Rifle::USSWeaponComponent_Rifle()
 
 void USSWeaponComponent_Rifle::AttackHitCheck()
 {
+	// 점사 공격
 	FTimerHandle BurstTimerHandle[2];
-
+	const float FireTerm = 0.1f;
 	LineTraceAttackHitCheck();
 	GetWorld()->GetTimerManager().SetTimer(
 		BurstTimerHandle[0],
 		this, 
 		&USSWeaponComponent_Rifle::LineTraceAttackHitCheck,
-		0.1f, 
+		FireTerm,
 		false);
 	GetWorld()->GetTimerManager().SetTimer(
 		BurstTimerHandle[1],
 		this,
 		&USSWeaponComponent_Rifle::LineTraceAttackHitCheck,
-		0.2f,
+		FireTerm * 2.0f,
 		false);
 
+	// 공격 가능 설정
 	if (ACharacter* PlayerCharacter = Cast<ACharacter>(GetOwner()))
 	{
 		if (PlayerCharacter->IsLocallyControlled())
@@ -137,7 +139,7 @@ void USSWeaponComponent_Rifle::ShowAttackEffect(const FHitResult& HitResult)
 		}
 	}
 
-	// Show ShellEjct
+	// Show ShellEject
 	if (WeaponMesh->DoesSocketExist(ShellEjectSocketName))
 	{
 		FTransform ShellEjectSocketTransform = WeaponMesh->GetSocketTransform(ShellEjectSocketName);

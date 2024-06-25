@@ -356,7 +356,6 @@ void ASS_MurdockPlayer::Aim(const FInputActionValue& Value)
 
 	bAiming = Value.Get<bool>();
 	OnAiming.Broadcast(bAiming);
-	SetAimingToMovementComponent(bAiming);
 
 	if (bAiming)
 	{
@@ -369,12 +368,6 @@ void ASS_MurdockPlayer::Aim(const FInputActionValue& Value)
 		SetCharacterControlData(*CharacterControlManager.Find(ECharacterControlType::Normal));
 		AttemptSprint();
 	}
-}
-
-void ASS_MurdockPlayer::SetAimingToMovementComponent(bool bNewAiming)
-{
-	USSCharacterMovementComponent* SSCharacterMovement = Cast<USSCharacterMovementComponent>(GetCharacterMovement());
-	SSCharacterMovement->SetAiming(bNewAiming);
 }
 
 void ASS_MurdockPlayer::Fire(const FInputActionValue& Value)
@@ -569,7 +562,6 @@ bool ASS_MurdockPlayer::MatchingInput()
 				USSStratagem* Stratagem = AvailableStratagems[i].second;
 
 				const TArray<EStrataCommand> StrataCommandArr = Stratagem->GetCommandSequence();
-
 				// 스트라타젬 커맨드 수보다, 현재 입력 커맨드 수가 많으면 검사할 필요가 없음
 				if (InputSequence.Num() > StrataCommandArr.Num())
 				{
@@ -642,7 +634,6 @@ void ASS_MurdockPlayer::DetachStrataIndicator()
 		CurStrataIndicator->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 		CurStrataIndicator->SetActorRotation(FRotator(0.0f, 0.0f, 0.0f).Quaternion());
 		CurStrataIndicator->SetSimulateCollision();
-		CurStrataIndicator->SetStrataCauser(GetController());
 	}
 }
 
@@ -723,6 +714,7 @@ bool ASS_MurdockPlayer::ServerRpcFire_Validate()
 
 void ASS_MurdockPlayer::ServerRpcFire_Implementation()
 {
+	// 공격 판정을 위한 타이머 생성
 	FTimerHandle HitCheckTimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(
 		HitCheckTimerHandle,
@@ -731,6 +723,8 @@ void ASS_MurdockPlayer::ServerRpcFire_Implementation()
 			}),
 		0.07f,
 		false);
+
+	// 애니메이션 동기화
 	RpcPlayAnimation(FireMontage);
 }
 
@@ -771,7 +765,9 @@ void ASS_MurdockPlayer::ServerRpcStrataReady_Implementation(const FName& Stratag
 	USSStratagemManager* StratagemManager = SSGameInstance->GetStratagemManager();
 	USSStratagem* SelectedStratagem = StratagemManager->GetStratagem(StratagemName);
 	CurStrataIndicator->SetStratagem(SelectedStratagem);
+	CurStrataIndicator->SetStrataCauser(GetController());
 
+	// 생성한 StrataIndicator를 캐릭터에 부착
 	if (CurStrataIndicator)
 	{
 		USkeletalMeshComponent* PlayerSkeletalMesh = GetMesh();

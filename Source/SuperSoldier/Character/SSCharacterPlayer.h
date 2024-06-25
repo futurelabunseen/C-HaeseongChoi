@@ -43,6 +43,7 @@ protected:
 // Widget Section
 public:
 	virtual void SetupCharacterWidget(class USSUserPlayWidget* InUserWidget);
+	virtual void ResetCharacterWidget(class USSUserPlayWidget* InUserWidget);
 
 // Move Section
 protected:

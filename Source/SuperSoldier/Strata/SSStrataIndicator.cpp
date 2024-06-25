@@ -73,9 +73,14 @@ void ASSStrataIndicator::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherA
 {
 	if (!IsValid(CurStratagem)) return;
 
-	// Delay And Activate
+	// 지연시간 이후 효과 발동
 	FTimerHandle StrataActiveTimerHandle;
-	GetWorld()->GetTimerManager().SetTimer(StrataActiveTimerHandle, this, &ASSStrataIndicator::ActivateStrataAndDestroy, CurStratagem->GetDelayTime(), false);
+	GetWorld()->GetTimerManager().SetTimer(
+		StrataActiveTimerHandle, 
+		this, 
+		&ASSStrataIndicator::ActivateStrataAndDestroy, 
+		CurStratagem->GetDelayTime(), 
+		false);
 
 	FVector StrataIndicatorBeamEnd = GetActorLocation();
 	EStrataType CurStrataType = CurStratagem->GetStarataType();
@@ -83,6 +88,7 @@ void ASSStrataIndicator::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherA
 
 	StrataIndicatorBeamEnd.Z += 8000.0f;
 
+	// 스트라타젬 타입에 따라 빛 색깔을 설정
 	switch (CurStrataType)
 	{
 	case EStrataType::SUPPORT:

@@ -107,20 +107,30 @@ void ASS_RespawnTankPlayer::Landed(const FHitResult& Hit)
 
 	if (HasAuthority())
 	{
+		// 충돌을 비활성화
 		GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
+		// 리스폰할 캐릭터를 게임에 등장시키고 Detach
 		ASSCharacterPlayer* PlayerCharacter = Cast<ASSCharacterPlayer>(MurdockCharacter);
 		check(PlayerCharacter);
 		PlayerCharacter->SetActorHiddenInGame(false);
 		PlayerCharacter->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 
+		// 충분한 시간 뒤에 캐릭터를 리스폰, 카메라 효과가 보여지도록 Client RPC를 호출
 		FTimerHandle CallFuncTimer;
+		const float RespawnDelay = 0.8f;
 		GetWorld()->GetTimerManager().SetTimer(CallFuncTimer, FTimerDelegate::CreateLambda([&]() {
-			ClientRpcStartCameraEffect(MurdockCharacter);
+			APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
+			PlayerController->SetViewTargetWithBlend(
+				MurdockCharacter, 
+				0.6f, 
+				EViewTargetBlendFunction::VTBlend_EaseIn,
+				2.0f);
 			RespawnMurdockCharacter();
-		}), 0.8f, false);
+		}), RespawnDelay, false);
 
+		// Multicast RPC로 랜딩 후, 이펙트 처리
 		NetMulticastSettingEffectOnLand();
 	}
 
@@ -129,13 +139,13 @@ void ASS_RespawnTankPlayer::Landed(const FHitResult& Hit)
 		APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
 		if (PlayerController)
 		{
-			// Disable Input
+			// 입력을 비활성화
 			DisableInput(PlayerController);
 
-			// Play the Camera Shake
+			// 카메라 흔들림 연출 수행
 			PlayerController->ClientStartCameraShake(LandingCameraLocationShakeClass);
 
-			// Stop Falling Sound
+			// 추락 사운드가 더이상 안나게 설정
 			FallingSoundComponent->Stop();
 			UGameplayStatics::SpawnSound2D(GetWorld(), LandingSound, 1.0f, 1.0f, 2.2f);
 		}
@@ -150,6 +160,7 @@ void ASS_RespawnTankPlayer::BeginPlay()
 
 	if (HasAuthority())
 	{
+		// 착지 후 Possess할 플레이어 캐릭터를 월드에 스폰하고 소켓 위치에 부착한다.
 		FActorSpawnParameters ActorSpawnParameters;
 		ActorSpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 		MurdockCharacter = GetWorld()->SpawnActor<ASS_MurdockPlayer>(ASS_MurdockPlayer::StaticClass(), ActorSpawnParameters);
@@ -162,10 +173,10 @@ void ASS_RespawnTankPlayer::BeginPlay()
 			FAttachmentTransformRules::SnapToTargetNotIncludingScale,
 			SocketName);
 
+		// 착지하기 전까진 보여질 필요가 없기 때문에 게임에서 안보이게한다.
 		MurdockCharacter->SetActorHiddenInGame(true);
 		MurdockCharacter->SetCharacterCollisionType(ECharacterCollisionType::NoCollision);
 	}
-
 	else
 	{
 		TrailNiagara->SetActive(true);
@@ -173,8 +184,6 @@ void ASS_RespawnTankPlayer::BeginPlay()
 		// If Locally Controlled
 		if (IsLocallyControlled())
 		{
-			SetActorTickEnabled(true);
-
 			APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
 			if (PlayerController)
 			{
@@ -182,7 +191,6 @@ void ASS_RespawnTankPlayer::BeginPlay()
 			}
 
 			FollowCamera->SetRelativeLocation(RespawnStartCameraRelativeLocation);
-
 			FallingSoundComponent = UGameplayStatics::SpawnSound2D(
 				GetWorld(), 
 				FallingSound);
@@ -209,6 +217,7 @@ void ASS_RespawnTankPlayer::OnRep_Controller()
 
 	if (Controller)
 	{
+		SetActorTickEnabled(true);
 		Controller->SetControlRotation(FRotator::ZeroRotator);
 	}
 }
@@ -219,6 +228,7 @@ void ASS_RespawnTankPlayer::Tick(float DeltaSeconds)
 
 	FVector NewLocation = FMath::Lerp(FollowCamera->GetRelativeLocation(), RespawnEndCameraRelativeLocation, 0.1f);
 
+	// 충분히 비슷하다면 카메라 효과를 중지
 	if (FollowCamera->GetRelativeLocation().Equals(NewLocation, 1.0f))
 	{
 		FollowCamera->SetRelativeLocation(RespawnEndCameraRelativeLocation);
@@ -233,7 +243,6 @@ void ASS_RespawnTankPlayer::Tick(float DeltaSeconds)
 void ASS_RespawnTankPlayer::RespawnMurdockCharacter()
 {
 	check(MurdockCharacter);
-
 	SetRespawnMurdockLocation();
 }
 
@@ -246,21 +255,27 @@ void ASS_RespawnTankPlayer::SetRespawnMurdockLocation()
 	FName RespawnStartLocationSocketName = TEXT("Socket_MurdockCharacter");
 	FName RespawnEndLocationSocketName = TEXT("Socket_RespawnComplete");
 
+	// 소켓 위치를 이용해 리스폰 시작 위치와 끝 위치를 설정 
 	FVector RespawnStartLocation = GetMesh()->GetSocketTransform(RespawnStartLocationSocketName).GetLocation();
 	FVector RespawnEndLocation = GetMesh()->GetSocketTransform(RespawnEndLocationSocketName).GetLocation();
 	FVector LocationDist = RespawnEndLocation - RespawnStartLocation;
 	RespawnEndLocation += LocationDist * 0.5f;
 
-	FVector FinalLocation = FMath::Lerp(RespawnStartLocation, RespawnEndLocation, LerpCharacterAlpha);
-	MurdockCharacter->SetActorLocation(RespawnEndLocation);
+	// 리스폰 시작 위치에서 리스폰 최종 위치로 보간해 등장 연출
+	FVector FinalLocation = FMath::InterpEaseInOut(RespawnStartLocation, RespawnEndLocation, LerpCharacterAlpha, 4.0f);
+	LerpCharacterAlpha >= 0.85f ? FinalLocation = RespawnEndLocation : FinalLocation;
+	MurdockCharacter->SetActorLocation(FinalLocation);
 
+	// 등장 연출이 끝나면 컨트롤러가 리스폰한 캐릭터를 Possess하게 한다.
 	if (LerpCharacterAlpha >= 1.0f)
 	{
-		Controller->Possess(MurdockCharacter);
-		MurdockCharacter->Respawn(MurdockCharacter->GetActorLocation());
 		MurdockCharacter->SetCharacterCollisionType(ECharacterCollisionType::Normal);
+		MurdockCharacter->SetActorLocation(RespawnEndLocation);
+		MurdockCharacter->Respawn(MurdockCharacter->GetActorLocation());
+		GetController()->Possess(MurdockCharacter);
 		SetLifeSpan(2.0f);
 	}
+	// 일정 시간 뒤, 다시 실행되도록 타이머 설정
 	else
 	{
 		GetWorld()->GetTimerManager().SetTimer(RespawnTimerHandle, this, &ASS_RespawnTankPlayer::RespawnMurdockCharacter, 0.016f, false);
@@ -300,5 +315,5 @@ void ASS_RespawnTankPlayer::ClientRpcStartCameraEffect_Implementation(ASSCharact
 	APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
 	MurdockCharacter = RespawnCharacter;
 
-	PlayerController->SetViewTargetWithBlend(RespawnCharacter, 0.6f);
+	PlayerController->SetViewTargetWithBlend(MurdockCharacter, 0.6f);
 }

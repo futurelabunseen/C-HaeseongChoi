@@ -167,6 +167,9 @@ void ASSPlayerController::UpdateViewTarget(APawn* aPawn)
 
 void ASSPlayerController::ServerRpcSpectatePrevious_Implementation()
 {
+	ASSCharacterPlayer* SSCharacterPlayer = CastChecked<ASSCharacterPlayer>(GetCharacter());
+	if (!SSCharacterPlayer->bDead) return;
+
 	UpdatePlayerIndex();
 	ClearPrevDelegate();
 
@@ -177,6 +180,9 @@ void ASSPlayerController::ServerRpcSpectatePrevious_Implementation()
 
 void ASSPlayerController::ServerRpcSpectateNext_Implementation()
 {
+	ASSCharacterPlayer* SSCharacterPlayer = CastChecked<ASSCharacterPlayer>(GetCharacter());
+	if (!SSCharacterPlayer->bDead) return;
+
 	UpdatePlayerIndex();
 	ClearPrevDelegate();
 

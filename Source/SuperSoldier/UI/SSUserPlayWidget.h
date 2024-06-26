@@ -66,4 +66,13 @@ protected:
 
 	UPROPERTY()
 	TObjectPtr<class UImage> BloodyEffectImage;
+
+public:
+	UFUNCTION()
+	void PlayBloodyEffect();
+protected:
+	float PrevBroadcastedHP;
+
+	UPROPERTY(BlueprintReadWrite)
+	TObjectPtr<class UWidgetAnimation> AnimBloodyEffect;
 };

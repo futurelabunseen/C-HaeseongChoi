@@ -30,6 +30,8 @@ void USSUserPlayWidget::NativeConstruct()
 
 	BloodyEffectImage = Cast<UImage>(GetWidgetFromName(TEXT("ImgBloodyEffect")));
 	ensure(BloodyEffectImage);
+
+	PrevBroadcastedHP = 0.0f;
 }
 
 void USSUserPlayWidget::UpdateHPBar(float NewCurrentHP)
@@ -45,10 +47,11 @@ void USSUserPlayWidget::UpdateHPBar(float NewCurrentHP)
 void USSUserPlayWidget::UpdateBloodyEffect(float NewCurrentHP)
 {
 	ensure(MaxHP > 0.0f);
-	if (BloodyEffectImage)
+	if (PrevBroadcastedHP > NewCurrentHP && BloodyEffectImage)
 	{
-		BloodyEffectImage->SetRenderOpacity(1.0f - (NewCurrentHP / MaxHP));
+		PlayBloodyEffect();
 	}
+	PrevBroadcastedHP = NewCurrentHP;
 }
 
 void USSUserPlayWidget::UpdateCrossHair(bool bAiming)
@@ -94,5 +97,13 @@ void USSUserPlayWidget::FadeInOut(bool bFadeOut)
 	else
 	{
 		PlayAnimation(AnimFadeInOut, 0.0f, 1, EUMGSequencePlayMode::Reverse);
+	}
+}
+
+void USSUserPlayWidget::PlayBloodyEffect()
+{
+	if (AnimBloodyEffect)
+	{
+		PlayAnimation(AnimBloodyEffect);
 	}
 }

@@ -46,8 +46,8 @@ public:
 	void StopServer();
 	void ResetServer();
 protected:
-	const int32 ClearTotalKilledNonPlayerCharacterNum = 200;
-	const int32 PlayerRespawnLimits = 10;
+	const int32 ClearTotalKilledNonPlayerCharacterNum = 120;
+	const int32 PlayerRespawnLimits = 6;
 
 // Game Clear Section
 public:

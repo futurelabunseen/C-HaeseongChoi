@@ -90,7 +90,9 @@ int32 ASSGameMode::RespawnPlayers(FVector TargetLocation)
 	for (APlayerController* PlayerController : TActorRange<APlayerController>(GetWorld()))
 	{
 		ASSCharacterPlayer* PlayerCharacter = CastChecked<ASSCharacterPlayer>(PlayerController->GetCharacter());
+
 		ASSPlayerController* SSPlayerController = CastChecked<ASSPlayerController>(PlayerController);
+		SSPlayerController->ClearPrevDelegate();
 
 		if (PlayerCharacter->bDead && (CurPlayerRespawnRemain > 0))
 		{
@@ -146,7 +148,7 @@ void ASSGameMode::OnNonPlayerCharacterDead()
 	NewTotalKilledMonsterCount = FMath::Clamp(NewTotalKilledMonsterCount, 0, ClearTotalKilledNonPlayerCharacterNum);
 	SSGameState->SetTotalKilledMonsterCount(NewTotalKilledMonsterCount);
 
-	if (NewTotalKilledMonsterCount == ClearTotalKilledNonPlayerCharacterNum)
+	if (!bWaitingForResetServer && NewTotalKilledMonsterCount == ClearTotalKilledNonPlayerCharacterNum)
 	{
 		EndServer(true);
 	}
@@ -158,7 +160,7 @@ void ASSGameMode::OnPlayerCharacterDead(FVector DeadLocation)
 	{
 		ASSGameState* SSGameState = GetGameState<ASSGameState>();
 		int32 CurPlayerRespawnRemain = SSGameState->GetRemainPlayerRespawnCount();
-		if (CurPlayerRespawnRemain > 0)
+		if (!bWaitingForResetServer && CurPlayerRespawnRemain > 0)
 		{
 			FTimerHandle RespawnTimerHandle;
 			GetWorld()->GetTimerManager().SetTimer(

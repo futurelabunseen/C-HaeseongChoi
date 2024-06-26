@@ -155,6 +155,10 @@ void ASSPlayerController::SetupInputComponent()
 
 void ASSPlayerController::UpdateViewTarget(APawn* aPawn)
 {
+	ASSCharacterPlayer* SSCharacterPlayer = CastChecked<ASSCharacterPlayer>(GetCharacter());
+	bool IsCharacterDead = SSCharacterPlayer->bDead;
+	if (!IsCharacterDead) return;
+
 	if(IsValid(aPawn))
 	{
 		SetViewTargetWithBlend(aPawn);
@@ -168,7 +172,9 @@ void ASSPlayerController::UpdateViewTarget(APawn* aPawn)
 void ASSPlayerController::ServerRpcSpectatePrevious_Implementation()
 {
 	ASSCharacterPlayer* SSCharacterPlayer = CastChecked<ASSCharacterPlayer>(GetCharacter());
-	if (!SSCharacterPlayer->bDead) return;
+
+	bool IsCharacterDead = SSCharacterPlayer->bDead;
+	if (!IsCharacterDead) return;
 
 	UpdatePlayerIndex();
 	ClearPrevDelegate();
@@ -181,7 +187,9 @@ void ASSPlayerController::ServerRpcSpectatePrevious_Implementation()
 void ASSPlayerController::ServerRpcSpectateNext_Implementation()
 {
 	ASSCharacterPlayer* SSCharacterPlayer = CastChecked<ASSCharacterPlayer>(GetCharacter());
-	if (!SSCharacterPlayer->bDead) return;
+
+	bool IsCharacterDead = SSCharacterPlayer->bDead;
+	if (!IsCharacterDead) return;
 
 	UpdatePlayerIndex();
 	ClearPrevDelegate();
@@ -194,7 +202,9 @@ void ASSPlayerController::ServerRpcSpectateNext_Implementation()
 void ASSPlayerController::SpectatePrevious(const FInputActionValue& Value)
 {
 	ASSCharacterPlayer* SSCharacterPlayer = CastChecked<ASSCharacterPlayer>(GetCharacter());
-	if (!SSCharacterPlayer->bDead) return;
+
+	bool IsCharacterDead = SSCharacterPlayer->bDead;
+	if (!IsCharacterDead) return;
 
 	bool bPressed = Value.Get<bool>();
 	if (bPressed)
@@ -205,9 +215,6 @@ void ASSPlayerController::SpectatePrevious(const FInputActionValue& Value)
 
 void ASSPlayerController::SpectateNext(const FInputActionValue& Value)
 {
-	ASSCharacterPlayer* SSCharacterPlayer = CastChecked<ASSCharacterPlayer>(GetCharacter());
-	if (!SSCharacterPlayer->bDead) return;
-
 	bool bPressed = Value.Get<bool>();
 	if (bPressed)
 	{

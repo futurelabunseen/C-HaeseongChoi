@@ -61,6 +61,9 @@ public:
 
 	UFUNCTION()
 	void UpdateViewTarget(APawn* aPawn);
+
+	UFUNCTION()
+	void ClearPrevDelegate();
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputMappingContext> SpectateInputMappingContext;
@@ -78,7 +81,6 @@ protected:
 	void SpectateNext(const FInputActionValue& Value);
 
 	void UpdatePlayerIndex();
-	void ClearPrevDelegate();
 	void SpectateTarget();
 
 };

@@ -25,6 +25,9 @@ ASSCharacterBase::ASSCharacterBase(const FObjectInitializer& ObjectInitializer)
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 	GetMesh()->SetCollisionProfileName(TEXT("NoCollision"));
 
+	// Character Movement
+	GetCharacterMovement()->bEnablePhysicsInteraction = false;
+
 	// Stat
 	Stat = CreateDefaultSubobject<USSCharacterStatComponent>(TEXT("Stat"));
 

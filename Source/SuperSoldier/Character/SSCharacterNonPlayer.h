@@ -6,6 +6,9 @@
 #include "Character/SSCharacterBase.h"
 #include "Interface/SSCharacterAIInterface.h"
 #include "SSCharacterNonPlayer.generated.h"
+
+#define WALK_SPEED_CORRECTION 0.75f
+
 /**
  * 
  */

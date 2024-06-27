@@ -47,7 +47,7 @@ ASS_LandBug::ASS_LandBug(const FObjectInitializer& ObjectInitializer)
 	GetCapsuleComponent()->InitCapsuleSize(75.f, 75.0f);
 
 	// Movement
-	DefaultWalkSpeed = 750.0f;
+	DefaultWalkSpeed = 750.0f * WALK_SPEED_CORRECTION;
 	GetCharacterMovement()->MaxWalkSpeed = DefaultWalkSpeed;
 
 	// Mesh & AnimInstance

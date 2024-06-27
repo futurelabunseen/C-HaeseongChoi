@@ -74,6 +74,4 @@ protected:
 
 	UFUNCTION(Client, Unreliable)
 	void ClientRpcJumpToSection(ASSCharacterPlayer* CharacterToPlay, UAnimMontage* MontageToPlay, FName SectionName);
-
-	virtual void Tick(float DeltaSeconds) override;
 };

@@ -34,7 +34,7 @@ public:
 	int32 RespawnPlayers(FVector TargetLocation);
 
 protected:
-	bool IsAllPlayerDead();
+	bool IsAllPlayerDead(APlayerController* FilterController = nullptr);
 
 // Game Clear Section
 public:
@@ -49,8 +49,15 @@ protected:
 	const int32 ClearTotalKilledNonPlayerCharacterNum = 120;
 	const int32 PlayerRespawnLimits = 6;
 
-// Game Clear Section
+// Spectate Section
 public:
 	const int32 GetPlayerIndex(APlayerController* QueryPlayerController);
 	const int32 ClampPlayerIndex(int32 CurIndex);
+
+// Game Start Section
+public:
+	void GameStart();
+	FORCEINLINE bool GetIsGameStarted() { return bIsGameStarted; }
+protected:
+	bool bIsGameStarted = false;
 };

@@ -74,7 +74,7 @@ ASS_Kraken::ASS_Kraken(const FObjectInitializer& ObjectInitializer)
 	GetCapsuleComponent()->InitCapsuleSize(200.f, 200.0f);
 
 	// Movement
-	DefaultWalkSpeed = 725.0f;
+	DefaultWalkSpeed = 725.0f * WALK_SPEED_CORRECTION;
 	GetCharacterMovement()->MaxWalkSpeed = DefaultWalkSpeed;
 
 	// Mesh & AnimInstance

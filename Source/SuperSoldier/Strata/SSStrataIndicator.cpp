@@ -91,6 +91,9 @@ void ASSStrataIndicator::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherA
 	// 스트라타젬 타입에 따라 빛 색깔을 설정
 	switch (CurStrataType)
 	{
+	case EStrataType::CORE:
+		StrataBeamColor = { 10.0f, 0.0f, 10.0f, 1.0f };
+		break;
 	case EStrataType::SUPPORT:
 		StrataBeamColor = { 0.0f, 0.0f, 10.0f, 1.0f };
 		break;

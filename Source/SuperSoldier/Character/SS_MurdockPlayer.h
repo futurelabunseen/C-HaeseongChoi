@@ -29,7 +29,7 @@ public:
 protected:
 	void ResetPlayerInputVariable();
 	virtual void BeginPlay() override;
-
+	virtual void Tick(float DeltaSeconds) override;
 // CharacterControl Section
 protected:
 	TMap<ECharacterControlType, class USSCharacterControlData*> CharacterControlManager;

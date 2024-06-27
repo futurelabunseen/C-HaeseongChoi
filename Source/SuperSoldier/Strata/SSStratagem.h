@@ -20,8 +20,9 @@ UENUM()
 enum class EStrataType : int32
 {
 	NONE,
+	CORE,
 	SUPPORT,
-	OFFENSE
+	OFFENSE,
 };
 
 /**

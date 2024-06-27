@@ -252,12 +252,15 @@ void ASS_MurdockPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 
+	SetActorTickEnabled(true);
+
 	InitializeStratagem();
 	InitializeWeapon();
 
-	GetCharacterMovement()->SetMovementMode(MOVE_None);
-	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	if (HasAuthority())
+	{
+		SetCharacterCollisionType(ECharacterCollisionType::NoCollision);
+	}
 
 	// Remove Gun Mesh
 	GetMesh()->HideBoneByName(TEXT("gun"), EPhysBodyOp::PBO_None);
@@ -275,7 +278,14 @@ void ASS_MurdockPlayer::InitializeStratagem()
 	// Register Stratagem
 	USSGameInstance* SSGameInstance = Cast<USSGameInstance>(GetGameInstance());
 	USSStratagemManager* StratagemManager = SSGameInstance->GetStratagemManager();
-	USSStratagem* DefaultStratagem = StratagemManager->GetStratagem(FName(TEXT("Reinforcements")));
+
+	USSStratagem* DefaultStratagem = StratagemManager->GetStratagem(FName(TEXT("GameStart")));
+	if (DefaultStratagem)
+	{
+		AvailableStratagems.Add(std::make_pair(FName(TEXT("GameStart")), DefaultStratagem));
+	}
+
+	DefaultStratagem = StratagemManager->GetStratagem(FName(TEXT("Reinforcements")));
 	if (DefaultStratagem)
 	{
 		AvailableStratagems.Add(std::make_pair(FName(TEXT("Reinforcements")), DefaultStratagem));

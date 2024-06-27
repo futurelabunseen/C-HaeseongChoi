@@ -59,7 +59,7 @@ ASS_Creepster::ASS_Creepster(const FObjectInitializer& ObjectInitializer)
 	GetCapsuleComponent()->InitCapsuleSize(75.f, 75.0f);
 
 	// Movement
-	DefaultWalkSpeed = 800.0f;
+	DefaultWalkSpeed = 800.0f * WALK_SPEED_CORRECTION;
 	GetCharacterMovement()->MaxWalkSpeed = DefaultWalkSpeed;
 
 	// Mesh & AnimInstance

@@ -6,6 +6,7 @@
 #include "Strata/SStrataReinforcements.h"
 #include "Strata/SSStrataPrecisionStrike.h"
 #include "Strata/SSStrataAirStrike.h"
+#include "Strata/SSStrataGameStart.h"
 
 USSStratagemManager::USSStratagemManager()
 {
@@ -30,6 +31,12 @@ void USSStratagemManager::InitializeStratagem()
 	if (AirStrike)
 	{
 		StratagemMap.Add(FName(TEXT("AirStrike")), AirStrike);
+	}
+
+	USSStrataGameStart* GameStart = NewObject<USSStrataGameStart>();
+	if (GameStart)
+	{
+		StratagemMap.Add(FName(TEXT("GameStart")), GameStart);
 	}
 }
 

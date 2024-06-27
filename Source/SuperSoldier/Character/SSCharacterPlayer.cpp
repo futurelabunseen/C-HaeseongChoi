@@ -211,23 +211,3 @@ void ASSCharacterPlayer::ClientRpcPlayAnimation_Implementation(ASSCharacterPlaye
 		AnimInstance->Montage_Play(MontageToPlay, AnimationSpeedRate);
 	}
 }
-
-void ASSCharacterPlayer::Tick(float DeltaSeconds)
-{
-	Super::Tick(DeltaSeconds);
-
-	//if (IsLocallyControlled())
-	//{
-	//	const FRotator Rotation = Controller->GetControlRotation();
-	//	const FRotator YawRotation(0, Rotation.Yaw, 0);
-	//	const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);                // (1,0,0) 카메라 전방
-	//	const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);                    // (0,1,0) 
-
-	//	DrawDebugDirectionalArrow(GetWorld(), GetActorLocation(), GetActorLocation() + ForwardDirection * 100.0f, 10.0f, FColor::Cyan, false, -1, 0, 5.0f);
-	//	DrawDebugDirectionalArrow(GetWorld(), GetActorLocation(), GetActorLocation() + RightDirection * 100.0f, 10.0f, FColor::Blue, false, -1, 0, 5.0f);
-
-	//	FVector Start = GetActorUpVector() * 10.0f + GetActorLocation();
-	//	FVector End = GetActorForwardVector() * 50.0f + Start;
-	//	DrawDebugDirectionalArrow(GetWorld(), Start, End, 10.0f, FColor::Red, false, -1, 0, 10.0f);
-	//}
-}

@@ -122,12 +122,12 @@ int32 ASSGameMode::RespawnPlayers(FVector TargetLocation)
 	return RespawnedPlayerNum;
 }
 
-bool ASSGameMode::IsAllPlayerDead()
+bool ASSGameMode::IsAllPlayerDead(APlayerController* FilterController)
 {
 	bool bAllPlayerDead = true;
 	for (APlayerController* PlayerController : TActorRange<APlayerController>(GetWorld()))
 	{
-		if (PlayerController)
+		if (PlayerController && PlayerController != FilterController)
 		{
 			ASSCharacterBase* CharacterPlayer = CastChecked<ASSCharacterBase>(PlayerController->GetCharacter());
 
@@ -266,8 +266,8 @@ void ASSGameMode::ResetServer()
 		}
 	}
 
-	SetNonPlayerCharacterSpawn(true);
 	bWaitingForResetServer = false;
+	bIsGameStarted = false;
 }
 
 const int32 ASSGameMode::GetPlayerIndex(APlayerController* QueryPlayerController)
@@ -287,4 +287,13 @@ const int32 ASSGameMode::GetPlayerIndex(APlayerController* QueryPlayerController
 const int32 ASSGameMode::ClampPlayerIndex(int32 CurIndex)
 {
 	return FMath::Clamp(CurIndex, 0, CurPlayerNum - 1);
+}
+
+void ASSGameMode::GameStart()
+{
+	if (bWaitingForResetServer) return;
+	if (bIsGameStarted) return;
+
+	bIsGameStarted = true;
+	SetNonPlayerCharacterSpawn(true);
 }

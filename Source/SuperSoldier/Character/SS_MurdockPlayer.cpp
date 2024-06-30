@@ -769,6 +769,12 @@ void ASS_MurdockPlayer::ServerRpcStrataReady_Implementation(const FName& Stratag
 
 	RpcPlayAnimation(StrataReadyMontage);
 
+	if (CurStrataIndicator)
+	{
+		CurStrataIndicator->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+		CurStrataIndicator->Destroy();
+	}
+
 	CurStrataIndicator = GetWorld()->SpawnActor<ASSStrataIndicator>(ASSStrataIndicator::StaticClass());
 
 	USSGameInstance* SSGameInstance = Cast<USSGameInstance>(GetGameInstance());

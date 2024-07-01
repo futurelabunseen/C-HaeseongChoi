@@ -78,6 +78,14 @@ void ASSGameMode::Logout(AController* Exiting)
 		bWaitingForResetServer = true;
 		ResetServer();
 	}
+	else
+	{
+		APlayerController* ExitPlayerController = Cast<APlayerController>(Exiting);
+		if (IsValid(ExitPlayerController) && IsAllPlayerDead(ExitPlayerController))
+		{
+			RespawnPlayers(FVector::ZeroVector);
+		}
+	}
 }
 
 int32 ASSGameMode::RespawnPlayers(FVector TargetLocation)
@@ -89,9 +97,12 @@ int32 ASSGameMode::RespawnPlayers(FVector TargetLocation)
 
 	for (APlayerController* PlayerController : TActorRange<APlayerController>(GetWorld()))
 	{
-		ASSCharacterPlayer* PlayerCharacter = CastChecked<ASSCharacterPlayer>(PlayerController->GetCharacter());
+		ASSCharacterPlayer* PlayerCharacter = Cast<ASSCharacterPlayer>(PlayerController->GetCharacter());
+		ASSPlayerController* SSPlayerController = Cast<ASSPlayerController>(PlayerController);
 
-		ASSPlayerController* SSPlayerController = CastChecked<ASSPlayerController>(PlayerController);
+		if (!IsValid(PlayerCharacter)) continue;
+		if (!IsValid(SSPlayerController)) continue;
+
 		SSPlayerController->ClearPrevDelegate();
 
 		if (PlayerCharacter->bDead && (CurPlayerRespawnRemain > 0))
@@ -129,9 +140,8 @@ bool ASSGameMode::IsAllPlayerDead(APlayerController* FilterController)
 	{
 		if (PlayerController && PlayerController != FilterController)
 		{
-			ASSCharacterBase* CharacterPlayer = CastChecked<ASSCharacterBase>(PlayerController->GetCharacter());
-
-			if (!CharacterPlayer->bDead)
+			ASSCharacterBase* CharacterPlayer = Cast<ASSCharacterBase>(PlayerController->GetCharacter());
+			if (IsValid(CharacterPlayer) && !CharacterPlayer->bDead)
 			{
 				bAllPlayerDead = false;
 				break;
@@ -249,6 +259,7 @@ void ASSGameMode::ResetServer()
 	SS_LOG(LogSSNetwork, Log, TEXT("ResetServer"))
 
 	ASSGameState* SSGameState = GetGameState<ASSGameState>();
+	SetNonPlayerCharacterSpawn(false);
 	SSGameState->SetTotalKilledMonsterCount(0);
 	SSGameState->SetRemainPlayerRespawnCount(PlayerRespawnLimits);
 

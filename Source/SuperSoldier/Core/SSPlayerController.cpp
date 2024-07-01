@@ -31,15 +31,18 @@ ASSPlayerController::ASSPlayerController()
 		UserResultWidgetClass = UserResultWidgetRef.Class;
 	}
 
-	// Spectate Input Action & Input Mapping Context
+	// Input Mapping Context
 	{
-		static ConstructorHelpers::FObjectFinder<UInputMappingContext> InputMappingContextRef(
-			TEXT("/Game/SuperSoldier/Input/IMC_Spectate.IMC_Spectate"));
-		if (InputMappingContextRef.Object)
+		static ConstructorHelpers::FObjectFinder<UInputMappingContext> ControllerInputMappingContextRef(
+			TEXT("/Game/SuperSoldier/Input/IMC_Controller.IMC_Controller"));
+		if (ControllerInputMappingContextRef.Object)
 		{
-			SpectateInputMappingContext = InputMappingContextRef.Object;
+			ControllerInputMappingContext = ControllerInputMappingContextRef.Object;
 		}
+	}
 
+	// Spectate Input Action
+	{
 		static ConstructorHelpers::FObjectFinder<UInputAction> InputActionSpectateNextRef(
 			TEXT("/Game/SuperSoldier/Input/Actions/IA_SpectateNext.IA_SpectateNext"));
 		if (InputActionSpectateNextRef.Object)
@@ -52,6 +55,16 @@ ASSPlayerController::ASSPlayerController()
 		if (InputActionSpectatePreviousRef.Object)
 		{
 			SpectatePreviousAction = InputActionSpectatePreviousRef.Object;
+		}
+	}
+
+	// Toggle KeyInfo Action
+	{
+		static ConstructorHelpers::FObjectFinder<UInputAction> InputActionSpectateNextRef(
+			TEXT("/Game/SuperSoldier/Input/Actions/IA_ToggleKeyInfo.IA_ToggleKeyInfo"));
+		if (InputActionSpectateNextRef.Object)
+		{
+			ToggleKeyInfoAction = InputActionSpectateNextRef.Object;
 		}
 	}
 }
@@ -106,9 +119,9 @@ void ASSPlayerController::AcknowledgePossession(APawn* P)
 		Subsystem->ClearAllMappings();
 
 		UInputMappingContext* MappingContext = SSCharacterPlayer->GetIMC();
-		if (IsValid(SpectateInputMappingContext))
+		if (IsValid(ControllerInputMappingContext))
 		{
-			Subsystem->AddMappingContext(SpectateInputMappingContext, 0);
+			Subsystem->AddMappingContext(ControllerInputMappingContext, 0);
 		}
 
 		if (IsValid(MappingContext))
@@ -151,6 +164,7 @@ void ASSPlayerController::SetupInputComponent()
 	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
 	EnhancedInputComponent->BindAction(SpectateNextAction, ETriggerEvent::Triggered, this, &ASSPlayerController::SpectateNext);
 	EnhancedInputComponent->BindAction(SpectatePreviousAction, ETriggerEvent::Triggered, this, &ASSPlayerController::SpectatePrevious);
+	EnhancedInputComponent->BindAction(ToggleKeyInfoAction, ETriggerEvent::Triggered, this, &ASSPlayerController::ToggleKeyInfo);
 }
 
 void ASSPlayerController::UpdateViewTarget(APawn* aPawn)
@@ -262,4 +276,14 @@ void ASSPlayerController::ClientRpcSetAndShowFinalGameStatistics_Implementation(
 	ASSPlayerState* SSPlayerState = GetPlayerState<ASSPlayerState>();
 	SSPlayerState->SetPlayStatistics(FinalPlayStatistics);
 	ShowGameResult(bCleared);
+}
+
+void ASSPlayerController::ToggleKeyInfo(const FInputActionValue& Value)
+{
+	bool bPressed = Value.Get<bool>();
+	if (bPressed)
+	{
+		// Toggle Key Info
+		UserPlayWidget->ToggleKeyInfo();
+	}
 }

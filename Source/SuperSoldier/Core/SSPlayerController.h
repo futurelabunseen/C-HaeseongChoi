@@ -47,6 +47,11 @@ protected:
 	UPROPERTY()
 	TObjectPtr<class USSUserResultWidget> UserResultWidget;
 
+// IMC Section
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputMappingContext> ControllerInputMappingContext;
+
 // Spectate Section
 public:
 	FOnPossessionChanged OnPossessionChanged;
@@ -66,9 +71,6 @@ public:
 	void ClearPrevDelegate();
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UInputMappingContext> SpectateInputMappingContext;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> SpectatePreviousAction;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
@@ -83,4 +85,10 @@ protected:
 	void UpdatePlayerIndex();
 	void SpectateTarget();
 
+// Toggle KeyInfo Section
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction> ToggleKeyInfoAction;
+
+	void ToggleKeyInfo(const FInputActionValue& Value);
 };

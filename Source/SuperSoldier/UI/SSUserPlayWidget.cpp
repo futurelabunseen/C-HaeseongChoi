@@ -32,6 +32,7 @@ void USSUserPlayWidget::NativeConstruct()
 	ensure(BloodyEffectImage);
 
 	PrevBroadcastedHP = 0.0f;
+	bShowToggleKeyInfo = true;
 }
 
 void USSUserPlayWidget::UpdateHPBar(float NewCurrentHP)
@@ -106,4 +107,18 @@ void USSUserPlayWidget::PlayBloodyEffect()
 	{
 		PlayAnimation(AnimBloodyEffect);
 	}
+}
+
+void USSUserPlayWidget::ToggleKeyInfo()
+{
+	if (bShowToggleKeyInfo)
+	{
+		PlayAnimation(ToggleKeyInfoAnimation);
+	}
+	else
+	{
+		PlayAnimation(ToggleKeyInfoAnimation, 0.0f, 1, EUMGSequencePlayMode::Reverse);
+	}
+
+	bShowToggleKeyInfo = !bShowToggleKeyInfo;
 }

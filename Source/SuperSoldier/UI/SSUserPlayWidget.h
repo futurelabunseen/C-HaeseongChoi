@@ -75,4 +75,13 @@ protected:
 
 	UPROPERTY(BlueprintReadWrite)
 	TObjectPtr<class UWidgetAnimation> AnimBloodyEffect;
+
+public:
+	UFUNCTION()
+	void ToggleKeyInfo();
+protected:
+	bool bShowToggleKeyInfo;
+
+	UPROPERTY(BlueprintReadWrite)
+	TObjectPtr<class UWidgetAnimation> ToggleKeyInfoAnimation;
 };

@@ -26,6 +26,6 @@ public:
 	virtual void SetAIActionDelegate(const FAICharacterActionFinished& InOnActionFinished) = 0;
 	virtual void TurnInPlace(bool bTurnRight) = 0;
 
-	virtual float GetAttackRange() = 0;
-	virtual const TArray<FName>& GetAttackMontageSectionNames() = 0;
+	virtual const float& GetAttackRange() const = 0;
+	virtual const TArray<FName>& GetAttackMontageSectionNames() const = 0;
 };

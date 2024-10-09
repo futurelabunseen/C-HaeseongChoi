@@ -14,7 +14,7 @@ USSStrataGameStart::USSStrataGameStart()
 
 }
 
-void USSStrataGameStart::ActivateStratagem(UWorld* const CurWorld, AController* const StrataCauser, const FVector& TargetLocation)
+void USSStrataGameStart::ActivateStratagem(UWorld* const CurWorld, AController* const StrataCauser, const FVector TargetLocation, const FVector ThrowedDirection)
 {
 	if (!IsValid(CurWorld)) return;
 

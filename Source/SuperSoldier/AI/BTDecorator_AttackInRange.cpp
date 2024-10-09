@@ -15,6 +15,7 @@ bool UBTDecorator_AttackInRange::CalculateRawConditionValue(UBehaviorTreeCompone
 {
     bool bResult = Super::CalculateRawConditionValue(OwnerComp, NodeMemory);
 
+	// Null 체크
     APawn* ControllingPawn = OwnerComp.GetAIOwner()->GetPawn();
     if (nullptr == ControllingPawn)
     {
@@ -33,6 +34,7 @@ bool UBTDecorator_AttackInRange::CalculateRawConditionValue(UBehaviorTreeCompone
         return false;
     }
 
+	// 타겟 플레이어까지의 거리가 공격 범위보다 작으면 성공
     float DistanceToTarget = ControllingPawn->GetDistanceTo(TargetPawn);
     const float AttackRange = AICharacter->GetAttackRange();
 	bResult = (DistanceToTarget <= AttackRange);

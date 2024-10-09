@@ -24,9 +24,9 @@ USStrataReinforcements::USStrataReinforcements()
 		EStrataCommand::UP };
 }
 
-void USStrataReinforcements::ActivateStratagem(UWorld* const CurWorld, AController* const StrataCauser, const FVector& TargetLocation)
+void USStrataReinforcements::ActivateStratagem(UWorld* const CurWorld, AController* const StrataCauser, const FVector TargetLocation, const FVector ThrowedDirection)
 {
-	Super::ActivateStratagem(CurWorld, StrataCauser, TargetLocation);
+	Super::ActivateStratagem(CurWorld, StrataCauser, TargetLocation, ThrowedDirection);
 
 	if (!IsValid(CurWorld)) return;
 

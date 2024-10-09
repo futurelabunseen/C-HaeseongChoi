@@ -13,21 +13,21 @@ USSStrataAirStrike::USSStrataAirStrike()
 	CommandArray = TArray<EStrataCommand>{ EStrataCommand::UP, EStrataCommand::RIGHT, EStrataCommand::DOWN, EStrataCommand::RIGHT };
 }
 
-void USSStrataAirStrike::ActivateStratagem(UWorld* const CurWorld, AController* const StrataCauser, const FVector& TargetLocation)
+void USSStrataAirStrike::ActivateStratagem(UWorld* const CurWorld, AController* const StrataCauser, const FVector TargetLocation, const FVector ThrowedDirection)
 {
-	Super::ActivateStratagem(CurWorld, StrataCauser, TargetLocation);
+	Super::ActivateStratagem(CurWorld, StrataCauser, TargetLocation, ThrowedDirection);
 
 	if (!IsValid(CurWorld)) return;
 
 	// 던진 방향의 XY 정보만 사용
-	ThrowedDirection.Z = 0.0f;
-	ThrowedDirection.Normalize();
+	FVector ThrowedDirectionXY = { ThrowedDirection.X, ThrowedDirection.Y, 0.0f };
+	ThrowedDirectionXY.Normalize();
 
 	// 외적을 통해 던져진 방향에 수직이 되는 벡터를 구한다.
-	FVector PerpendicularVector = ThrowedDirection ^ FVector::UpVector;
+	FVector PerpendicularVector = ThrowedDirectionXY ^ FVector::UpVector;
 	if (PerpendicularVector.IsNearlyZero())
 	{
-		PerpendicularVector = ThrowedDirection ^ FVector::RightVector;
+		PerpendicularVector = ThrowedDirectionXY ^ FVector::RightVector;
 	}
 	PerpendicularVector.Normalize();
 

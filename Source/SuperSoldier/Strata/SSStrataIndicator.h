@@ -13,6 +13,9 @@ class SUPERSOLDIER_API ASSStrataIndicator : public AActor
 public:	
 	ASSStrataIndicator();
 protected:
+	UPROPERTY()
+	FVector ThrowedDirection;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<class UStaticMeshComponent> StrataIndicatorMesh;
 

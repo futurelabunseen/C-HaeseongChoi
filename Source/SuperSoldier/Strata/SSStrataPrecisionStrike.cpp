@@ -13,9 +13,9 @@ USSStrataPrecisionStrike::USSStrataPrecisionStrike()
 	CommandArray = TArray<EStrataCommand>{ EStrataCommand::RIGHT, EStrataCommand::RIGHT, EStrataCommand::UP };
 }
 
-void USSStrataPrecisionStrike::ActivateStratagem(UWorld* const CurWorld, AController* const StrataCauser, const FVector& TargetLocation)
+void USSStrataPrecisionStrike::ActivateStratagem(UWorld* const CurWorld, AController* const StrataCauser, const FVector TargetLocation, const FVector ThrowedDirection)
 {
-	Super::ActivateStratagem(CurWorld, StrataCauser, TargetLocation);
+	Super::ActivateStratagem(CurWorld, StrataCauser, TargetLocation, ThrowedDirection);
 
 	if (!IsValid(CurWorld)) return;
 

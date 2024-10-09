@@ -44,7 +44,7 @@ public:
 	void NotifyActionEnd(UAnimMontage* TargetMontage, bool IsProperlyEnded);
 	virtual void SetAIActionDelegate(const FAICharacterActionFinished& InOnActionFinished) override;
 
-	FORCEINLINE virtual const TArray<FName>& GetAttackMontageSectionNames() { return AttackMontageSectionNames; }
+	FORCEINLINE virtual const TArray<FName>& GetAttackMontageSectionNames() const { return AttackMontageSectionNames; }
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
 	TArray<FName> AttackMontageSectionNames;
@@ -63,7 +63,7 @@ protected:
 
 // AI Section
 public:
-	virtual float GetAttackRange() override;
+	virtual const float& GetAttackRange() const override;
 protected:
 	float AttackRange;
 

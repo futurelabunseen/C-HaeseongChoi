@@ -37,10 +37,9 @@ public:
 
 	virtual const float& GetDelayTime() const { return DelayTime; }
 	virtual const TArray<EStrataCommand>& GetCommandSequence() const;
-	virtual void ActivateStratagem(UWorld* const CurWorld, AController* const StrataCauser, const FVector& TargetLocation);
+	virtual void ActivateStratagem(UWorld* const CurWorld, AController* const StrataCauser, const FVector TargetLocation, const FVector ThrowedDirection);
 
 	FORCEINLINE const EStrataType& GetStarataType() const { return StrataType; }
-	FORCEINLINE void SetThrowedDirection(const FVector& NewThrowedDirection) { ThrowedDirection = NewThrowedDirection; }
 	
 protected:
 	float DelayTime;
@@ -48,6 +47,4 @@ protected:
 
 	EStrataType StrataType;
 	TArray<EStrataCommand> CommandArray;
-
-	FVector ThrowedDirection;
 };

@@ -15,5 +15,5 @@ class SUPERSOLDIER_API USSStrataPrecisionStrike : public USSStratagem
 	GENERATED_BODY()
 public:
 	USSStrataPrecisionStrike();
-	virtual void ActivateStratagem(UWorld* const CurWorld, AController* const StrataCauser, const FVector& TargetLocation) override;
+	virtual void ActivateStratagem(UWorld* const CurWorld, AController* const StrataCauser, const FVector TargetLocation, const FVector ThrowedDirection) override;
 };

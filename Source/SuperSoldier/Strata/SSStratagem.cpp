@@ -15,7 +15,7 @@ const TArray<EStrataCommand>& USSStratagem::GetCommandSequence() const
 	return CommandArray;
 }
 
-void USSStratagem::ActivateStratagem(UWorld* const CurWorld, AController* const StrataCauser, const FVector& TargetLocation)
+void USSStratagem::ActivateStratagem(UWorld* const CurWorld, AController* const StrataCauser, const FVector TargetLocation, const FVector ThrowedDirection)
 {
 	if (!IsValid(CurWorld)) return;
 

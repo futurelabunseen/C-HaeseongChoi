@@ -161,7 +161,7 @@ void ASSCharacterNonPlayer::TurnInPlace(bool bTurnRight)
 {
 }
 
-float ASSCharacterNonPlayer::GetAttackRange()
+const float& ASSCharacterNonPlayer::GetAttackRange() const
 {
 	return AttackRange;
 }

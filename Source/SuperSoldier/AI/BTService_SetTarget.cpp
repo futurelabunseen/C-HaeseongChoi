@@ -21,6 +21,7 @@ void UBTService_SetTarget::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* No
 
     if (ControllingPawn)
     {
+		// 플레이어 캐릭터 클래스로 생성된 모든 액터를 가져온다.
         TArray<AActor*> Actors;
         UGameplayStatics::GetAllActorsOfClass(GetWorld(), ASSCharacterPlayer::StaticClass(), Actors);
 
@@ -32,6 +33,7 @@ void UBTService_SetTarget::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* No
             {
                 if (ASSCharacterPlayer* PlayerCharacter = Cast<ASSCharacterPlayer>(Actor))
                 {
+					// 죽어있는 플레이어는 타게팅하지 않는다.
                     if (PlayerCharacter->bDead)
                     {
                         continue;
@@ -47,6 +49,7 @@ void UBTService_SetTarget::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* No
                 }
             }
 
+			// 가장 가까운 플레이어를 BlackBoard Data의 TargetPlayer에 설정한다.
             UBlackboardComponent* BlackboardComp = OwnerComp.GetBlackboardComponent();
             if (BlackboardComp)
             {

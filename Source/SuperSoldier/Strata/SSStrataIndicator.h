@@ -34,10 +34,10 @@ protected:
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
-	void SetToShowStrataBeam(FLinearColor BeamColor, FVector BeamEnd);
+	void SetToShowStrataBeam(int32 CurStrataType);
 
 	UFUNCTION(NetMulticast, Unreliable)
-	void NetMulticastRpcShowStrataBeam(FLinearColor BeamColor, FVector_NetQuantize BeamEnd);
+	void NetMulticastRpcShowStrataBeam(int32 CurStrataType);
 public:
 	void SetStratagem(class USSStratagem* NewStratagem);
 	void ActivateStrataAndDestroy();

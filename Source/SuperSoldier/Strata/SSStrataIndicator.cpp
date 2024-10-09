@@ -82,14 +82,20 @@ void ASSStrataIndicator::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherA
 		CurStratagem->GetDelayTime(), 
 		false);
 
-	FVector StrataIndicatorBeamEnd = GetActorLocation();
 	EStrataType CurStrataType = CurStratagem->GetStarataType();
+	NetMulticastRpcShowStrataBeam(static_cast<int32>(CurStrataType));
+}
+
+void ASSStrataIndicator::SetToShowStrataBeam(int32 CurStrataType)
+{
+	EStrataType CastedStrataType = static_cast<EStrataType>(CurStrataType);
+
+	FVector BeamEnd = GetActorLocation();
+	BeamEnd.Z += 8000.0f;
+
 	FLinearColor StrataBeamColor = { 0.0f, 0.0f, 0.0f, 1.0f };
-
-	StrataIndicatorBeamEnd.Z += 8000.0f;
-
 	// 스트라타젬 타입에 따라 빛 색깔을 설정
-	switch (CurStrataType)
+	switch (CastedStrataType)
 	{
 	case EStrataType::CORE:
 		StrataBeamColor = { 10.0f, 0.0f, 10.0f, 1.0f };
@@ -104,13 +110,8 @@ void ASSStrataIndicator::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherA
 		break;
 	}
 
-	NetMulticastRpcShowStrataBeam(StrataBeamColor, StrataIndicatorBeamEnd);
-}
-
-void ASSStrataIndicator::SetToShowStrataBeam(FLinearColor BeamColor, FVector BeamEnd)
-{
 	StrataIndicatorBeam->SetVectorParameter(TEXT("User.Beam End"), BeamEnd);
-	StrataIndicatorBeam->SetColorParameter(TEXT("User.Color"), BeamColor);
+	StrataIndicatorBeam->SetColorParameter(TEXT("User.Color"), StrataBeamColor);
 	StrataIndicatorBeam->Activate();
 }
 
@@ -125,13 +126,13 @@ void ASSStrataIndicator::ActivateStrataAndDestroy()
 	Destroy();
 }
 
-void ASSStrataIndicator::NetMulticastRpcShowStrataBeam_Implementation(FLinearColor BeamColor, FVector_NetQuantize BeamEnd)
+void ASSStrataIndicator::NetMulticastRpcShowStrataBeam_Implementation(int32 CurStrataType)
 {
 	StrataIndicatorMesh->SetSimulatePhysics(false);
 	StrataIndicatorMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	if (!HasAuthority())
 	{
-		SetToShowStrataBeam(BeamColor, BeamEnd);
+		SetToShowStrataBeam(CurStrataType);
 	}
 }

@@ -10,7 +10,11 @@ USSStrataAirStrike::USSStrataAirStrike()
 	CoolTime = 25.0f;
 	StrataType = EStrataType::OFFENSE;
 
-	CommandArray = TArray<EStrataCommand>{ EStrataCommand::UP, EStrataCommand::RIGHT, EStrataCommand::DOWN, EStrataCommand::RIGHT };
+	CommandArray = TArray<EStrataCommand>{ 
+		EStrataCommand::UP, 
+		EStrataCommand::RIGHT, 
+		EStrataCommand::DOWN, 
+		EStrataCommand::RIGHT };
 }
 
 void USSStrataAirStrike::ActivateStratagem(UWorld* const CurWorld, AController* const StrataCauser, const FVector TargetLocation, const FVector ThrowedDirection)
@@ -25,19 +29,15 @@ void USSStrataAirStrike::ActivateStratagem(UWorld* const CurWorld, AController* 
 
 	// 외적을 통해 던져진 방향에 수직이 되는 벡터를 구한다.
 	FVector PerpendicularVector = ThrowedDirectionXY ^ FVector::UpVector;
-	if (PerpendicularVector.IsNearlyZero())
-	{
-		PerpendicularVector = ThrowedDirectionXY ^ FVector::RightVector;
-	}
 	PerpendicularVector.Normalize();
 
 	// 미사일 간격과 개수
 	const float Spacing = 800.0f;
 	const int SpawnStrikeNum = 5;
 
-	// 스폰될 위치를 설정
+	// 타격될 위치를 설정
 	TArray<FVector> StrikePosition;
-	StrikePosition.Add(TargetLocation - PerpendicularVector * Spacing * (SpawnStrikeNum / 2 - 1));
+	StrikePosition.Add(TargetLocation - PerpendicularVector * Spacing * (SpawnStrikeNum / 2));
 	for (int i = 0; i < SpawnStrikeNum - 1; ++i)
 	{
 		StrikePosition.Add(StrikePosition.Last() + PerpendicularVector * Spacing);
@@ -53,13 +53,13 @@ void USSStrataAirStrike::ActivateStratagem(UWorld* const CurWorld, AController* 
 			AirStrikeActor->SetStrataCauser(StrataCauser);
 
 			// 순차적으로 떨어지도록 Z값을 설정
-			FVector AirStrikeLocation = StrikePosition[i];
-			AirStrikeLocation.Z += 4000.0f + 850.0f * i;
-			AirStrikeActor->SetActorLocation(AirStrikeLocation);
+			// 비스듬하게 떨어지도록 위치를 설정
+			FVector SpawnLocation = StrikePosition[i] - PerpendicularVector * Spacing;
+			SpawnLocation.Z += 4000.0f + 850.0f * i;
+			AirStrikeActor->SetActorLocation(SpawnLocation);
 
-			// 타격 위치는 스트라타젬이 던져진 방향에 수직인 벡터를 이용해 설정
-			FVector StrikeLocation = StrikePosition[i] - PerpendicularVector * 800;
-			AirStrikeActor->Strike(StrikeLocation);
+			// 타격 위치로 날아가도록 함수 호출
+			AirStrikeActor->Strike(StrikePosition[i]);
 		}
 	}
 }

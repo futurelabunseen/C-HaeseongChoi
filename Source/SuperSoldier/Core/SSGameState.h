@@ -46,5 +46,5 @@ public:
 	virtual void OnRep_RemainPlayerRespawnCount();
 
 	UPROPERTY(ReplicatedUsing = OnRep_RemainPlayerRespawnCount)
-	int32 RemainPlayerRespawnCount = 0;
+	int32 RemainPlayerRespawnCount = 30;
 };
